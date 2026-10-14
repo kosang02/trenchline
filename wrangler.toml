@@ -1,6 +1,7 @@
 name = "trenchline"
 main = "src/index.js"
 compatibility_date = "2025-09-01"
+workers_dev = true  # 기존 *.workers.dev 주소도 계속 열어둔다
 
 routes = [
   { pattern = "playtrenchline.com", custom_domain = true },
@@ -19,6 +20,7 @@ id = "db6f5461368446deaaf351e4296949e0"
 # 같은 KV를 쓰되 키 앞에 "dev:"를 붙여 실제 유저 세이브와 섞이지 않게 한다.
 [env.dev]
 name = "trenchline-dev"
+workers_dev = true
 vars = { PREFIX = "dev:" }
 routes = [{ pattern = "dev.playtrenchline.com", custom_domain = true }]
 kv_namespaces = [{ binding = "SAVES", id = "db6f5461368446deaaf351e4296949e0" }]
