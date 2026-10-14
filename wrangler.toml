@@ -2,6 +2,11 @@ name = "trenchline"
 main = "src/index.js"
 compatibility_date = "2025-09-01"
 
+routes = [
+  { pattern = "playtrenchline.com", custom_domain = true },
+  { pattern = "www.playtrenchline.com", custom_domain = true },
+]
+
 [assets]
 directory = "./public"
 binding = "ASSETS"
@@ -15,4 +20,5 @@ id = "db6f5461368446deaaf351e4296949e0"
 [env.dev]
 name = "trenchline-dev"
 vars = { PREFIX = "dev:" }
+routes = [{ pattern = "dev.playtrenchline.com", custom_domain = true }]
 kv_namespaces = [{ binding = "SAVES", id = "db6f5461368446deaaf351e4296949e0" }]
