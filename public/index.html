@@ -178,6 +178,7 @@ body.pc .keys{display:block}
         <button class="btn" id="bCont" hidden>이어하기</button>
         <button class="btn" id="bMeta">사령부 보급창</button>
         <button class="btn" id="bMode">화면</button>
+        <button class="btn" id="bLang" lang="en">English</button>
       </div>
       <p id="best"></p>
       <div id="account" class="account" hidden></div>
@@ -229,103 +230,499 @@ body.pc .keys{display:block}
 
 <script>
 (()=>{
+/* ---------- i18n ---------- */
+/* 번역 표. 왼쪽은 한국어 원문(코드 속 _t('...')와 화면 HTML 문구), 오른쪽에 영어를 채운다.
+   빈 칸("")이면 한국어가 그대로 나온다. {0},{1}... 자리표시와 <b> 같은 태그는 지우지 말고 그대로 둔다. */
+const I18N_EN={
+  "부대 지시":"Orders",
+  "시드":"Seed",
+  "시드 (비우면 무작위)":"Seed (blank = random)",
+  "보병은 한두 발에 쓰러지고 멀수록·움직일수록·참호 안일수록 덜 맞습니다. 기관총은 보병을, 대전차병은 전차를, 박격포와 지원 카드는 뭉친 적을 잡습니다. 지원 카드는 누른 뒤 전장을 탭. 붉은 표식은 적의 포격·공습 예고이니 피하세요. 60초마다 양쪽 보급이 20%씩 늘어납니다.":"Infantry drop in one or two hits, and are harder to hit at range, on the move, or in a trench. Machine guns shred infantry, anti-tank troops kill tanks, and mortars and support cards break up clustered enemies. Tap a support card, then tap the field. Red markers warn of incoming enemy barrages and air strikes: move clear. Every 60 s, supply income on both sides rises 20%.",
+  "포격 취소":"Cancel Barrage",
+  "배속 ·":"Speed ·",
+  "일시정지 ·":"Pause ·",
+  "전선 보기 ·":"View front ·",
+  "화면 이동(화면 가장자리에 마우스를 대도 이동) ·":"Pan (or push the cursor to the screen edge) ·",
+  "전진·사수·후퇴 ·":"Advance / Hold / Fall Back ·",
+  "병력·포격 ·":"Troops / Barrage ·",
+  "단축키:":"Keys:",
+  "소리":"Sound",
+  "전선 보기":"View Front",
+  "후퇴":"Fall Back",
+  "사수":"Hold",
+  "전진":"Advance",
+  "적군":"Enemy",
+  "아군":"Allied",
+  "주황 테두리가 진입할 수 있는 지점입니다. 정예: 강한 적, 보상 두 배 · 보급: 보급으로 구매 · 휴식: 사령부 보수 또는 훈련 · 유물: 유물 상자 · ?: 사건 · 사령부: 최종 목표":"Orange-bordered nodes are reachable. Elite: tougher enemy, double reward · Supply: shop, pay with Supply · Rest: repair HQ or train · Relic: relic chest · ?: event · HQ: final objective",
+  "화면":"Display",
+  "이어하기":"Continue",
+  "새 작전":"New Operation",
+  "죽을 때마다 공적이 쌓여 영구 강화를 사고, 처음 발견한 유물은 도감에 남아 다음 작전에도 보너스를 줍니다. 열 개의 전선을 돌파해 적 사령부까지 진격하는 작전입니다. 전투에서 이기면 특성이나 새 병과를 얻고, 사령부 피해는 다음 전투까지 이어집니다. 사령부가 무너지면 처음부터 다시 시작합니다.":"Every death earns Merit for permanent upgrades, and each Relic you find for the first time is logged in the Codex, giving a bonus to every future operation. Break through ten fronts and push on to the enemy HQ. Win a battle to gain a Perk or a new unit; HQ damage carries over to the next battle. If your HQ falls, you start over.",
+  "테스트 서버":"Test Server",
+  "참호전선":"Trench Line",
+  "소총수":"Rifleman",
+  "돌격조":"Assault Team",
+  "기관총":"Machine Gun",
+  "대전차병":"Anti-Tank",
+  "저격수":"Sniper",
+  "박격포":"Mortar",
+  "전차":"Tank",
+  "포격":"Barrage",
+  "지정 지점 주변에 포탄 8발. 밀집한 보병에 강합니다.":"Drops 8 shells around the marked spot. Strong against packed infantry.",
+  "연막탄":"Smoke",
+  "10초간 연막. 연막 안에서 쏘는 적은 명중률이 절반이 됩니다.":"10 s of smoke. Enemies firing from inside it have half their hit chance.",
+  "지뢰 살포":"Minefield",
+  "반경 안에 지뢰 6개를 깝니다. 밟은 적은 크게 다칩니다.":"Lays 6 mines in the area. Enemies that step on them take heavy damage.",
+  "구급 지원":"Field Aid",
+  "반경 안 아군이 4초에 걸쳐 체력 12를 회복합니다.":"Heals allies in the area for 12 HP over 4 s.",
+  "야포 사격":"Howitzer Strike",
+  "4초 뒤 대형 포탄 한 발. 피해 80, 전차에도 통합니다. 움직이는 적은 피합니다.":"One heavy shell lands after 4 s. 80 damage; works on tanks. Moving enemies dodge it.",
+  "기총소사":"Strafing Run",
+  "2.5초 뒤 전투기가 세로 한 줄을 두 번 훑습니다. 참호 한 줄 소탕용.":"After 2.5 s a fighter sweeps one vertical line, twice. Clears a trench line.",
+  "사거리가 아주 길고 한 발이면 쓰러뜨립니다. 기관총·박격포·대전차병·저격수를 먼저 노립니다. 연사가 느립니다.":"Very long range; one hit kills. Targets machine guns, mortars, anti-tank troops and snipers first. Slow rate of fire.",
+  "곡사로 범위 피해를 줍니다. 멀리 쏠수록 탄착이 크게 흩어지고, 가까운 적은 못 쏩니다. 저격수에게 약합니다.":"Lobbed shells deal area damage. The farther the shot, the wider the spread; can't hit close targets. Weak to snipers.",
+  "튼튼하고 범위 포격을 합니다. 대전차병과 수류탄에 약합니다.":"Sturdy, with area bombardment. Weak to anti-tank troops and grenades.",
+  "정밀 사격":"Precision Fire",
+  "소총수 명중률 +30%":"Rifleman accuracy +30%",
+  "신속 거치":"Quick Mount",
+  "기관총 사격 준비 시간 절반":"Machine gun setup time halved",
+  "성형작약":"Shaped Charge",
+  "대전차병 장갑 피해 +30%":"Anti-tank armor damage +30%",
+  "집속 수류탄":"Cluster Grenades",
+  "돌격조가 2번 공격마다 수류탄 투척, 피해 +30%":"Assault Teams throw a grenade every 2nd attack, damage +30%",
+  "사격 제원표":"Firing Tables",
+  "박격포 탄착 분산 -40%":"Mortar shell spread -40%",
+  "증가 장갑":"Added Armor",
+  "아군 전차 내구도 +30%":"Friendly tank HP +30%",
+  "보급선 확충":"Supply Expansion",
+  "보급 1회당 CP +15%":"Each supply drop gives +15% CP",
+  "병참 체계":"Logistics Chain",
+  "보급 주기 -12%":"Supply interval -12%",
+  "사전 비축":"Stockpile",
+  "전투 시작 CP +30":"Starting CP +30",
+  "참호 보강":"Reinforced Trench",
+  "참호 안에서 받는 피해 -15%":"Damage taken inside trenches -15%",
+  "야전 붕대":"Field Dressings",
+  "참호 안 보병이 초당 체력 2 회복":"Infantry in trenches heal 2 HP per second",
+  "포병 연대":"Artillery Regiment",
+  "포격 탄 +4발, 재사용 대기 -25%":"Barrage +4 shells, cooldown -25%",
+  "대량 징집":"Mass Conscription",
+  "모든 병력 비용 -10%":"All unit costs -10%",
+  "점령 포상":"Capture Bonus",
+  "참호를 빼앗을 때마다 CP +15":"+15 CP each time you take a trench",
+  "신속 편성":"Rapid Deployment",
+  "병력 재배치 대기시간 -20%":"Redeploy cooldown -20%",
+  "사령부 요새화":"Fortified HQ",
+  "사령부 최대 내구도 +60, 즉시 60 회복":"Max HQ HP +60, heal 60 now",
+  "고참병":"Veterans",
+  "모든 보병 명중률 +15%":"All infantry accuracy +15%",
+  "선발대":"Vanguard",
+  "전투 시작 시 소총수 2명 무료 배치":"2 free Riflemen deployed at battle start",
+  "조준경":"Scope",
+  "소총수 사거리 +35%, 거리에 따른 명중률 감소 절반":"Rifleman range +35%, accuracy loss over distance halved",
+  "철갑탄":"Armor-Piercing",
+  "소총수·기관총·저격수의 전차 피해 3배":"Rifleman, Machine Gun and Sniper damage to tanks ×3",
+  "속사":"Rapid Fire",
+  "소총수가 30% 확률로 곧바로 한 발 더 쏨":"30% chance a Rifleman fires again at once",
+  "소이탄":"Incendiary Shells",
+  "박격포탄 자리에 4초간 불이 붙어 들어선 적에게 피해":"Mortar shells leave fire for 4 s, damaging enemies who enter",
+  "연막 포격":"Smoke Barrage",
+  "포격 지점에 10초간 연막. 연막 안의 적은 명중률 절반":"Barrage leaves smoke for 10 s. Enemies inside have half accuracy",
+  "대인 지뢰":"Anti-Personnel Mines",
+  "전투 시작 시 아군 전방 무인지대에 지뢰 5개 매설":"5 mines laid in no man's land ahead of your lines at battle start",
+  "전과 포상":"Kill Bounty",
+  "적을 처치할 때마다 CP +2":"+2 CP per enemy killed",
+  "복수의 함성":"Battle Cry",
+  "아군이 쓰러지면 주변 아군이 4초간 연사 +50%":"When an ally falls, nearby allies get +50% fire rate for 4 s",
+  "위장복":"Camouflage",
+  "저격수가 맞을 확률 -50%, 사거리 +15%":"Sniper is hit 50% less often, range +15%",
+  "폭우":"Heavy Rain",
+  "모든 병력 이동 속도 -20%":"All troops move 20% slower",
+  "짙은 안개":"Dense Fog",
+  "모든 사거리 -18%":"All range -18%",
+  "적 포병 우세":"Enemy Artillery Advantage",
+  "적 포격 재사용 대기 절반":"Enemy barrage cooldown halved",
+  "전투":"Battle",
+  "정예":"Elite",
+  "보급":"Supply",
+  "휴식":"Rest",
+  "사령부":"HQ",
+  "유물":"Relic",
+  "녹슨 호루라기":"Rusty Whistle",
+  "전진 명령 중 아군 이동 속도 +25%":"Allies move 25% faster under Advance orders",
+  "야전 쌍안경":"Field Binoculars",
+  "모든 아군 사거리 +10%":"All allied range +10%",
+  "행운의 동전":"Lucky Coin",
+  "전투 승리 보급 +50%":"Battle victory Supply +50%",
+  "낡은 수통":"Worn Canteen",
+  "전투가 끝날 때마다 사령부 +15":"HQ +15 after every battle",
+  "묵주":"Rosary",
+  "아군 보병이 처음 치명상을 입으면 체력 1로 버팀":"First time allied infantry take a fatal hit, they hang on at 1 HP",
+  "탄약 상자":"Ammo Crate",
+  "기관총 사격 준비 즉시, 연사 +20%":"Machine gun setup instant, fire rate +20%",
+  "축음기":"Gramophone",
+  "전투 시작 30초간 보급량 2배":"Supply doubled for the first 30 s of battle",
+  "위장망":"Camo Netting",
+  "참호 안 아군이 맞을 확률 추가 -15%":"Allies in trenches are hit an extra 15% less often",
+  "노획 지도":"Captured Map",
+  "적이 CP 0으로 전투를 시작":"Enemy starts the battle with 0 CP",
+  "금장 회중시계":"Gold Pocket Watch",
+  "모든 지원 카드 재사용 대기 -30%":"All support card cooldowns -30%",
+  "전차병 장갑":"Tank Crew Armor",
+  "아군 전차 비용 -30%":"Friendly tank cost -30%",
+  "심문 기록":"Interrogation Log",
+  "정예·사령부 전투의 적 사전 배치 병력 절반":"Elite and HQ battles: enemy pre-placed troops halved",
+  "보급 마차":"Supply Wagon",
+  "보급소 가격 -25%":"Depot prices -25%",
+  "편지 묶음":"Bundle of Letters",
+  "아군이 쓰러질 때마다 CP +2":"+2 CP each time an ally falls",
+  "야전 철도":"Field Railway",
+  "보급 주기 -15%":"Supply interval -15%",
+  "대대 깃발":"Battalion Flag",
+  "점령한 참호 1개당 아군 명중률 +4%":"Allied accuracy +4% per trench held",
+  "사령부 증축":"HQ Extension",
+  "시작 사령부 내구도 +20":"Starting HQ HP +20",
+  "비상 금고":"Emergency Safe",
+  "시작 보급 +25":"Starting Supply +25",
+  "예비 탄약고":"Reserve Magazine",
+  "전투 시작 CP +15":"Starting CP +15",
+  "군수 예산":"Ordnance Budget",
+  "보급 1회당 CP +3":"Each supply drop gives +3 CP",
+  "참모 회의":"Staff Conference",
+  "보상 화면마다 다시 뽑기 1회":"One reroll per reward screen",
+  "사관학교":"Academy",
+  "보상 선택지 3개 → 4개":"Reward choices 3 → 4",
+  "박격포 교범":"Mortar Manual",
+  "작전 시작부터 박격포 편성":"Start the operation with Mortars",
+  "저격 교범":"Sniper Manual",
+  "작전 시작부터 저격수 편성":"Start the operation with Snipers",
+  "전리품 상자":"Loot Crate",
+  "작전 시작 시 무작위 유물 1개":"1 random Relic at operation start",
+  "지원 참모부":"Support Staff",
+  "지원 카드 출전 슬롯 +1 (2칸 → 3칸)":"+1 support card slot (2 → 3)",
+  "사관학교 출신":"Academy Graduate",
+  "정규 교육을 마친 신임 지휘관":"Newly commissioned officer, fresh from the academy",
+  "표준 편성과 포격 지원":"Standard loadout and barrage support",
+  "없음":"None",
+  "보병":"Infantry",
+  "보병 출신":"Infantry Officer",
+  "소총 중대를 이끌던 중위":"Lieutenant, rifle company",
+  "선발대·고참병 특성으로 시작":"Starts with Vanguard and Veterans perks",
+  "포격 대신 연막탄 · 사령부 -40":"Smoke instead of Barrage · HQ -40",
+  "포병":"Artillery",
+  "포병 출신":"Artillery Officer",
+  "포병 관측장교":"Artillery Observer",
+  "야포 사격 카드 추가":"Adds the Howitzer Strike card",
+  "시작 보급 0 · 사령부 -40":"Starting Supply 0 · HQ -40",
+  "3번째 전선 도달":"Reach Front 3",
+  "기갑":"Armor",
+  "기갑 출신":"Armor Officer",
+  "시제 전차 시험대대":"Prototype Tank Trial Battalion",
+  "전차를 처음부터 편성":"Tanks available from the start",
+  "포격 대신 연막탄 · 사령부 -20":"Smoke instead of Barrage · HQ -20",
+  "누적 공적 200":"200 total Merit earned",
+  "정보":"Intel",
+  "정보 출신":"Intel Officer",
+  "참모본부 정보과":"General Staff Intelligence Section",
+  "노획 지도 유물(적이 CP 0으로 시작)":"Captured Map relic (enemy starts with 0 CP)",
+  "포격 대신 구급 지원 · 사령부 -40 · 시작 보급 0":"Field Aid instead of Barrage · HQ -40 · Starting Supply 0",
+  "유물 도감 6종":"6 Relics in the Codex",
+  "회랑 정찰":"Corridor Recon",
+  "기본 규칙":"Standard rules",
+  "철갑의 계절":"Season of Steel",
+  "적 전차가 3번째 전선부터, 전투 30초부터 나온다":"Enemy tanks appear from Front 3, from 30 s into battle",
+  "끊어진 보급선":"Broken Supply Line",
+  "아군 보급 주기 ×1.15":"Your supply interval ×1.15",
+  "증원 도착":"Reinforcements Arrive",
+  "정예 전투에 적 기관총·소총수 추가 배치":"Elite battles add enemy machine guns and riflemen",
+  "포병 총동원":"All Guns Fire",
+  "적이 지원 카드를 두 단계 일찍 쓴다":"Enemy uses support cards two tiers earlier",
+  "벨스타 결전":"Showdown at Belsta",
+  "적 사령부 600, 내구도 절반 이하에서 총동원(적 지원 대기 절반)":"Enemy HQ 600; below half HP it goes all-out (enemy support cooldowns halved)",
+  "저장 실패: ":"Save failed: ",
+  ". 다음 저장 때 다시 시도합니다.":". Will retry on the next save.",
+  "클라우드 저장을 불러왔습니다.":"Cloud save loaded.",
+  "이 코드의 계정이 없습니다.":"No account for this code.",
+  "불러오기 실패: ":"Load failed: ",
+  "<div class=\"acc-row\"><span>계정 코드</span><code id=\"accCode\">{0}</code><button class=\"btn\" id=\"accCopy\">복사</button><button class=\"btn\" id=\"accSync\">지금 저장</button><button class=\"btn\" id=\"accOut\">이 기기에서 로그아웃</button></div>\n      <p class=\"acc-note\">{1} 이 코드가 계정입니다. 잃어버리면 복구할 수 없고, 코드를 아는 사람은 누구나 불러올 수 있습니다.</p>":"<div class=\"acc-row\"><span>Account code</span><code id=\"accCode\">{0}</code><button class=\"btn\" id=\"accCopy\">Copy</button><button class=\"btn\" id=\"accSync\">Save now</button><button class=\"btn\" id=\"accOut\">Log out of this device</button></div>\n      <p class=\"acc-note\">{1} This code is your account. If you lose it, it can't be recovered, and anyone who knows it can load it.</p>",
+  "클라우드에 저장됨 · {0}":"Saved to cloud · {0}",
+  "자동으로 클라우드에 저장됩니다.":"Saves to the cloud automatically.",
+  "<div class=\"acc-row\"><button class=\"btn primary\" id=\"accNew\">새 계정 만들기</button><input id=\"accIn\" class=\"seed\" maxlength=\"20\" placeholder=\"계정 코드 입력\" aria-label=\"계정 코드\" autocomplete=\"off\"><button class=\"btn\" id=\"accLoad\">불러오기</button></div>\n      <p class=\"acc-note\">{0}</p>":"<div class=\"acc-row\"><button class=\"btn primary\" id=\"accNew\">New account</button><input id=\"accIn\" class=\"seed\" maxlength=\"20\" placeholder=\"Enter account code\" aria-label=\"Account code\" autocomplete=\"off\"><button class=\"btn\" id=\"accLoad\">Load</button></div>\n      <p class=\"acc-note\">{0}</p>",
+  "계정을 만들면 지금 진행 상황이 클라우드에 올라가고, 다른 기기에서 코드로 이어서 할 수 있습니다.":"Creating an account uploads your current progress to the cloud, so you can continue on another device with the code.",
+  "계정을 만들지 못했습니다: ":"Couldn't create account: ",
+  "코드는 12자리입니다.":"The code is 12 characters.",
+  "코드를 복사했습니다.":"Code copied.",
+  "로그아웃했습니다. 이 기기의 진행 상황은 남아 있습니다.":"Logged out. Progress on this device is kept.",
+  "코드를 길게 눌러 복사하세요.":"Long-press the code to copy it.",
+  "지휘관 부임":"Take Command",
+  "새 지휘관의 출신을 고르세요. 출신의 장점은 작전 내내 유지됩니다.":"Pick your commander's Background. Its advantage lasts the whole operation.",
+  "지난번 선택":"Last pick",
+  "출신":"Background",
+  "잠김 · ":"Locked · ",
+  "{0}. 장점: {1}. 대가: {2}.":"{0}. Pro: {1}. Con: {2}.",
+  "해금 조건: {0}.":"Unlock: {0}.",
+  "돌아가기":"Back",
+  "등급 {0}":"Rank {0}",
+  " · 클리어":" · Cleared",
+  " · 지난번":" · Last",
+  "기본 규칙.":"Standard rules.",
+  " 공적 +{0}%.":" Merit +{0}%.",
+  "작전 등급":"Operation Rank",
+  "등급이 높을수록 규칙이 하나씩 더해집니다. 클리어하면 다음 등급이 열립니다.":"Higher ranks add one rule each. Clearing a rank unlocks the next.",
+  "<span>보유 공적<b class=\"merit\">{0}</b></span><span>유물 도감<b>{1}/{2}</b></span>":"<span>Merit<b class=\"merit\">{0}</b></span><span>Relic Codex<b>{1}/{2}</b></span>",
+  "<span class=\"og-st\">{0}{1}<b>{2}등급</b></span><span>시드<b>{3}</b></span><span>사령부<b>{4}/{5}</b></span><span>보급<b>{6}</b></span><span>전선<b>{7}/{8}</b></span><span>사살<b>{9}</b></span>":"<span class=\"og-st\">{0}{1}<b>Rank {2}</b></span><span>Seed<b>{3}</b></span><span>HQ<b>{4}/{5}</b></span><span>Supply<b>{6}</b></span><span>Front<b>{7}/{8}</b></span><span>Kills<b>{9}</b></span>",
+  "<svg viewBox=\"0 0 {0} {1}\" width=\"{2}\" height=\"{3}\" role=\"img\" aria-label=\"작전 지도\">":"<svg viewBox=\"0 0 {0} {1}\" width=\"{2}\" height=\"{3}\" role=\"img\" aria-label=\"Operation map\">",
+  "특성 · {0}/{1}단계":"Perks · tier {0}/{1}",
+  "지원 카드":"Support Cards",
+  " 비용 {0} · 대기 {1}초":" Cost {0} · Cooldown {1}s",
+  "병과":"Units",
+  "비용 {0} · 체력 {1} · 사거리 {2}":"Cost {0} · HP {1} · Range {2}",
+  "{0} 지원":"{0} Card",
+  "{0} 편성":"{0} Unit",
+  "얻을 특성이 없습니다.":"No Perks left to gain.",
+  "{0} 획득.":"Gained {0}.",
+  "정예 전리품":"Elite Spoils",
+  "정예 부대의 물자에서 유물을 하나 고르세요.":"Pick a Relic from the elite unit's supplies.",
+  "다시 뽑기 ({0}회)":"Reroll ({0})",
+  "선택지를 새로 받습니다.":"Get a fresh set of choices.",
+  "정예 부대 격파":"Elite Unit Destroyed",
+  "전선 돌파":"Front Breached",
+  "보급 {0}을 확보했습니다. 보상을 하나 고르세요.":"Secured {0} Supply. Pick one reward.",
+  "건너뛰기 (보급 +20)":"Skip (Supply +20)",
+  "더 얻을 유물이 없습니다.":"No more Relics to gain.",
+  "지도로":"To Map",
+  "{0}을(를) 얻었습니다.{1}":"Gained {0}.{1}",
+  " 처음 발견한 유물이라 도감에 기록됩니다. 앞으로 모든 작전에서 CP 수입 +1%, 사령부 +2가 영구 적용됩니다.":" First discovery, so it's logged in the Codex. From now on every operation gets CP income +1% and HQ +2.",
+  "버려진 유물 상자":"Abandoned Relic Chest",
+  "무너진 벙커에서 상자를 찾았습니다. 하나만 챙길 수 있습니다.":"You find a chest in a collapsed bunker. You can only take one item.",
+  "사령부 보수":"HQ Repairs",
+  "사령부 내구도 +70":"HQ HP +70",
+  "후방 보급소":"Rear Depot",
+  "보급을 써서 특성이나 병과를 들입니다.":"Spend Supply on Perks or units.",
+  "떠나기":"Leave",
+  "후방 휴식":"Rear Rest",
+  "하루 동안 전선이 조용합니다. 한 가지만 할 수 있습니다.":"The front is quiet for a day. Choose one.",
+  "사령부 내구도 +{0}":"HQ HP +{0}",
+  "훈련":"Training",
+  "무작위 특성 1개 획득":"1 random Perk",
+  "훈련 완료":"Training complete",
+  "무너진 참호의 유품":"Relics of a Fallen Trench",
+  "포격에 묻힌 참호에서 장교의 소지품이 보입니다. 파내려면 시간이 걸리고, 그동안 사령부가 노출됩니다.":"An officer's belongings lie in a trench buried by shellfire. Digging takes time, and your HQ is exposed meanwhile.",
+  "파낸다":"Dig",
+  "사령부 -30, 무작위 유물 1개":"HQ -30, 1 random Relic",
+  "이미 쓸 만한 건 다 챙겼습니다.":"Anything useful is already taken.",
+  " 도감에 새로 기록됐습니다.":" New Codex entry.",
+  "그냥 지나간다":"Pass By",
+  "아무 일도 없음":"Nothing happens",
+  "전선을 지나쳤습니다.":"You move on.",
+  "버려진 보급창고":"Abandoned Supply Depot",
+  "포격에 무너진 창고에서 상자 몇 개가 보입니다. 더 깊이 뒤지면 무언가 있을 수 있지만 잔해가 불안정합니다.":"A few crates are visible in a depot flattened by shelling. Digging deeper might turn up something, but the rubble is unstable.",
+  "보이는 것만 챙긴다":"Take What's Visible",
+  "보급 +35":"Supply +35",
+  "보급 35를 챙겼습니다.":"Took 35 Supply.",
+  "깊이 뒤진다":"Dig Deeper",
+  "반반 확률: 특성 1개 또는 사령부 -40":"50/50: 1 Perk or HQ -40",
+  "잔해가 무너져 사령부가 40 피해를 입었습니다.":"The rubble collapsed. HQ took 40 damage.",
+  "낙오병 무리":"Stragglers",
+  "다른 부대에서 떨어져 나온 소총수들이 합류하길 원합니다. 먹일 보급이 필요합니다.":"Riflemen cut off from their units want to join you. They need Supply to be fed.",
+  "받아들인다":"Take Them In",
+  "다음 전투 시작 시 소총수 4명 배치, 보급 -15":"4 Riflemen deployed at the start of the next battle, Supply -15",
+  "소총수 4명이 다음 전투에 합류합니다.":"4 Riflemen will join the next battle.",
+  "보급만 나눠 보낸다":"Share Rations",
+  "사령부 +25":"HQ +25",
+  "사령부 인원이 쉬면서 내구도 25를 회복했습니다.":"HQ staff rested and recovered 25 HP.",
+  "포병 연락장교":"Artillery Liaison",
+  "인접 포병대가 화력 지원을 약속하는 대신 보급을 요구합니다.":"A neighboring artillery battery promises fire support in exchange for Supply.",
+  "보급 60을 넘긴다":"Hand Over 60 Supply",
+  "포병 연대 특성 획득":"Gain Artillery Regiment perk",
+  "포병 연대 특성을 얻었습니다.":"You gained the Artillery Regiment perk.",
+  "이미 최대 지원을 받고 있어 거래가 무산됐습니다.":"You already have maximum support, so the deal fell through.",
+  "거절한다":"Decline",
+  "장교가 떠났습니다.":"The officer left.",
+  "노획 차량":"Captured Vehicle",
+  "적이 버리고 간 장갑차를 정비병이 고칠 수 있다고 합니다.":"A mechanic says he can repair an armored vehicle the enemy abandoned.",
+  "수리한다":"Repair",
+  "보급 -50. 전차 편성, 이미 있으면 증가 장갑":"Supply -50. Adds a Tank; if you already have one, Added Armor",
+  "전차를 편성했습니다.":"Tank added.",
+  "증가 장갑을 얻었습니다.":"Gained Added Armor.",
+  "쓸 데가 없어 돌려보냈습니다.":"Nothing to use it for; you sent it back.",
+  "부품만 뜯어 판다":"Sell for Parts",
+  "보급 +30":"Supply +30",
+  "보급 30을 얻었습니다.":"Gained 30 Supply.",
+  "야간 기습 제안":"Night Raid Proposal",
+  "중대장이 오늘 밤 적 참호 기습을 건의합니다. 성공하면 적 보급을 빼앗지만 실패하면 병력을 잃습니다.":"Your company commander proposes raiding an enemy trench tonight. Success seizes enemy supplies; failure costs troops.",
+  "기습한다":"Raid",
+  "60%: 보급 +60 / 40%: 사령부 -35":"60%: Supply +60 / 40%: HQ -35",
+  "기습 성공. 보급 60을 노획했습니다.":"Raid succeeded. Captured 60 Supply.",
+  "기습이 발각돼 사령부가 35 피해를 입었습니다.":"The raid was spotted. HQ took 35 damage.",
+  "참호를 보강한다":"Reinforce Trenches",
+  "참호 보강 특성 (최대치면 사령부 +20)":"Reinforced Trench perk (HQ +20 if maxed)",
+  "참호 보강 특성을 얻었습니다.":"Gained the Reinforced Trench perk.",
+  "사령부를 20 보강했습니다.":"Reinforced HQ by 20.",
+  " 작전 등급 {0}({1})이 열렸습니다.":" Operation Rank {0} ({1}) unlocked.",
+  "전투 {0}회 · 적 사살 {1} · 공적 +{2} (보유 {3}).":"Battles {0} · Kills {1} · Merit +{2} (total {3}).",
+  "{0} {1}등급으로 적 사령부를 함락했습니다.{2} ":"{0} took the enemy HQ at Rank {1}.{2} ",
+  "{0}번째 전선에서 사령부가 무너졌습니다. 최고 기록은 {1}번째 전선입니다. ":"Your HQ fell at Front {0}. Best: Front {1}. ",
+  "작전 완수":"Operation Complete",
+  "작전 실패":"Operation Failed",
+  " 이번 작전의 유물 하나를 다음 작전에 가져갈 수 있습니다.":" You may carry one Relic from this operation into the next.",
+  "가져가지 않음":"Carry None",
+  "계속":"Continue",
+  "공적":"Merit",
+  "사령부 보급창":"HQ Depot",
+  "공적으로 모든 작전에 남는 강화를 삽니다. 보유 공적 {0}. 도감 유물 {1}/{2}개 · 영구 보너스 CP 수입 +{3}%, 사령부 +{4}.{5}":"Spend Merit on upgrades that carry across all operations. Merit held: {0}. Codex relics {1}/{2} · permanent bonus: CP income +{3}%, HQ +{4}.{5}",
+  " 다음 작전 계승 유물: {0}.":" Carried over to next operation: {0}.",
+  "새 작전 시작":"Start New Operation",
+  "<li style=\"margin-top:6px\"><b style=\"color:var(--fg)\">유물 도감</b></li>":"<li style=\"margin-top:6px\"><b style=\"color:var(--fg)\">Relic Codex</b></li>",
+  "<li class=\"no\"><b>◇ ???</b> · 아직 발견하지 못함</li>":"<li class=\"no\"><b>◇ ???</b> · Not yet found</li>",
+  "<b>지휘관 명부</b><table><tr><th></th>":"<b>Commander Roster</b><table><tr><th></th>",
+  "</table><p>★ 클리어 · ○ 도전 가능 · · 잠김(등급 미개방)</p>":"</table><p>★ Cleared · ○ Available · · Locked (rank not open)</p>",
+  "최고 기록 {0}번째 전선 · 작전 완수 {1}회 · 열린 등급 {2} · 명부 {3}/{4} · 보유 공적 <span class=\"merit\">{5}</span> · 유물 도감 {6}/{7}":"Best: Front {0} · Operations won {1} · Ranks open {2} · Roster {3}/{4} · Merit <span class=\"merit\">{5}</span> · Relic Codex {6}/{7}",
+  "진흙 평원":"Mud Plain",
+  "숲 가장자리":"Forest Edge",
+  "폐허 마을":"Ruined Village",
+  "설원":"Snowfield",
+  "숲":"Forest",
+  "폐허":"Ruins",
+  "포탄 구덩이":"Shell Crater",
+  "철조망":"Barbed Wire",
+  "늪":"Swamp",
+  "고지":"High Ground",
+  "토치카":"Pillbox",
+  "화면: PC":"Display: PC",
+  "화면: 모바일":"Display: Mobile",
+  "소리 켬":"Sound On",
+  "소리 끔":"Sound Off",
+  "일시정지":"Pause",
+  "+{0} / {1}초":"+{0} / {1}s",
+  "<p>출전 지원 카드 {0}/{1}</p><div class=\"lo\">{2}</div>":"<p>Support loadout {0}/{1}</p><div class=\"lo\">{2}</div>",
+  "출전 지원 카드 {0}/{1}":"Support loadout {0}/{1}",
+  "적 사령부 공략":"Assault on Enemy HQ",
+  "{0}번째 전선 · {1}":"Front {0} · {1}",
+  "정예 부대":"Elite Unit",
+  "일반 전투":"Standard Battle",
+  "<h2>{0}</h2><p>{1}{2}지형: {3}. {4}적 사령부 내구도 {5}, 아군 사령부 {6}/{7}.</p>{8}":"<h2>{0}</h2><p>{1}{2}Terrain: {3}. {4}Enemy HQ HP {5}, your HQ {6}/{7}.</p>{8}",
+  "적 사령부는 내구도가 높고 전차와 기관총이 미리 배치돼 있습니다. ":"The enemy HQ is heavily fortified, with tanks and machine guns already in place. ",
+  "적이 진지를 미리 갖추고 있습니다. ":"The enemy has prepared positions. ",
+  "개활지":"Open Ground",
+  "등급 {0} {1}. ":"Rank {0} {1}. ",
+  "작전 개시":"Begin Operation",
+  "<h2>적 사령부 함락</h2><p>적 사살 {0} · 아군 손실 {1}</p>":"<h2>Enemy HQ Taken</h2><p>Kills {0} · Losses {1}</p>",
+  "결과 보기":"View Results",
+  "<h2>전선 돌파</h2><p>적 사살 {0} · 아군 손실 {1} · 사령부 {2}/{3}</p>":"<h2>Front Breached</h2><p>Kills {0} · Losses {1} · HQ {2}/{3}</p>",
+  "보상 고르기":"Pick Reward",
+  "<h2>아군 사령부 함락</h2><p>적 사살 {0} · 아군 손실 {1}</p>":"<h2>Your HQ Has Fallen</h2><p>Kills {0} · Losses {1}</p>"
+};
+const LANG=(()=>{try{const v=localStorage.getItem('trenchline.lang');if(v==='ko'||v==='en')return v}catch(e){}return /^ko\b/i.test(navigator.language||'')?'ko':'en'})();
+function _t(k,...a){const s=LANG==='en'&&I18N_EN[k]?I18N_EN[k]:k;return a.length?s.replace(/\{(\d+)\}/g,(m,i)=>a[+i]):s}
+function translateDOM(){
+  document.documentElement.lang=LANG;
+  if(LANG!=='en')return;
+  document.title=I18N_EN['참호전선']||'Trench Line';
+  const sub=document.querySelector('header h1 small');if(sub)sub.remove();
+  const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let n;
+  while((n=w.nextNode())){const v=n.nodeValue,k=v.trim();if(k&&I18N_EN[k])n.nodeValue=v.replace(k,I18N_EN[k])}
+  for(const el of document.querySelectorAll('[placeholder],[aria-label],[title]'))
+    for(const at of ['placeholder','aria-label','title']){const v=el.getAttribute(at);if(v&&I18N_EN[v])el.setAttribute(at,I18N_EN[v])}
+}
+function setLang(l){try{localStorage.setItem('trenchline.lang',l)}catch(e){}location.reload()}
 let VW=240;const VH=168,WORLD=640,GY=40,FLOORS=10,FY0=54,FY1=156,FMID=105;
 const clampY=y=>Math.max(FY0,Math.min(FY1,y));
 const HQ={1:40,'-1':600};
 const TR=[112,216,320,424,528];
 const U={
-  rifle:  {name:'소총수',  cost:10, hp:10, dmg:10,range:48,rof:1.35,spd:11,cd:1.5,kind:'small',acc:.6},
-  assault:{name:'돌격조',  cost:20, hp:18, dmg:8, range:24,rof:.6, spd:15,cd:4,  kind:'small',acc:.62,grenade:true,gEvery:4,gDmg:14,gArmor:30},
-  mg:     {name:'기관총',  cost:35, hp:30, dmg:10,range:62,rof:.15,spd:7, cd:8,  kind:'small',acc:.26,setup:1.2},
-  at:     {name:'대전차병',cost:25, hp:10, dmg:10,armorDmg:66,range:52,rof:3,spd:10,cd:6,kind:'at',acc:.5,armorAcc:.82},
-  sniper: {name:'저격수',  cost:40, hp:20, dmg:30,range:112,rof:2.4,spd:9,cd:12,kind:'small',acc:.8,decay:.12,prio:true,snipe:true},
-  mortar: {name:'박격포',  cost:50, hp:20, dmg:12,range:72,min:28,rof:4.4,spd:7,cd:12,kind:'shell',splash:10,flight:1.1,arc:42,scatter:6,spread:.32},
-  tank:   {name:'전차',    cost:110,hp:130,dmg:16,range:52,rof:3.2,spd:6, cd:35, kind:'shell',splash:6,flight:.22,arc:0,scatter:3,armor:true},
+  rifle:  {name:_t('소총수'),  cost:10, hp:10, dmg:10,range:48,rof:1.35,spd:11,cd:1.5,kind:'small',acc:.6},
+  assault:{name:_t('돌격조'),  cost:20, hp:18, dmg:8, range:24,rof:.6, spd:15,cd:4,  kind:'small',acc:.62,grenade:true,gEvery:4,gDmg:14,gArmor:30},
+  mg:     {name:_t('기관총'),  cost:35, hp:30, dmg:10,range:62,rof:.15,spd:7, cd:8,  kind:'small',acc:.26,setup:1.2},
+  at:     {name:_t('대전차병'),cost:25, hp:10, dmg:10,armorDmg:66,range:52,rof:3,spd:10,cd:6,kind:'at',acc:.5,armorAcc:.82},
+  sniper: {name:_t('저격수'),  cost:40, hp:20, dmg:30,range:112,rof:2.4,spd:9,cd:12,kind:'small',acc:.8,decay:.12,prio:true,snipe:true},
+  mortar: {name:_t('박격포'),  cost:50, hp:20, dmg:12,range:72,min:28,rof:4.4,spd:7,cd:12,kind:'shell',splash:10,flight:1.1,arc:42,scatter:6,spread:.32},
+  tank:   {name:_t('전차'),    cost:110,hp:130,dmg:16,range:52,rof:3.2,spd:6, cd:35, kind:'shell',splash:6,flight:.22,arc:0,scatter:3,armor:true},
 };
-const BAR={name:'포격',cost:70,cd:40,n:8};
+const BAR={name:_t('포격'),cost:70,cd:40,n:8};
 // 지원 카드. shape: circle(반경 r) | line(세로 줄, 폭 ±r). delay: 경고 표식이 뜬 뒤 효과까지 걸리는 초.
 const SUP={
-  bar:     {name:'포격',     cost:70,cd:40,delay:1.6,r:26,shape:'circle',desc:'지정 지점 주변에 포탄 8발. 밀집한 보병에 강합니다.'},
-  smoke:   {name:'연막탄',   cost:25,cd:22,delay:.8, r:34,shape:'circle',desc:'10초간 연막. 연막 안에서 쏘는 적은 명중률이 절반이 됩니다.'},
-  mines:   {name:'지뢰 살포',cost:40,cd:45,delay:0,  r:24,shape:'circle',desc:'반경 안에 지뢰 6개를 깝니다. 밟은 적은 크게 다칩니다.'},
-  aid:     {name:'구급 지원',cost:45,cd:40,delay:0,  r:28,shape:'circle',desc:'반경 안 아군이 4초에 걸쳐 체력 12를 회복합니다.'},
-  howitzer:{name:'야포 사격',cost:80,cd:45,delay:4,  r:16,shape:'circle',desc:'4초 뒤 대형 포탄 한 발. 피해 80, 전차에도 통합니다. 움직이는 적은 피합니다.'},
-  strafe:  {name:'기총소사', cost:90,cd:50,delay:2.5,r:9, shape:'line',  desc:'2.5초 뒤 전투기가 세로 한 줄을 두 번 훑습니다. 참호 한 줄 소탕용.'},
+  bar:     {name:_t('포격'),     cost:70,cd:40,delay:1.6,r:26,shape:'circle',desc:_t('지정 지점 주변에 포탄 8발. 밀집한 보병에 강합니다.')},
+  smoke:   {name:_t('연막탄'),   cost:25,cd:22,delay:.8, r:34,shape:'circle',desc:_t('10초간 연막. 연막 안에서 쏘는 적은 명중률이 절반이 됩니다.')},
+  mines:   {name:_t('지뢰 살포'),cost:40,cd:45,delay:0,  r:24,shape:'circle',desc:_t('반경 안에 지뢰 6개를 깝니다. 밟은 적은 크게 다칩니다.')},
+  aid:     {name:_t('구급 지원'),cost:45,cd:40,delay:0,  r:28,shape:'circle',desc:_t('반경 안 아군이 4초에 걸쳐 체력 12를 회복합니다.')},
+  howitzer:{name:_t('야포 사격'),cost:80,cd:45,delay:4,  r:16,shape:'circle',desc:_t('4초 뒤 대형 포탄 한 발. 피해 80, 전차에도 통합니다. 움직이는 적은 피합니다.')},
+  strafe:  {name:_t('기총소사'), cost:90,cd:50,delay:2.5,r:9, shape:'line',  desc:_t('2.5초 뒤 전투기가 세로 한 줄을 두 번 훑습니다. 참호 한 줄 소탕용.')},
 };
 const SUP_ORDER=['bar','smoke','mines','aid','howitzer','strafe'];
 const ORDER=['rifle','assault','mg','at','sniper','mortar','tank'];
-const UNIT_DESC={sniper:'사거리가 아주 길고 한 발이면 쓰러뜨립니다. 기관총·박격포·대전차병·저격수를 먼저 노립니다. 연사가 느립니다.',mortar:'곡사로 범위 피해를 줍니다. 멀리 쏠수록 탄착이 크게 흩어지고, 가까운 적은 못 쏩니다. 저격수에게 약합니다.',tank:'튼튼하고 범위 포격을 합니다. 대전차병과 수류탄에 약합니다.'};
+const UNIT_DESC={sniper:_t('사거리가 아주 길고 한 발이면 쓰러뜨립니다. 기관총·박격포·대전차병·저격수를 먼저 노립니다. 연사가 느립니다.'),mortar:_t('곡사로 범위 피해를 줍니다. 멀리 쏠수록 탄착이 크게 흩어지고, 가까운 적은 못 쏩니다. 저격수에게 약합니다.'),tank:_t('튼튼하고 범위 포격을 합니다. 대전차병과 수류탄에 약합니다.')};
 const PERKS={
-  rifleDmg:{name:'정밀 사격',desc:'소총수 명중률 +30%',max:2},
-  mgSetup:{name:'신속 거치',desc:'기관총 사격 준비 시간 절반',max:1},
-  atDmg:{name:'성형작약',desc:'대전차병 장갑 피해 +30%',max:2},
-  grenade:{name:'집속 수류탄',desc:'돌격조가 2번 공격마다 수류탄 투척, 피해 +30%',max:1},
-  mortarSplash:{name:'사격 제원표',desc:'박격포 탄착 분산 -40%',max:2,req:'mortar'},
-  tankHp:{name:'증가 장갑',desc:'아군 전차 내구도 +30%',max:2,req:'tank'},
-  income:{name:'보급선 확충',desc:'보급 1회당 CP +15%',max:3},
-  logistics:{name:'병참 체계',desc:'보급 주기 -12%',max:3},
-  startCP:{name:'사전 비축',desc:'전투 시작 CP +30',max:2},
-  trench:{name:'참호 보강',desc:'참호 안에서 받는 피해 -15%',max:2},
-  medic:{name:'야전 붕대',desc:'참호 안 보병이 초당 체력 2 회복',max:1},
-  barrage:{name:'포병 연대',desc:'포격 탄 +4발, 재사용 대기 -25%',max:2},
-  cheap:{name:'대량 징집',desc:'모든 병력 비용 -10%',max:2},
-  capture:{name:'점령 포상',desc:'참호를 빼앗을 때마다 CP +15',max:1},
-  drill:{name:'신속 편성',desc:'병력 재배치 대기시간 -20%',max:2},
-  hqArmor:{name:'사령부 요새화',desc:'사령부 최대 내구도 +60, 즉시 60 회복',max:3},
-  veteran:{name:'고참병',desc:'모든 보병 명중률 +15%',max:2},
-  vanguard:{name:'선발대',desc:'전투 시작 시 소총수 2명 무료 배치',max:2},
-  scope:{name:'조준경',desc:'소총수 사거리 +35%, 거리에 따른 명중률 감소 절반',max:1},
-  apAmmo:{name:'철갑탄',desc:'소총수·기관총·저격수의 전차 피해 3배',max:1},
-  doubleTap:{name:'속사',desc:'소총수가 30% 확률로 곧바로 한 발 더 쏨',max:1},
-  incendiary:{name:'소이탄',desc:'박격포탄 자리에 4초간 불이 붙어 들어선 적에게 피해',max:1,req:'mortar'},
-  smoke:{name:'연막 포격',desc:'포격 지점에 10초간 연막. 연막 안의 적은 명중률 절반',max:1},
-  mines:{name:'대인 지뢰',desc:'전투 시작 시 아군 전방 무인지대에 지뢰 5개 매설',max:2},
-  bounty:{name:'전과 포상',desc:'적을 처치할 때마다 CP +2',max:2},
-  rally:{name:'복수의 함성',desc:'아군이 쓰러지면 주변 아군이 4초간 연사 +50%',max:1},
-  ghillie:{name:'위장복',desc:'저격수가 맞을 확률 -50%, 사거리 +15%',max:1,req:'sniper'},
+  rifleDmg:{name:_t('정밀 사격'),desc:_t('소총수 명중률 +30%'),max:2},
+  mgSetup:{name:_t('신속 거치'),desc:_t('기관총 사격 준비 시간 절반'),max:1},
+  atDmg:{name:_t('성형작약'),desc:_t('대전차병 장갑 피해 +30%'),max:2},
+  grenade:{name:_t('집속 수류탄'),desc:_t('돌격조가 2번 공격마다 수류탄 투척, 피해 +30%'),max:1},
+  mortarSplash:{name:_t('사격 제원표'),desc:_t('박격포 탄착 분산 -40%'),max:2,req:'mortar'},
+  tankHp:{name:_t('증가 장갑'),desc:_t('아군 전차 내구도 +30%'),max:2,req:'tank'},
+  income:{name:_t('보급선 확충'),desc:_t('보급 1회당 CP +15%'),max:3},
+  logistics:{name:_t('병참 체계'),desc:_t('보급 주기 -12%'),max:3},
+  startCP:{name:_t('사전 비축'),desc:_t('전투 시작 CP +30'),max:2},
+  trench:{name:_t('참호 보강'),desc:_t('참호 안에서 받는 피해 -15%'),max:2},
+  medic:{name:_t('야전 붕대'),desc:_t('참호 안 보병이 초당 체력 2 회복'),max:1},
+  barrage:{name:_t('포병 연대'),desc:_t('포격 탄 +4발, 재사용 대기 -25%'),max:2},
+  cheap:{name:_t('대량 징집'),desc:_t('모든 병력 비용 -10%'),max:2},
+  capture:{name:_t('점령 포상'),desc:_t('참호를 빼앗을 때마다 CP +15'),max:1},
+  drill:{name:_t('신속 편성'),desc:_t('병력 재배치 대기시간 -20%'),max:2},
+  hqArmor:{name:_t('사령부 요새화'),desc:_t('사령부 최대 내구도 +60, 즉시 60 회복'),max:3},
+  veteran:{name:_t('고참병'),desc:_t('모든 보병 명중률 +15%'),max:2},
+  vanguard:{name:_t('선발대'),desc:_t('전투 시작 시 소총수 2명 무료 배치'),max:2},
+  scope:{name:_t('조준경'),desc:_t('소총수 사거리 +35%, 거리에 따른 명중률 감소 절반'),max:1},
+  apAmmo:{name:_t('철갑탄'),desc:_t('소총수·기관총·저격수의 전차 피해 3배'),max:1},
+  doubleTap:{name:_t('속사'),desc:_t('소총수가 30% 확률로 곧바로 한 발 더 쏨'),max:1},
+  incendiary:{name:_t('소이탄'),desc:_t('박격포탄 자리에 4초간 불이 붙어 들어선 적에게 피해'),max:1,req:'mortar'},
+  smoke:{name:_t('연막 포격'),desc:_t('포격 지점에 10초간 연막. 연막 안의 적은 명중률 절반'),max:1},
+  mines:{name:_t('대인 지뢰'),desc:_t('전투 시작 시 아군 전방 무인지대에 지뢰 5개 매설'),max:2},
+  bounty:{name:_t('전과 포상'),desc:_t('적을 처치할 때마다 CP +2'),max:2},
+  rally:{name:_t('복수의 함성'),desc:_t('아군이 쓰러지면 주변 아군이 4초간 연사 +50%'),max:1},
+  ghillie:{name:_t('위장복'),desc:_t('저격수가 맞을 확률 -50%, 사거리 +15%'),max:1,req:'sniper'},
 };
-const MODS={rain:{name:'폭우',desc:'모든 병력 이동 속도 -20%'},fog:{name:'짙은 안개',desc:'모든 사거리 -18%'},arty:{name:'적 포병 우세',desc:'적 포격 재사용 대기 절반'}};
-const NODE_LABEL={battle:'전투',elite:'정예',shop:'보급',event:'?',rest:'휴식',boss:'사령부',cache:'유물'};
+const MODS={rain:{name:_t('폭우'),desc:_t('모든 병력 이동 속도 -20%')},fog:{name:_t('짙은 안개'),desc:_t('모든 사거리 -18%')},arty:{name:_t('적 포병 우세'),desc:_t('적 포격 재사용 대기 절반')}};
+const NODE_LABEL={battle:_t('전투'),elite:_t('정예'),shop:_t('보급'),event:'?',rest:_t('휴식'),boss:_t('사령부'),cache:_t('유물')};
 const RELICS={
-  whistle:{name:'녹슨 호루라기',desc:'전진 명령 중 아군 이동 속도 +25%'},
-  binocs:{name:'야전 쌍안경',desc:'모든 아군 사거리 +10%'},
-  coin:{name:'행운의 동전',desc:'전투 승리 보급 +50%'},
-  canteen:{name:'낡은 수통',desc:'전투가 끝날 때마다 사령부 +15'},
-  rosary:{name:'묵주',desc:'아군 보병이 처음 치명상을 입으면 체력 1로 버팀'},
-  ammobox:{name:'탄약 상자',desc:'기관총 사격 준비 즉시, 연사 +20%'},
-  gramophone:{name:'축음기',desc:'전투 시작 30초간 보급량 2배'},
-  netting:{name:'위장망',desc:'참호 안 아군이 맞을 확률 추가 -15%'},
-  map:{name:'노획 지도',desc:'적이 CP 0으로 전투를 시작'},
-  watch:{name:'금장 회중시계',desc:'모든 지원 카드 재사용 대기 -30%'},
-  gloves:{name:'전차병 장갑',desc:'아군 전차 비용 -30%'},
-  dossier:{name:'심문 기록',desc:'정예·사령부 전투의 적 사전 배치 병력 절반'},
-  wagon:{name:'보급 마차',desc:'보급소 가격 -25%'},
-  letter:{name:'편지 묶음',desc:'아군이 쓰러질 때마다 CP +2'},
-  railway:{name:'야전 철도',desc:'보급 주기 -15%'},
-  banner:{name:'대대 깃발',desc:'점령한 참호 1개당 아군 명중률 +4%'},
+  whistle:{name:_t('녹슨 호루라기'),desc:_t('전진 명령 중 아군 이동 속도 +25%')},
+  binocs:{name:_t('야전 쌍안경'),desc:_t('모든 아군 사거리 +10%')},
+  coin:{name:_t('행운의 동전'),desc:_t('전투 승리 보급 +50%')},
+  canteen:{name:_t('낡은 수통'),desc:_t('전투가 끝날 때마다 사령부 +15')},
+  rosary:{name:_t('묵주'),desc:_t('아군 보병이 처음 치명상을 입으면 체력 1로 버팀')},
+  ammobox:{name:_t('탄약 상자'),desc:_t('기관총 사격 준비 즉시, 연사 +20%')},
+  gramophone:{name:_t('축음기'),desc:_t('전투 시작 30초간 보급량 2배')},
+  netting:{name:_t('위장망'),desc:_t('참호 안 아군이 맞을 확률 추가 -15%')},
+  map:{name:_t('노획 지도'),desc:_t('적이 CP 0으로 전투를 시작')},
+  watch:{name:_t('금장 회중시계'),desc:_t('모든 지원 카드 재사용 대기 -30%')},
+  gloves:{name:_t('전차병 장갑'),desc:_t('아군 전차 비용 -30%')},
+  dossier:{name:_t('심문 기록'),desc:_t('정예·사령부 전투의 적 사전 배치 병력 절반')},
+  wagon:{name:_t('보급 마차'),desc:_t('보급소 가격 -25%')},
+  letter:{name:_t('편지 묶음'),desc:_t('아군이 쓰러질 때마다 CP +2')},
+  railway:{name:_t('야전 철도'),desc:_t('보급 주기 -15%')},
+  banner:{name:_t('대대 깃발'),desc:_t('점령한 참호 1개당 아군 명중률 +4%')},
 };
 const META_UP={
-  hq:{name:'사령부 증축',desc:'시작 사령부 내구도 +20',max:5,cost:[20,35,55,80,110]},
-  supply:{name:'비상 금고',desc:'시작 보급 +25',max:3,cost:[20,40,70]},
-  cp:{name:'예비 탄약고',desc:'전투 시작 CP +15',max:3,cost:[25,45,75]},
-  payroll:{name:'군수 예산',desc:'보급 1회당 CP +3',max:4,cost:[25,45,70,100]},
-  reroll:{name:'참모 회의',desc:'보상 화면마다 다시 뽑기 1회',max:2,cost:[40,90]},
-  academy:{name:'사관학교',desc:'보상 선택지 3개 → 4개',max:1,cost:[70]},
-  mortarDoc:{name:'박격포 교범',desc:'작전 시작부터 박격포 편성',max:1,cost:[50]},
-  sniperDoc:{name:'저격 교범',desc:'작전 시작부터 저격수 편성',max:1,cost:[50]},
-  chest:{name:'전리품 상자',desc:'작전 시작 시 무작위 유물 1개',max:1,cost:[90]},
-  slots:{name:'지원 참모부',desc:'지원 카드 출전 슬롯 +1 (2칸 → 3칸)',max:1,cost:[80]},
+  hq:{name:_t('사령부 증축'),desc:_t('시작 사령부 내구도 +20'),max:5,cost:[20,35,55,80,110]},
+  supply:{name:_t('비상 금고'),desc:_t('시작 보급 +25'),max:3,cost:[20,40,70]},
+  cp:{name:_t('예비 탄약고'),desc:_t('전투 시작 CP +15'),max:3,cost:[25,45,75]},
+  payroll:{name:_t('군수 예산'),desc:_t('보급 1회당 CP +3'),max:4,cost:[25,45,70,100]},
+  reroll:{name:_t('참모 회의'),desc:_t('보상 화면마다 다시 뽑기 1회'),max:2,cost:[40,90]},
+  academy:{name:_t('사관학교'),desc:_t('보상 선택지 3개 → 4개'),max:1,cost:[70]},
+  mortarDoc:{name:_t('박격포 교범'),desc:_t('작전 시작부터 박격포 편성'),max:1,cost:[50]},
+  sniperDoc:{name:_t('저격 교범'),desc:_t('작전 시작부터 저격수 편성'),max:1,cost:[50]},
+  chest:{name:_t('전리품 상자'),desc:_t('작전 시작 시 무작위 유물 1개'),max:1,cost:[90]},
+  slots:{name:_t('지원 참모부'),desc:_t('지원 카드 출전 슬롯 +1 (2칸 → 3칸)'),max:1,cost:[80]},
 };
 
 /* ---------- storage ---------- */
 const META_DEF={merit:0,earned:0,up:{},found:[],heir:null,runs:0,best:0,wins:0,rank:1,clears:{}};
 // 지휘관 출신: 작전 시작 때 고른다. 장점 하나와 대가. 시작 혜택은 작전 내내 유지된다.
 const ORIGINS={
-  acad: {name:'사관학교 출신',line:'정규 교육을 마친 신임 지휘관',pro:'표준 편성과 포격 지원',con:'없음',hq:0,supply:0,unlock:()=>true,lock:''},
-  inf:  {name:'보병 출신',line:'소총 중대를 이끌던 중위',pro:'선발대·고참병 특성으로 시작',con:'포격 대신 연막탄 · 사령부 -40',perks:{vanguard:1,veteran:1},support:['smoke'],hq:-40,supply:0,unlock:()=>true,lock:''},
-  art:  {name:'포병 출신',line:'포병 관측장교',pro:'야포 사격 카드 추가',con:'시작 보급 0 · 사령부 -40',support:['bar','howitzer'],hq:-40,supply:-20,unlock:M=>M.best>=3,lock:'3번째 전선 도달'},
-  arm:  {name:'기갑 출신',line:'시제 전차 시험대대',pro:'전차를 처음부터 편성',con:'포격 대신 연막탄 · 사령부 -20',units:['tank'],support:['smoke'],hq:-20,supply:0,unlock:M=>M.earned>=200,lock:'누적 공적 200'},
-  intel:{name:'정보 출신',line:'참모본부 정보과',pro:'노획 지도 유물(적이 CP 0으로 시작)',con:'포격 대신 구급 지원 · 사령부 -40 · 시작 보급 0',relics:['map'],support:['aid'],hq:-40,supply:-20,unlock:M=>M.found.length>=6,lock:'유물 도감 6종'},
+  acad: {short:_t('사관학교'),name:_t('사관학교 출신'),line:_t('정규 교육을 마친 신임 지휘관'),pro:_t('표준 편성과 포격 지원'),con:_t('없음'),hq:0,supply:0,unlock:()=>true,lock:''},
+  inf:  {short:_t('보병'),name:_t('보병 출신'),line:_t('소총 중대를 이끌던 중위'),pro:_t('선발대·고참병 특성으로 시작'),con:_t('포격 대신 연막탄 · 사령부 -40'),perks:{vanguard:1,veteran:1},support:['smoke'],hq:-40,supply:0,unlock:()=>true,lock:''},
+  art:  {short:_t('포병'),name:_t('포병 출신'),line:_t('포병 관측장교'),pro:_t('야포 사격 카드 추가'),con:_t('시작 보급 0 · 사령부 -40'),support:['bar','howitzer'],hq:-40,supply:-20,unlock:M=>M.best>=3,lock:_t('3번째 전선 도달')},
+  arm:  {short:_t('기갑'),name:_t('기갑 출신'),line:_t('시제 전차 시험대대'),pro:_t('전차를 처음부터 편성'),con:_t('포격 대신 연막탄 · 사령부 -20'),units:['tank'],support:['smoke'],hq:-20,supply:0,unlock:M=>M.earned>=200,lock:_t('누적 공적 200')},
+  intel:{short:_t('정보'),name:_t('정보 출신'),line:_t('참모본부 정보과'),pro:_t('노획 지도 유물(적이 CP 0으로 시작)'),con:_t('포격 대신 구급 지원 · 사령부 -40 · 시작 보급 0'),relics:['map'],support:['aid'],hq:-40,supply:-20,unlock:M=>M.found.length>=6,lock:_t('유물 도감 6종')},
 };
 const ORIGIN_ORDER=['acad','inf','art','arm','intel'];
 // 출신 그림: 병과 무기. 24×14, RELIC_PAL. 화면에는 Scale2x로 다듬어 보여준다.
@@ -340,12 +737,12 @@ const OG_URL={};
 function originArt(k,cls){if(!OG_URL[k]){const m=ORIGIN_ART[k].map(r=>(r+'........................').slice(0,24));OG_URL[k]=epx(bake(m,RELIC_PAL)).toDataURL()}return `<img class="${cls||'og'}" src="${OG_URL[k]}" alt="">`}
 // 작전 등급: 클리어하면 다음 등급이 열린다. 규칙은 누적된다.
 const RANKS=[null,
-  {name:'회랑 정찰',rule:'기본 규칙'},
-  {name:'철갑의 계절',rule:'적 전차가 3번째 전선부터, 전투 30초부터 나온다'},
-  {name:'끊어진 보급선',rule:'아군 보급 주기 ×1.15'},
-  {name:'증원 도착',rule:'정예 전투에 적 기관총·소총수 추가 배치'},
-  {name:'포병 총동원',rule:'적이 지원 카드를 두 단계 일찍 쓴다'},
-  {name:'벨스타 결전',rule:'적 사령부 600, 내구도 절반 이하에서 총동원(적 지원 대기 절반)'},
+  {name:_t('회랑 정찰'),rule:_t('기본 규칙')},
+  {name:_t('철갑의 계절'),rule:_t('적 전차가 3번째 전선부터, 전투 30초부터 나온다')},
+  {name:_t('끊어진 보급선'),rule:_t('아군 보급 주기 ×1.15')},
+  {name:_t('증원 도착'),rule:_t('정예 전투에 적 기관총·소총수 추가 배치')},
+  {name:_t('포병 총동원'),rule:_t('적이 지원 카드를 두 단계 일찍 쓴다')},
+  {name:_t('벨스타 결전'),rule:_t('적 사령부 600, 내구도 절반 이하에서 총동원(적 지원 대기 절반)')},
 ];
 const rk=()=>RUN&&RUN.rank||1;
 const SYNC_KEYS=new Set(['trenchline.run','trenchline.meta']);
@@ -373,15 +770,16 @@ async function api(path,opt){const r=await fetch(CLOUD.api+path,{cache:'no-store
 async function cloudPush(keepalive){
   if(!CLOUD.on||!CLOUD.code)return;clearTimeout(CLOUD.timer);CLOUD.timer=null;
   try{const savedAt=localSavedAt()||Date.now();await api('/save/'+CLOUD.code,{method:'PUT',body:JSON.stringify({savedAt,data:cloudSnapshot()}),keepalive:!!keepalive});
-    CLOUD.last=Date.now();CLOUD.msg='';}catch(e){CLOUD.msg='저장 실패: '+e.message+'. 다음 저장 때 다시 시도합니다.'}
+    CLOUD.last=Date.now();CLOUD.msg='';}catch(e){CLOUD.msg=_t('저장 실패: ')+e.message+_t('. 다음 저장 때 다시 시도합니다.')}
   renderAccount();
 }
 async function cloudPull(force){
   if(!CLOUD.on||!CLOUD.code)return;
+  CLOUD.err=false;
   try{const j=await api('/save/'+CLOUD.code);
-    if(j.data&&(force||j.savedAt>localSavedAt())){cloudApply(j.data,j.savedAt);CLOUD.msg='클라우드 저장을 불러왔습니다.'}
+    if(j.data&&(force||j.savedAt>localSavedAt())){cloudApply(j.data,j.savedAt);CLOUD.msg=_t('클라우드 저장을 불러왔습니다.')}
     else if(!force&&localSavedAt()>(j.savedAt||0))cloudPush();
-    CLOUD.last=Date.now()}catch(e){CLOUD.msg=e.status===404?'이 코드의 계정이 없습니다.':'불러오기 실패: '+e.message}
+    CLOUD.last=Date.now()}catch(e){CLOUD.err=true;CLOUD.msg=e.status===404?_t('이 코드의 계정이 없습니다.'):_t('불러오기 실패: ')+e.message}
   if(!$('#vTitle').hidden)showTitle();else renderAccount();
 }
 async function cloudInit(){
@@ -391,21 +789,19 @@ async function cloudInit(){
 function setCode(c){CLOUD.code=c;try{if(c)localStorage.setItem('trenchline.code',JSON.stringify(c));else localStorage.removeItem('trenchline.code')}catch(e){}}
 function renderAccount(){
   const el=document.getElementById('account');if(!el)return;el.hidden=!CLOUD.on;if(!CLOUD.on)return;
-  const t=CLOUD.last?new Date(CLOUD.last).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}):'';
+  const t=CLOUD.last?new Date(CLOUD.last).toLocaleTimeString(LANG==='en'?'en-US':'ko-KR',{hour:'2-digit',minute:'2-digit'}):'';
   el.innerHTML=CLOUD.code
-    ?`<div class="acc-row"><span>계정 코드</span><code id="accCode">${fmtCode(CLOUD.code)}</code><button class="btn" id="accCopy">복사</button><button class="btn" id="accSync">지금 저장</button><button class="btn" id="accOut">이 기기에서 로그아웃</button></div>
-      <p class="acc-note">${CLOUD.msg||(t?`클라우드에 저장됨 · ${t}`:'자동으로 클라우드에 저장됩니다.')} 이 코드가 계정입니다. 잃어버리면 복구할 수 없고, 코드를 아는 사람은 누구나 불러올 수 있습니다.</p>`
-    :`<div class="acc-row"><button class="btn primary" id="accNew">새 계정 만들기</button><input id="accIn" class="seed" maxlength="20" placeholder="계정 코드 입력" aria-label="계정 코드" autocomplete="off"><button class="btn" id="accLoad">불러오기</button></div>
-      <p class="acc-note">${CLOUD.msg||'계정을 만들면 지금 진행 상황이 클라우드에 올라가고, 다른 기기에서 코드로 이어서 할 수 있습니다.'}</p>`;
+    ?_t("<div class=\"acc-row\"><span>계정 코드</span><code id=\"accCode\">{0}</code><button class=\"btn\" id=\"accCopy\">복사</button><button class=\"btn\" id=\"accSync\">지금 저장</button><button class=\"btn\" id=\"accOut\">이 기기에서 로그아웃</button></div>\n      <p class=\"acc-note\">{1} 이 코드가 계정입니다. 잃어버리면 복구할 수 없고, 코드를 아는 사람은 누구나 불러올 수 있습니다.</p>",fmtCode(CLOUD.code),CLOUD.msg||(t?_t("클라우드에 저장됨 · {0}",t):_t('자동으로 클라우드에 저장됩니다.')))
+    :_t("<div class=\"acc-row\"><button class=\"btn primary\" id=\"accNew\">새 계정 만들기</button><input id=\"accIn\" class=\"seed\" maxlength=\"20\" placeholder=\"계정 코드 입력\" aria-label=\"계정 코드\" autocomplete=\"off\"><button class=\"btn\" id=\"accLoad\">불러오기</button></div>\n      <p class=\"acc-note\">{0}</p>",CLOUD.msg||_t('계정을 만들면 지금 진행 상황이 클라우드에 올라가고, 다른 기기에서 코드로 이어서 할 수 있습니다.'));
   const on=(id,f)=>{const b=document.getElementById(id);if(b)b.onclick=f};
-  on('accNew',async()=>{try{const j=await api('/account',{method:'POST'});setCode(j.code);CLOUD.msg='';cloudMark();await cloudPush()}catch(e){CLOUD.msg='계정을 만들지 못했습니다: '+e.message;renderAccount()}});
-  on('accLoad',async()=>{const c=normCode($('#accIn').value);if(c.length!==12){CLOUD.msg='코드는 12자리입니다.';return renderAccount()}
-    const prev=CLOUD.code;setCode(c);await cloudPull(true);if(CLOUD.msg.startsWith('이 코드의')||CLOUD.msg.startsWith('불러오기 실패')){setCode(prev);renderAccount()}});
-  on('accCopy',()=>{const txt=fmtCode(CLOUD.code);try{navigator.clipboard.writeText(txt).then(()=>{CLOUD.msg='코드를 복사했습니다.';renderAccount()},()=>selectCode())}catch(e){selectCode()}});
+  on('accNew',async()=>{try{const j=await api('/account',{method:'POST'});setCode(j.code);CLOUD.msg='';cloudMark();await cloudPush()}catch(e){CLOUD.msg=_t('계정을 만들지 못했습니다: ')+e.message;renderAccount()}});
+  on('accLoad',async()=>{const c=normCode($('#accIn').value);if(c.length!==12){CLOUD.msg=_t('코드는 12자리입니다.');return renderAccount()}
+    const prev=CLOUD.code;setCode(c);await cloudPull(true);if(CLOUD.err){setCode(prev);renderAccount()}});
+  on('accCopy',()=>{const txt=fmtCode(CLOUD.code);try{navigator.clipboard.writeText(txt).then(()=>{CLOUD.msg=_t('코드를 복사했습니다.');renderAccount()},()=>selectCode())}catch(e){selectCode()}});
   on('accSync',()=>cloudPush());
-  on('accOut',()=>{if(CLOUD.timer)cloudPush();setCode(null);CLOUD.msg='로그아웃했습니다. 이 기기의 진행 상황은 남아 있습니다.';renderAccount()});
+  on('accOut',()=>{if(CLOUD.timer)cloudPush();setCode(null);CLOUD.msg=_t('로그아웃했습니다. 이 기기의 진행 상황은 남아 있습니다.');renderAccount()});
 }
-function selectCode(){const c=document.getElementById('accCode');if(!c)return;const g=document.createRange();g.selectNodeContents(c);const s=getSelection();s.removeAllRanges();s.addRange(g);CLOUD.msg='코드를 길게 눌러 복사하세요.'}
+function selectCode(){const c=document.getElementById('accCode');if(!c)return;const g=document.createRange();g.selectNodeContents(c);const s=getSelection();s.removeAllRanges();s.addRange(g);CLOUD.msg=_t('코드를 길게 눌러 복사하세요.')}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&CLOUD.timer)cloudPush(true)});
 
 /* ---------- pixel sprites ---------- */
@@ -531,15 +927,15 @@ function gainRelic(k){if(!RUN.relics.includes(k))RUN.relics.push(k);const M=getM
 function relicPool(){return shuffle(Object.keys(RELICS).filter(k=>!RUN.relics.includes(k)))}
 function startSetup(){
   const M=getMeta(),last=store.get('trenchline.lastSetup')||{};
-  panel('지휘관 부임','새 지휘관의 출신을 고르세요. 출신의 장점은 작전 내내 유지됩니다.',ORIGIN_ORDER.map(k=>{const o=ORIGINS[k],ok=o.unlock(M);
-    return {icon:originArt(k),tag:ok?(last.origin===k?'지난번 선택':'출신'):'잠김 · '+o.lock,name:o.name,desc:ok?`${o.line}. 장점: ${o.pro}. 대가: ${o.con}.`:`해금 조건: ${o.lock}.`,disabled:!ok,
-      go:()=>{if(M.rank>1)pickRank(k);else newRun(k,1)}}}),{label:'돌아가기',go:showTitle});
+  panel(_t('지휘관 부임'),_t('새 지휘관의 출신을 고르세요. 출신의 장점은 작전 내내 유지됩니다.'),ORIGIN_ORDER.map(k=>{const o=ORIGINS[k],ok=o.unlock(M);
+    return {icon:originArt(k),tag:ok?(last.origin===k?_t('지난번 선택'):_t('출신')):_t('잠김 · ')+o.lock,name:o.name,desc:ok?_t("{0}. 장점: {1}. 대가: {2}.",o.line,o.pro,o.con):_t("해금 조건: {0}.",o.lock),disabled:!ok,
+      go:()=>{if(M.rank>1)pickRank(k);else newRun(k,1)}}}),{label:_t('돌아가기'),go:showTitle});
 }
 function pickRank(origin){
   const M=getMeta(),last=store.get('trenchline.lastSetup')||{};
-  const ch=[];for(let i=1;i<=M.rank;i++)ch.push({tag:`등급 ${i}`+(M.clears[origin+':'+i]?' · 클리어':'')+(last.rank===i?' · 지난번':''),name:RANKS[i].name,
-    desc:(i===1?'기본 규칙.':RANKS.slice(2,i+1).map(x=>x.rule).join('. ')+'.')+(i>1?` 공적 +${(i-1)*10}%.`:''),go:()=>newRun(origin,i)});
-  panel('작전 등급','등급이 높을수록 규칙이 하나씩 더해집니다. 클리어하면 다음 등급이 열립니다.',ch.reverse(),{label:'돌아가기',go:startSetup});
+  const ch=[];for(let i=1;i<=M.rank;i++)ch.push({tag:_t("등급 {0}",i)+(M.clears[origin+':'+i]?_t(' · 클리어'):'')+(last.rank===i?_t(' · 지난번'):''),name:RANKS[i].name,
+    desc:(i===1?_t('기본 규칙.'):RANKS.slice(2,i+1).map(x=>x.rule).join('. ')+'.')+(i>1?_t(" 공적 +{0}%.",(i-1)*10):''),go:()=>newRun(origin,i)});
+  panel(_t('작전 등급'),_t('등급이 높을수록 규칙이 하나씩 더해집니다. 클리어하면 다음 등급이 열립니다.'),ch.reverse(),{label:_t('돌아가기'),go:startSetup});
 }
 function newRun(origin,rank){
   origin=ORIGINS[origin]?origin:'acad';rank=Math.max(1,Math.min(6,rank||1));
@@ -590,9 +986,9 @@ const curNode=()=>RUN.path.length?nodeById(RUN.path[RUN.path.length-1]):null;
 function reachable(){const c=curNode();if(!c)return RUN.map[0].map(n=>n.id);if(c.f>=FLOORS-1)return [];return c.next.map(j=>RUN.map[c.f+1][j].id)}
 
 function statusHTML(){
-  if(!RUN){const M=getMeta();return `<span>보유 공적<b class="merit">${M.merit}</b></span><span>유물 도감<b>${M.found.length}/${Object.keys(RELICS).length}</b></span>`}
+  if(!RUN){const M=getMeta();return _t("<span>보유 공적<b class=\"merit\">{0}</b></span><span>유물 도감<b>{1}/{2}</b></span>",M.merit,M.found.length,Object.keys(RELICS).length)}
   const c=curNode();
-  return `<span class="og-st">${originArt(RUN.origin||'acad','og sm')}${ORIGINS[RUN.origin||'acad'].name.replace(' 출신','')}<b>${rk()}등급</b></span><span>시드<b>${RUN.seed||'-'}</b></span><span>사령부<b>${RUN.hq}/${RUN.hqMax}</b></span><span>보급<b>${RUN.supply}</b></span><span>전선<b>${c?c.f+1:0}/${FLOORS}</b></span><span>사살<b>${RUN.kills}</b></span>`;
+  return _t("<span class=\"og-st\">{0}{1}<b>{2}등급</b></span><span>시드<b>{3}</b></span><span>사령부<b>{4}/{5}</b></span><span>보급<b>{6}</b></span><span>전선<b>{7}/{8}</b></span><span>사살<b>{9}</b></span>",originArt(RUN.origin||'acad','og sm'),ORIGINS[RUN.origin||'acad'].short,rk(),RUN.seed||'-',RUN.hq,RUN.hqMax,RUN.supply,c?c.f+1:0,FLOORS,RUN.kills);
 }
 function chipsHTML(){
   let s=RUN.units.map(u=>`<button type="button" class="chip u" data-k="unit:${u}">${U[u].name}</button>`).join('');
@@ -605,7 +1001,7 @@ function showMap(){
   show('vMap');$('#mapStatus').innerHTML=statusHTML();$('#mapChips').innerHTML=chipsHTML();
   const CW=78,H=236,W=FLOORS*CW,done=new Set(RUN.path),reach=new Set(reachable());
   const P=n=>[n.f*CW+CW/2,(n.i+1)*H/(n.n+1)];
-  let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="작전 지도">`;
+  let s=_t("<svg viewBox=\"0 0 {0} {1}\" width=\"{2}\" height=\"{3}\" role=\"img\" aria-label=\"작전 지도\">",W,H,W,H);
   for(const row of RUN.map)for(const a of row)for(const j of a.next){const b=RUN.map[a.f+1][j];const [x1,y1]=P(a),[x2,y2]=P(b);
     const dn=done.has(a.id)&&done.has(b.id)&&RUN.path.indexOf(b.id)===RUN.path.indexOf(a.id)+1;
     s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="${dn?'done':''}"/>`}
@@ -629,10 +1025,10 @@ function finishNode(n){RUN.path.push(n.id);saveRun();showMap()}
 /* ---------- panels ---------- */
 function tipFor(key){
   const [t,k]=key.split(':');
-  if(t==='relic'){const r=RELICS[k];return {icon:iconImg(k,'ico lg'),tag:'유물',name:r.name,desc:r.desc,lore:r.lore}}
-  if(t==='perk'){const p=PERKS[k],l=lv(k);return {tag:`특성 · ${l}/${p.max}단계`,name:p.name,desc:p.desc+(l>1?` (×${l})`:'')}}
-  if(t==='sup'){const d=SUP[k];return {icon:`<img class="ico lg" src="${supIcon(k)}" alt="">`,tag:'지원 카드',name:d.name,desc:d.desc+` 비용 ${d.cost} · 대기 ${d.cd}초`}}
-  if(t==='unit'){const u=U[k];return {tag:'병과',name:u.name,desc:(UNIT_DESC[k]?UNIT_DESC[k]+' ':'')+`비용 ${u.cost} · 체력 ${u.hp} · 사거리 ${u.range}`}}
+  if(t==='relic'){const r=RELICS[k];return {icon:iconImg(k,'ico lg'),tag:_t('유물'),name:r.name,desc:r.desc,lore:r.lore}}
+  if(t==='perk'){const p=PERKS[k],l=lv(k);return {tag:_t("특성 · {0}/{1}단계",l,p.max),name:p.name,desc:p.desc+(l>1?` (×${l})`:'')}}
+  if(t==='sup'){const d=SUP[k];return {icon:`<img class="ico lg" src="${supIcon(k)}" alt="">`,tag:_t('지원 카드'),name:d.name,desc:d.desc+_t(" 비용 {0} · 대기 {1}초",d.cost,d.cd)}}
+  if(t==='unit'){const u=U[k];return {tag:_t('병과'),name:u.name,desc:(UNIT_DESC[k]?UNIT_DESC[k]+' ':'')+_t("비용 {0} · 체력 {1} · 사거리 {2}",u.cost,u.hp,u.range)}}
 }
 function showTip(btn){
   const tp=$('#tip'),d=tipFor(btn.dataset.k);if(!d)return;
@@ -650,7 +1046,7 @@ function panel(title,text,choices,skip){
   show('vPanel');$('#panelStatus').innerHTML=statusHTML();$('#pTitle').textContent=title;$('#pText').textContent=text;
   const box=$('#pChoices');box.innerHTML='';
   for(const c of choices){const b=document.createElement('button');b.className='choice';b.disabled=!!c.disabled;
-    b.innerHTML=`${c.icon?c.icon:''}${c.tag?`<em class="tag">${c.tag}</em>`:''}<b>${c.name}</b><span>${c.desc}</span>${c.price!=null?`<em class="price">${c.price} 보급</em>`:''}`;
+    b.innerHTML=`${c.icon?c.icon:''}${c.tag?`<em class="tag">${c.tag}</em>`:''}<b>${c.name}</b><span>${c.desc}</span>${c.price!=null?`<em class="price">${c.price} ${c.unit||_t('보급')}</em>`:''}`;
     b.onclick=c.go;box.append(b)}
   const sk=$('#pSkip');sk.hidden=!skip;if(skip){sk.textContent=skip.label;sk.onclick=skip.go}
 }
@@ -661,7 +1057,7 @@ function optionPool(){
   for(const k of SUP_ORDER)if(!supOwned().includes(k)){pool.push({kind:'support',k});pool.push({kind:'support',k})}
   return shuffle(pool).filter((o,i,a)=>a.findIndex(p=>p.k===o.k&&p.kind===o.kind)===i);
 }
-function optView(o){if(o.kind==='support')return {icon:`<img class="ico lg" src="${supIcon(o.k)}" alt="">`,tag:'NEW SUPPORT',name:SUP[o.k].name+' 지원',desc:SUP[o.k].desc+` 비용 ${SUP[o.k].cost} · 대기 ${SUP[o.k].cd}초`};return o.kind==='unit'?{tag:'NEW UNIT',name:U[o.k].name+' 편성',desc:UNIT_DESC[o.k]}:{tag:'PERK'+(lv(o.k)?` LV${lv(o.k)+1}`:''),name:PERKS[o.k].name,desc:PERKS[o.k].desc}}
+function optView(o){if(o.kind==='support')return {icon:`<img class="ico lg" src="${supIcon(o.k)}" alt="">`,tag:'NEW SUPPORT',name:_t('{0} 지원',SUP[o.k].name),desc:SUP[o.k].desc+_t(" 비용 {0} · 대기 {1}초",SUP[o.k].cost,SUP[o.k].cd)};return o.kind==='unit'?{tag:'NEW UNIT',name:_t('{0} 편성',U[o.k].name),desc:UNIT_DESC[o.k]}:{tag:'PERK'+(lv(o.k)?` LV${lv(o.k)+1}`:''),name:PERKS[o.k].name,desc:PERKS[o.k].desc}}
 function applyOpt(o){
   if(o.kind==='unit'){RUN.units.push(o.k);return}
   if(o.kind==='support'){const own=supOwned();if(!own.includes(o.k))own.push(o.k);const lo=supLoadout();if(lo.length<supSlots()&&!lo.includes(o.k))lo.push(o.k);return}
@@ -670,92 +1066,92 @@ function applyOpt(o){
 function supOwned(){if(!RUN.support)RUN.support=['bar'];return RUN.support}
 function supSlots(){return 2+mlv('slots')}
 function supLoadout(){if(!RUN.loadout)RUN.loadout=supOwned().slice(0,supSlots());RUN.loadout=RUN.loadout.filter(k=>SUP[k]&&supOwned().includes(k)).slice(0,supSlots());return RUN.loadout}
-function grantRandom(){const o=optionPool().find(o=>o.kind==='perk');if(!o)return '얻을 특성이 없습니다.';applyOpt(o);return `${PERKS[o.k].name} 획득.`}
+function grantRandom(){const o=optionPool().find(o=>o.kind==='perk');if(!o)return _t('얻을 특성이 없습니다.');applyOpt(o);return _t("{0} 획득.",PERKS[o.k].name)}
 function showReward(n,gain,keep){
   if(!keep){RUN.rr=mlv('reroll')}
   const cnt=3+mlv('academy'),opts=optionPool().slice(0,cnt);
-  const ch=opts.map(o=>({...optView(o),go:()=>{applyOpt(o);if(n.type==='elite')relicChoice(n,'정예 전리품','정예 부대의 물자에서 유물을 하나 고르세요.');else finishNode(n)}}));
-  if(RUN.rr>0)ch.push({tag:'REROLL',name:`다시 뽑기 (${RUN.rr}회)`,desc:'선택지를 새로 받습니다.',go:()=>{RUN.rr--;showReward(n,gain,true)}});
-  panel(n.type==='elite'?'정예 부대 격파':'전선 돌파',`보급 ${gain}을 확보했습니다. 보상을 하나 고르세요.`,ch,
-    {label:'건너뛰기 (보급 +20)',go:()=>{RUN.supply+=20;if(n.type==='elite')relicChoice(n,'정예 전리품','정예 부대의 물자에서 유물을 하나 고르세요.');else finishNode(n)}});
+  const ch=opts.map(o=>({...optView(o),go:()=>{applyOpt(o);if(n.type==='elite')relicChoice(n,_t('정예 전리품'),_t('정예 부대의 물자에서 유물을 하나 고르세요.'));else finishNode(n)}}));
+  if(RUN.rr>0)ch.push({tag:'REROLL',name:_t("다시 뽑기 ({0}회)",RUN.rr),desc:_t('선택지를 새로 받습니다.'),go:()=>{RUN.rr--;showReward(n,gain,true)}});
+  panel(n.type==='elite'?_t('정예 부대 격파'):_t('전선 돌파'),_t("보급 {0}을 확보했습니다. 보상을 하나 고르세요.",gain),ch,
+    {label:_t('건너뛰기 (보급 +20)'),go:()=>{RUN.supply+=20;if(n.type==='elite')relicChoice(n,_t('정예 전리품'),_t('정예 부대의 물자에서 유물을 하나 고르세요.'));else finishNode(n)}});
 }
 function relicView(k,isNew){return {icon:iconImg(k,'ico lg'),tag:'RELIC'+(isNew?' · NEW':''),name:RELICS[k].name,desc:RELICS[k].desc}}
 function relicChoice(n,title,text,count){
   const pool=relicPool().slice(0,count||2),M=getMeta();
-  if(!pool.length)return panel(title,'더 얻을 유물이 없습니다.',[],{label:'지도로',go:()=>finishNode(n)});
+  if(!pool.length)return panel(title,_t('더 얻을 유물이 없습니다.'),[],{label:_t('지도로'),go:()=>finishNode(n)});
   panel(title,text,pool.map(k=>({...relicView(k,!M.found.includes(k)),go:()=>{const nw=gainRelic(k);
-    panel(title,`${RELICS[k].name}을(를) 얻었습니다.${nw?' 처음 발견한 유물이라 도감에 기록됩니다. 앞으로 모든 작전에서 CP 수입 +1%, 사령부 +2가 영구 적용됩니다.':''}`,[],{label:'지도로',go:()=>finishNode(n)})}})));
+    panel(title,_t("{0}을(를) 얻었습니다.{1}",RELICS[k].name,nw?_t(' 처음 발견한 유물이라 도감에 기록됩니다. 앞으로 모든 작전에서 CP 수입 +1%, 사령부 +2가 영구 적용됩니다.'):''),[],{label:_t('지도로'),go:()=>finishNode(n)})}})));
 }
-function showCache(n){relicChoice(n,'버려진 유물 상자','무너진 벙커에서 상자를 찾았습니다. 하나만 챙길 수 있습니다.',3)}
+function showCache(n){relicChoice(n,_t('버려진 유물 상자'),_t('무너진 벙커에서 상자를 찾았습니다. 하나만 챙길 수 있습니다.'),3)}
 function showShop(n){
   const disc=has('wagon')?.75:1;
   if(!n.stock){n.stock=optionPool().slice(0,3).map(o=>({...o,price:Math.round((o.kind==='unit'?110:o.kind==='support'?95:R(55,85))*disc/5)*5}));const rk=relicPool()[0];if(rk)n.stock.push({kind:'relic',k:rk,price:Math.round(R(120,150)*disc/5)*5});n.repair=true}
   const ch=n.stock.map((o,i)=>({...(o.kind==='relic'?relicView(o.k,!getMeta().found.includes(o.k)):optView(o)),price:o.price,disabled:RUN.supply<o.price,go:()=>{RUN.supply-=o.price;if(o.kind==='relic')gainRelic(o.k);else applyOpt(o);n.stock.splice(i,1);showShop(n)}}));
-  if(n.repair)ch.push({tag:'REPAIR',name:'사령부 보수',desc:'사령부 내구도 +70',price:Math.round(40*disc),disabled:RUN.supply<Math.round(40*disc)||RUN.hq>=RUN.hqMax,go:()=>{RUN.supply-=Math.round(40*disc);RUN.hq=Math.min(RUN.hqMax,RUN.hq+70);n.repair=false;showShop(n)}});
-  panel('후방 보급소','보급을 써서 특성이나 병과를 들입니다.',ch,{label:'떠나기',go:()=>{delete n.stock;finishNode(n)}});
+  if(n.repair)ch.push({tag:'REPAIR',name:_t('사령부 보수'),desc:_t('사령부 내구도 +70'),price:Math.round(40*disc),disabled:RUN.supply<Math.round(40*disc)||RUN.hq>=RUN.hqMax,go:()=>{RUN.supply-=Math.round(40*disc);RUN.hq=Math.min(RUN.hqMax,RUN.hq+70);n.repair=false;showShop(n)}});
+  panel(_t('후방 보급소'),_t('보급을 써서 특성이나 병과를 들입니다.'),ch,{label:_t('떠나기'),go:()=>{delete n.stock;finishNode(n)}});
 }
 function showRest(n){
   const heal=Math.round(RUN.hqMax*.35);
-  panel('후방 휴식','하루 동안 전선이 조용합니다. 한 가지만 할 수 있습니다.',[
-    {tag:'REPAIR',name:'사령부 보수',desc:`사령부 내구도 +${heal}`,go:()=>{RUN.hq=Math.min(RUN.hqMax,RUN.hq+heal);finishNode(n)}},
-    {tag:'DRILL',name:'훈련',desc:'무작위 특성 1개 획득',go:()=>{const r=grantRandom();panel('훈련 완료',r,[],{label:'지도로',go:()=>finishNode(n)})}}]);
+  panel(_t('후방 휴식'),_t('하루 동안 전선이 조용합니다. 한 가지만 할 수 있습니다.'),[
+    {tag:'REPAIR',name:_t('사령부 보수'),desc:_t("사령부 내구도 +{0}",heal),go:()=>{RUN.hq=Math.min(RUN.hqMax,RUN.hq+heal);finishNode(n)}},
+    {tag:'DRILL',name:_t('훈련'),desc:_t('무작위 특성 1개 획득'),go:()=>{const r=grantRandom();panel(_t('훈련 완료'),r,[],{label:_t('지도로'),go:()=>finishNode(n)})}}]);
 }
 const EVENTS=[
-  {t:'무너진 참호의 유품',d:'포격에 묻힌 참호에서 장교의 소지품이 보입니다. 파내려면 시간이 걸리고, 그동안 사령부가 노출됩니다.',c:[
-    {name:'파낸다',desc:'사령부 -30, 무작위 유물 1개',go:()=>{RUN.hq=Math.max(1,RUN.hq-30);const k=relicPool()[0];if(!k)return '이미 쓸 만한 건 다 챙겼습니다.';const nw=gainRelic(k);return `${RELICS[k].name}을(를) 얻었습니다.${nw?' 도감에 새로 기록됐습니다.':''}`}},
-    {name:'그냥 지나간다',desc:'아무 일도 없음',go:()=>'전선을 지나쳤습니다.'}]},
-  {t:'버려진 보급창고',d:'포격에 무너진 창고에서 상자 몇 개가 보입니다. 더 깊이 뒤지면 무언가 있을 수 있지만 잔해가 불안정합니다.',c:[
-    {name:'보이는 것만 챙긴다',desc:'보급 +35',go:()=>{RUN.supply+=35;return '보급 35를 챙겼습니다.'}},
-    {name:'깊이 뒤진다',desc:'반반 확률: 특성 1개 또는 사령부 -40',go:()=>{if(Math.random()<.5)return grantRandom();RUN.hq=Math.max(1,RUN.hq-40);return '잔해가 무너져 사령부가 40 피해를 입었습니다.'}}]},
-  {t:'낙오병 무리',d:'다른 부대에서 떨어져 나온 소총수들이 합류하길 원합니다. 먹일 보급이 필요합니다.',c:[
-    {name:'받아들인다',desc:'다음 전투 시작 시 소총수 4명 배치, 보급 -15',go:()=>{RUN.recruits+=4;RUN.supply=Math.max(0,RUN.supply-15);return '소총수 4명이 다음 전투에 합류합니다.'}},
-    {name:'보급만 나눠 보낸다',desc:'사령부 +25',go:()=>{RUN.hq=Math.min(RUN.hqMax,RUN.hq+25);return '사령부 인원이 쉬면서 내구도 25를 회복했습니다.'}}]},
-  {t:'포병 연락장교',d:'인접 포병대가 화력 지원을 약속하는 대신 보급을 요구합니다.',c:[
-    {name:'보급 60을 넘긴다',desc:'포병 연대 특성 획득',need:60,go:()=>{RUN.supply-=60;if(lv('barrage')<2){RUN.perks.barrage=lv('barrage')+1;return '포병 연대 특성을 얻었습니다.'}RUN.supply+=60;return '이미 최대 지원을 받고 있어 거래가 무산됐습니다.'}},
-    {name:'거절한다',desc:'아무 일도 없음',go:()=>'장교가 떠났습니다.'}]},
-  {t:'노획 차량',d:'적이 버리고 간 장갑차를 정비병이 고칠 수 있다고 합니다.',c:[
-    {name:'수리한다',desc:'보급 -50. 전차 편성, 이미 있으면 증가 장갑',need:50,go:()=>{RUN.supply-=50;if(!RUN.units.includes('tank')){RUN.units.push('tank');return '전차를 편성했습니다.'}if(lv('tankHp')<2){RUN.perks.tankHp=lv('tankHp')+1;return '증가 장갑을 얻었습니다.'}RUN.supply+=50;return '쓸 데가 없어 돌려보냈습니다.'}},
-    {name:'부품만 뜯어 판다',desc:'보급 +30',go:()=>{RUN.supply+=30;return '보급 30을 얻었습니다.'}}]},
-  {t:'야간 기습 제안',d:'중대장이 오늘 밤 적 참호 기습을 건의합니다. 성공하면 적 보급을 빼앗지만 실패하면 병력을 잃습니다.',c:[
-    {name:'기습한다',desc:'60%: 보급 +60 / 40%: 사령부 -35',go:()=>{if(Math.random()<.6){RUN.supply+=60;return '기습 성공. 보급 60을 노획했습니다.'}RUN.hq=Math.max(1,RUN.hq-35);return '기습이 발각돼 사령부가 35 피해를 입었습니다.'}},
-    {name:'참호를 보강한다',desc:'참호 보강 특성 (최대치면 사령부 +20)',go:()=>{if(lv('trench')<2){RUN.perks.trench=lv('trench')+1;return '참호 보강 특성을 얻었습니다.'}RUN.hq=Math.min(RUN.hqMax,RUN.hq+20);return '사령부를 20 보강했습니다.'}}]},
+  {t:_t('무너진 참호의 유품'),d:_t('포격에 묻힌 참호에서 장교의 소지품이 보입니다. 파내려면 시간이 걸리고, 그동안 사령부가 노출됩니다.'),c:[
+    {name:_t('파낸다'),desc:_t('사령부 -30, 무작위 유물 1개'),go:()=>{RUN.hq=Math.max(1,RUN.hq-30);const k=relicPool()[0];if(!k)return _t('이미 쓸 만한 건 다 챙겼습니다.');const nw=gainRelic(k);return _t("{0}을(를) 얻었습니다.{1}",RELICS[k].name,nw?_t(' 도감에 새로 기록됐습니다.'):'')}},
+    {name:_t('그냥 지나간다'),desc:_t('아무 일도 없음'),go:()=>_t('전선을 지나쳤습니다.')}]},
+  {t:_t('버려진 보급창고'),d:_t('포격에 무너진 창고에서 상자 몇 개가 보입니다. 더 깊이 뒤지면 무언가 있을 수 있지만 잔해가 불안정합니다.'),c:[
+    {name:_t('보이는 것만 챙긴다'),desc:_t('보급 +35'),go:()=>{RUN.supply+=35;return _t('보급 35를 챙겼습니다.')}},
+    {name:_t('깊이 뒤진다'),desc:_t('반반 확률: 특성 1개 또는 사령부 -40'),go:()=>{if(Math.random()<.5)return grantRandom();RUN.hq=Math.max(1,RUN.hq-40);return _t('잔해가 무너져 사령부가 40 피해를 입었습니다.')}}]},
+  {t:_t('낙오병 무리'),d:_t('다른 부대에서 떨어져 나온 소총수들이 합류하길 원합니다. 먹일 보급이 필요합니다.'),c:[
+    {name:_t('받아들인다'),desc:_t('다음 전투 시작 시 소총수 4명 배치, 보급 -15'),go:()=>{RUN.recruits+=4;RUN.supply=Math.max(0,RUN.supply-15);return _t('소총수 4명이 다음 전투에 합류합니다.')}},
+    {name:_t('보급만 나눠 보낸다'),desc:_t('사령부 +25'),go:()=>{RUN.hq=Math.min(RUN.hqMax,RUN.hq+25);return _t('사령부 인원이 쉬면서 내구도 25를 회복했습니다.')}}]},
+  {t:_t('포병 연락장교'),d:_t('인접 포병대가 화력 지원을 약속하는 대신 보급을 요구합니다.'),c:[
+    {name:_t('보급 60을 넘긴다'),desc:_t('포병 연대 특성 획득'),need:60,go:()=>{RUN.supply-=60;if(lv('barrage')<2){RUN.perks.barrage=lv('barrage')+1;return _t('포병 연대 특성을 얻었습니다.')}RUN.supply+=60;return _t('이미 최대 지원을 받고 있어 거래가 무산됐습니다.')}},
+    {name:_t('거절한다'),desc:_t('아무 일도 없음'),go:()=>_t('장교가 떠났습니다.')}]},
+  {t:_t('노획 차량'),d:_t('적이 버리고 간 장갑차를 정비병이 고칠 수 있다고 합니다.'),c:[
+    {name:_t('수리한다'),desc:_t('보급 -50. 전차 편성, 이미 있으면 증가 장갑'),need:50,go:()=>{RUN.supply-=50;if(!RUN.units.includes('tank')){RUN.units.push('tank');return _t('전차를 편성했습니다.')}if(lv('tankHp')<2){RUN.perks.tankHp=lv('tankHp')+1;return _t('증가 장갑을 얻었습니다.')}RUN.supply+=50;return _t('쓸 데가 없어 돌려보냈습니다.')}},
+    {name:_t('부품만 뜯어 판다'),desc:_t('보급 +30'),go:()=>{RUN.supply+=30;return _t('보급 30을 얻었습니다.')}}]},
+  {t:_t('야간 기습 제안'),d:_t('중대장이 오늘 밤 적 참호 기습을 건의합니다. 성공하면 적 보급을 빼앗지만 실패하면 병력을 잃습니다.'),c:[
+    {name:_t('기습한다'),desc:_t('60%: 보급 +60 / 40%: 사령부 -35'),go:()=>{if(Math.random()<.6){RUN.supply+=60;return _t('기습 성공. 보급 60을 노획했습니다.')}RUN.hq=Math.max(1,RUN.hq-35);return _t('기습이 발각돼 사령부가 35 피해를 입었습니다.')}},
+    {name:_t('참호를 보강한다'),desc:_t('참호 보강 특성 (최대치면 사령부 +20)'),go:()=>{if(lv('trench')<2){RUN.perks.trench=lv('trench')+1;return _t('참호 보강 특성을 얻었습니다.')}RUN.hq=Math.min(RUN.hqMax,RUN.hq+20);return _t('사령부를 20 보강했습니다.')}}]},
 ];
 function showEvent(n){
   const e=n.ev!=null?EVENTS[n.ev]:EVENTS[n.ev=Math.random()*EVENTS.length|0];
-  panel(e.t,e.d,e.c.map(c=>({name:c.name,desc:c.desc,disabled:c.need&&RUN.supply<c.need,go:()=>{const r=c.go();panel(e.t,r,[],{label:'지도로',go:()=>finishNode(n)})}})));
+  panel(e.t,e.d,e.c.map(c=>({name:c.name,desc:c.desc,disabled:c.need&&RUN.supply<c.need,go:()=>{const r=c.go();panel(e.t,r,[],{label:_t('지도로'),go:()=>finishNode(n)})}})));
 }
 function gameOver(win){
   const c=curNode(),floor=win?FLOORS:(CFG?CFG.f+1:c?c.f+1:0);
   const M=getMeta(),R=rk(),og=RUN.origin||'acad',merit=Math.round((5+floor*12+(RUN.elites||0)*15+Math.floor(RUN.kills/8)+(win?100:0))*(1+.1*(R-1)));
   let unlocked='';
-  if(win){M.clears[og+':'+R]=true;if(R>=M.rank&&R<6){M.rank=R+1;unlocked=` 작전 등급 ${R+1}(${RANKS[R+1].name})이 열렸습니다.`}}
+  if(win){M.clears[og+':'+R]=true;if(R>=M.rank&&R<6){M.rank=R+1;unlocked=_t(" 작전 등급 {0}({1})이 열렸습니다.",R+1,RANKS[R+1].name)}}
   M.merit+=merit;M.earned+=merit;if(floor>M.best)M.best=floor;if(win)M.wins++;setMeta(M);store.del('trenchline.run');
-  const relics=[...(RUN.relics||[])],stats=`전투 ${RUN.battles}회 · 적 사살 ${RUN.kills} · 공적 +${merit} (보유 ${M.merit})`;
-  const text=(win?`${ORIGINS[og].name} ${R}등급으로 적 사령부를 함락했습니다.${unlocked} `:`${floor}번째 전선에서 사령부가 무너졌습니다. 최고 기록은 ${M.best}번째 전선입니다. `)+stats+'.';
+  const relics=[...(RUN.relics||[])],stats=_t("전투 {0}회 · 적 사살 {1} · 공적 +{2} (보유 {3}).",RUN.battles,RUN.kills,merit,M.merit);
+  const text=(win?_t("{0} {1}등급으로 적 사령부를 함락했습니다.{2} ",ORIGINS[og].name,R,unlocked):_t("{0}번째 전선에서 사령부가 무너졌습니다. 최고 기록은 {1}번째 전선입니다. ",floor,M.best))+stats;
   RUN=null;
   if(relics.length){
-    panel(win?'작전 완수':'작전 실패',text+' 이번 작전의 유물 하나를 다음 작전에 가져갈 수 있습니다.',
-      relics.map(k=>({...relicView(k),tag:'INHERIT',go:()=>{const m=getMeta();m.heir=k;setMeta(m);afterRun()}})),{label:'가져가지 않음',go:afterRun});
-  }else panel(win?'작전 완수':'작전 실패',text,[],{label:'계속',go:afterRun});
+    panel(win?_t('작전 완수'):_t('작전 실패'),text+_t(' 이번 작전의 유물 하나를 다음 작전에 가져갈 수 있습니다.'),
+      relics.map(k=>({...relicView(k),tag:'INHERIT',go:()=>{const m=getMeta();m.heir=k;setMeta(m);afterRun()}})),{label:_t('가져가지 않음'),go:afterRun});
+  }else panel(win?_t('작전 완수'):_t('작전 실패'),text,[],{label:_t('계속'),go:afterRun});
 }
 function afterRun(){showMeta()}
 function showMeta(){
   const M=getMeta(),L=legacy();
   const ch=Object.entries(META_UP).map(([k,u])=>{const l=M.up[k]||0,max=l>=u.max,c=u.cost[l];
-    return {tag:`LV ${l}/${u.max}`,name:u.name,desc:u.desc,price:max?null:c,disabled:max||M.merit<c,go:()=>{const m=getMeta();if(m.merit<c)return;m.merit-=c;m.up[k]=l+1;setMeta(m);showMeta()}}});
-  panel('사령부 보급창',`공적으로 모든 작전에 남는 강화를 삽니다. 보유 공적 ${M.merit}. 도감 유물 ${L.n}/${Object.keys(RELICS).length}개 · 영구 보너스 CP 수입 +${Math.round(L.inc*100)}%, 사령부 +${L.hq}.${M.heir?` 다음 작전 계승 유물: ${RELICS[M.heir].name}.`:''}`,ch.map(c=>({...c,price:c.price})),{label:'새 작전 시작',go:startSetup});
-  const box=$('#pChoices');box.querySelectorAll('.price').forEach(e=>e.textContent=e.textContent.replace('보급','공적'));
+    return {tag:`LV ${l}/${u.max}`,name:u.name,desc:u.desc,price:max?null:c,unit:_t('공적'),disabled:max||M.merit<c,go:()=>{const m=getMeta();if(m.merit<c)return;m.merit-=c;m.up[k]=l+1;setMeta(m);showMeta()}}});
+  panel(_t('사령부 보급창'),_t("공적으로 모든 작전에 남는 강화를 삽니다. 보유 공적 {0}. 도감 유물 {1}/{2}개 · 영구 보너스 CP 수입 +{3}%, 사령부 +{4}.{5}",M.merit,L.n,Object.keys(RELICS).length,Math.round(L.inc*100),L.hq,M.heir?_t(" 다음 작전 계승 유물: {0}.",RELICS[M.heir].name):''),ch.map(c=>({...c,price:c.price})),{label:_t('새 작전 시작'),go:startSetup});
+  const box=$('#pChoices');
   const ul=document.createElement('ul');ul.className='relic-list';ul.style.gridColumn='1/-1';
-  ul.innerHTML='<li style="margin-top:6px"><b style="color:var(--fg)">유물 도감</b></li>'+Object.entries(RELICS).map(([k,r])=>M.found.includes(k)?`<li>${iconImg(k,'ico sm')}<b>${r.name}</b> · ${r.desc}</li>`:'<li class="no"><b>◇ ???</b> · 아직 발견하지 못함</li>').join('');
+  ul.innerHTML=_t('<li style="margin-top:6px"><b style="color:var(--fg)">유물 도감</b></li>')+Object.entries(RELICS).map(([k,r])=>M.found.includes(k)?`<li>${iconImg(k,'ico sm')}<b>${r.name}</b> · ${r.desc}</li>`:_t('<li class="no"><b>◇ ???</b> · 아직 발견하지 못함</li>')).join('');
   box.append(ul);
   const g=document.createElement('div');g.className='clears';g.style.gridColumn='1/-1';
-  let h='<b>지휘관 명부</b><table><tr><th></th>'+[1,2,3,4,5,6].map(i=>`<th>${i}</th>`).join('')+'</tr>';
-  for(const k of ORIGIN_ORDER){h+=`<tr><th>${ORIGINS[k].name.replace(' 출신','')}</th>`+[1,2,3,4,5,6].map(i=>`<td class="${M.clears[k+':'+i]?'on':i>M.rank?'lock':''}">${M.clears[k+':'+i]?'★':i>M.rank?'·':'○'}</td>`).join('')+'</tr>'}
-  g.innerHTML=h+'</table><p>★ 클리어 · ○ 도전 가능 · · 잠김(등급 미개방)</p>';box.append(g);
+  let h=_t('<b>지휘관 명부</b><table><tr><th></th>')+[1,2,3,4,5,6].map(i=>`<th>${i}</th>`).join('')+'</tr>';
+  for(const k of ORIGIN_ORDER){h+=`<tr><th>${ORIGINS[k].short}</th>`+[1,2,3,4,5,6].map(i=>`<td class="${M.clears[k+':'+i]?'on':i>M.rank?'lock':''}">${M.clears[k+':'+i]?'★':i>M.rank?'·':'○'}</td>`).join('')+'</tr>'}
+  g.innerHTML=h+_t('</table><p>★ 클리어 · ○ 도전 가능 · · 잠김(등급 미개방)</p>');box.append(g);
 }
 function showTitle(){
   show('vTitle');renderAccount();const sv=store.get('trenchline.run');$('#bCont').hidden=!sv;
-  const M=getMeta();$('#best').innerHTML=M.runs?`최고 기록 ${M.best}번째 전선 · 작전 완수 ${M.wins}회 · 열린 등급 ${M.rank} · 명부 ${Object.keys(M.clears).length}/${ORIGIN_ORDER.length*6} · 보유 공적 <span class="merit">${M.merit}</span> · 유물 도감 ${M.found.length}/${Object.keys(RELICS).length}`:'';
+  const M=getMeta();$('#best').innerHTML=M.runs?_t("최고 기록 {0}번째 전선 · 작전 완수 {1}회 · 열린 등급 {2} · 명부 {3}/{4} · 보유 공적 <span class=\"merit\">{5}</span> · 유물 도감 {6}/{7}",M.best,M.wins,M.rank,Object.keys(M.clears).length,ORIGIN_ORDER.length*6,M.merit,M.found.length,Object.keys(RELICS).length):'';
 }
 $('#bNew').onclick=startSetup;
 $('#bMeta').onclick=showMeta;
@@ -767,19 +1163,19 @@ const cv=$('#cv'),ctx=cv.getContext('2d');
 const mini=$('#mini'),mx=mini.getContext('2d');
 /* ---------- terrain ---------- */
 const BIOMES={
-  mud:{name:'진흙 평원',cols:[[62,53,38],[70,60,43],[53,45,32],[75,65,48]],speck:[90,84,54],top:[84,80,50],pit:'#1f1a12',pit2:'#2b2418',crater:'#2a2318',sky:['#24282a','#4a463c','#8a7556'],hill:['#34342c','#29281f'],feats:{craters:3,wire:2,marsh:1.5,hill:1.5,forest:1,ruins:.6,pillbox:.6}},
-  forest:{name:'숲 가장자리',cols:[[52,56,36],[60,64,40],[46,50,31],[66,68,44]],speck:[84,92,52],top:[70,84,46],pit:'#1b1a10',pit2:'#272616',crater:'#262414',sky:['#232a26','#3e4a3c','#7a7a58'],hill:['#2c3528','#222a1f'],feats:{forest:4,craters:1.5,wire:1.5,marsh:1,hill:1,pillbox:.6}},
-  ruins:{name:'폐허 마을',cols:[[84,77,66],[94,86,74],[74,68,58],[100,92,80]],speck:[118,110,96],top:[96,90,76],pit:'#221e18',pit2:'#2e2922',crater:'#3a342c',sky:['#28272a','#4c4844','#8c7e68'],hill:['#383430','#2c2926'],feats:{ruins:4,pillbox:1.5,craters:2,wire:1.5,hill:.6}},
-  snow:{name:'설원',cols:[[196,198,196],[210,210,206],[184,188,188],[222,222,216]],speck:[170,176,178],top:[226,228,226],pit:'#3a3d40',pit2:'#4c5054',crater:'#8a9096',sky:['#2e3440','#6a7280','#b8bec4'],hill:['#7c8490','#626a76'],feats:{forest:2,craters:2,wire:2,marsh:1.5,hill:1.5,ruins:.6}},
+  mud:{name:_t('진흙 평원'),cols:[[62,53,38],[70,60,43],[53,45,32],[75,65,48]],speck:[90,84,54],top:[84,80,50],pit:'#1f1a12',pit2:'#2b2418',crater:'#2a2318',sky:['#24282a','#4a463c','#8a7556'],hill:['#34342c','#29281f'],feats:{craters:3,wire:2,marsh:1.5,hill:1.5,forest:1,ruins:.6,pillbox:.6}},
+  forest:{name:_t('숲 가장자리'),cols:[[52,56,36],[60,64,40],[46,50,31],[66,68,44]],speck:[84,92,52],top:[70,84,46],pit:'#1b1a10',pit2:'#272616',crater:'#262414',sky:['#232a26','#3e4a3c','#7a7a58'],hill:['#2c3528','#222a1f'],feats:{forest:4,craters:1.5,wire:1.5,marsh:1,hill:1,pillbox:.6}},
+  ruins:{name:_t('폐허 마을'),cols:[[84,77,66],[94,86,74],[74,68,58],[100,92,80]],speck:[118,110,96],top:[96,90,76],pit:'#221e18',pit2:'#2e2922',crater:'#3a342c',sky:['#28272a','#4c4844','#8c7e68'],hill:['#383430','#2c2926'],feats:{ruins:4,pillbox:1.5,craters:2,wire:1.5,hill:.6}},
+  snow:{name:_t('설원'),cols:[[196,198,196],[210,210,206],[184,188,188],[222,222,216]],speck:[170,176,178],top:[226,228,226],pit:'#3a3d40',pit2:'#4c5054',crater:'#8a9096',sky:['#2e3440','#6a7280','#b8bec4'],hill:['#7c8490','#626a76'],feats:{forest:2,craters:2,wire:2,marsh:1.5,hill:1.5,ruins:.6}},
 };
 const FEAT={
-  forest:{name:'숲',cover:.65,slow:.85,splash:.8},
-  ruins:{name:'폐허',cover:.5,slow:.8,splash:.7},
-  craters:{name:'포탄 구덩이',cover:.75,slow:.9,splash:.8},
-  wire:{name:'철조망',cover:1,slow:.4,splash:1},
-  marsh:{name:'늪',cover:1,slow:.55,splash:1,tankSlow:.5},
-  hill:{name:'고지',cover:.9,slow:.95,splash:1,range:1.2,acc:1.1},
-  pillbox:{name:'토치카',cover:.4,slow:1,splash:.5},
+  forest:{name:_t('숲'),cover:.65,slow:.85,splash:.8},
+  ruins:{name:_t('폐허'),cover:.5,slow:.8,splash:.7},
+  craters:{name:_t('포탄 구덩이'),cover:.75,slow:.9,splash:.8},
+  wire:{name:_t('철조망'),cover:1,slow:.4,splash:1},
+  marsh:{name:_t('늪'),cover:1,slow:.55,splash:1,tankSlow:.5},
+  hill:{name:_t('고지'),cover:.9,slow:.95,splash:1,range:1.2,acc:1.1},
+  pillbox:{name:_t('토치카'),cover:.4,slow:1,splash:.5},
 };
 function genTerrain(seed,f,boss){return seeded(seed,()=>{
   const bk=Object.keys(BIOMES),biome=boss?'ruins':bk[Math.floor(Math.random()*bk.length)],B=BIOMES[biome];
@@ -820,7 +1216,7 @@ function buildBackdrop(biome){
 var CUR_CRATER='#2a2318',CUR_BIOME='mud';
 let MODE=store.get('trenchline.mode')||(matchMedia('(pointer:fine) and (min-width:900px)').matches?'pc':'mobile');
 function applyMode(){VW=MODE==='pc'?380:240;document.body.classList.toggle('pc',MODE==='pc');buildBackdrop(CUR_BIOME);
-  const b=$('#bMode');if(b)b.textContent=MODE==='pc'?'화면: PC':'화면: 모바일';}
+  const b=$('#bMode');if(b)b.textContent=MODE==='pc'?_t('화면: PC'):_t('화면: 모바일');}
 applyMode();
 const [grd,gx]=mk(WORLD*SC,(VH-GY)*SC);
 function buildGround(TER){
@@ -1277,12 +1673,12 @@ function setStance(st){S.stance[1]=st;document.querySelectorAll('.seg button[dat
 document.querySelectorAll('.seg button[data-st]').forEach(b=>b.onclick=()=>S&&setStance(b.dataset.st));
 $('#bFront').onclick=()=>{if(S)S.follow=true};
 $('#bSpeed').onclick=e=>{if(!S)return;S.speed=S.speed>=4?1:S.speed+1;e.target.textContent='×'+S.speed};
-function soundLabel(){$('#bSound').textContent=AU.on?'소리 켬':'소리 끔';$('#bSound').setAttribute('aria-pressed',AU.on)}
+function soundLabel(){$('#bSound').textContent=AU.on?_t('소리 켬'):_t('소리 끔');$('#bSound').setAttribute('aria-pressed',AU.on)}
 $('#bSound').onclick=()=>{AU.on=!AU.on;store.set('trenchline.sound',AU.on);if(AU.on)audioInit();soundLabel()};
 soundLabel();
-$('#bPause').onclick=e=>{if(!S||S.over||!S.started)return;S.paused=!S.paused;e.target.textContent=S.paused?'계속':'일시정지'};
+$('#bPause').onclick=e=>{if(!S||S.over||!S.started)return;S.paused=!S.paused;e.target.textContent=S.paused?_t('계속'):_t('일시정지')};
 function ui(){
-  $('#cp').textContent=Math.floor(S.pts[1]);$('#cp').classList.toggle('pay',S.payFlash>0);$('#payAmt').textContent=`+${payAmount(1)} / ${payInterval(1).toFixed(1)}초`;$('#payBar').style.width=Math.min(100,S.payT[1]/payInterval(1)*100)+'%';
+  $('#cp').textContent=Math.floor(S.pts[1]);$('#cp').classList.toggle('pay',S.payFlash>0);$('#payAmt').textContent=_t("+{0} / {1}초",payAmount(1),payInterval(1).toFixed(1));$('#payBar').style.width=Math.min(100,S.payT[1]/payInterval(1)*100)+'%';
   $('#hpP').style.width=Math.max(0,S.hq[1]/S.hqMax[1]*100)+'%';$('#hpE').style.width=Math.max(0,S.hq[-1]/S.hqMax[-1]*100)+'%';
   for(const k in cards){const sup=!!SUP[k]&&!U[k],d=sup?{cost:SUP[k].cost,cd:supCd(1,k)}:S.ST[1][k],cd=S.cd[1][k]||0;
     cards[k].style.setProperty('--cd',(cd/d.cd*100)+'%');cards[k].classList.toggle('poor',S.pts[1]<d.cost);cards[k].classList.toggle('aim',S.aim===k)}
@@ -1291,32 +1687,32 @@ const ov=$('#ov');
 function overlay(html,btn,go){ov.hidden=false;ov.innerHTML=html+`<div><button class="btn primary" id="ovGo">${btn}</button></div>`;$('#ovGo').onclick=go}
 function loadoutPicker(){
   const own=supOwned();if(own.length<=supSlots())return '';
-  const lo=supLoadout();return `<p>출전 지원 카드 ${lo.length}/${supSlots()}</p><div class="lo">${own.map(k=>`<button type="button" data-lo="${k}" aria-pressed="${lo.includes(k)}"><img class="ico sm" src="${supIcon(k)}" alt="">${SUP[k].name}</button>`).join('')}</div>`;
+  const lo=supLoadout();return _t("<p>출전 지원 카드 {0}/{1}</p><div class=\"lo\">{2}</div>",lo.length,supSlots(),own.map(k=>`<button type="button" data-lo="${k}" aria-pressed="${lo.includes(k)}"><img class="ico sm" src="${supIcon(k)}" alt="">${SUP[k].name}</button>`).join(''));
 }
 function bindLoadout(){ov.querySelectorAll('[data-lo]').forEach(b=>b.onclick=()=>{const k=b.dataset.lo,lo=supLoadout();
   if(lo.includes(k)){if(lo.length>1)lo.splice(lo.indexOf(k),1)}else{if(lo.length>=supSlots())lo.shift();lo.push(k)}
-  ov.querySelectorAll('[data-lo]').forEach(x=>x.setAttribute('aria-pressed',lo.includes(x.dataset.lo)));const p=ov.querySelector('.lo').previousElementSibling;if(p)p.textContent=`출전 지원 카드 ${lo.length}/${supSlots()}`;buildCards();ui();saveRun()})}
+  ov.querySelectorAll('[data-lo]').forEach(x=>x.setAttribute('aria-pressed',lo.includes(x.dataset.lo)));const p=ov.querySelector('.lo').previousElementSibling;if(p)p.textContent=_t("출전 지원 카드 {0}/{1}",lo.length,supSlots());buildCards();ui();saveRun()})}
 function startBattle(n){
   const f=n.f,boss=n.type==='boss',elite=n.type==='elite';
   CFG={node:n,f,boss,elite,mod:n.mod,diff:(.82+f*.055)*(elite?1.1:1)*(boss?1.15:1),ehq:boss?(rk()>=6?600:520):200+f*18};
   newGame(CFG);show('vBattle');S.cam=0;
-  $('#bName').textContent=(boss?'적 사령부 공략':`${f+1}번째 전선 · ${elite?'정예 부대':'일반 전투'}`)+' · '+BIOMES[CFG.terrain.biome].name;
+  $('#bName').textContent=(boss?_t('적 사령부 공략'):_t("{0}번째 전선 · {1}",f+1,elite?_t('정예 부대'):_t('일반 전투')))+' · '+BIOMES[CFG.terrain.biome].name;
   const m=$('#bMod');m.hidden=!n.mod;if(n.mod){m.textContent=MODS[n.mod].name;m.title=MODS[n.mod].desc}
-  $('#bPause').textContent='일시정지';$('#bSpeed').textContent='×1';
+  $('#bPause').textContent=_t('일시정지');$('#bSpeed').textContent='×1';
   render();ui();
   setTimeout(bindLoadout,0);
-  overlay(`<h2>${$('#bName').textContent}</h2><p>${boss?'적 사령부는 내구도가 높고 전차와 기관총이 미리 배치돼 있습니다. ':elite?'적이 진지를 미리 갖추고 있습니다. ':''}${n.mod?MODS[n.mod].name+': '+MODS[n.mod].desc+'. ':''}지형: ${[...new Set(CFG.terrain.feats.map(o=>FEAT[o.type].name))].join(', ')||'개활지'}. ${rk()>1?`등급 ${rk()} ${RANKS[rk()].name}. `:''}적 사령부 내구도 ${CFG.ehq}, 아군 사령부 ${RUN.hq}/${RUN.hqMax}.</p>${loadoutPicker()}`,'작전 개시',()=>{ov.hidden=true;S.paused=false;S.started=true;audioInit();soundLabel()});
+  overlay(_t("<h2>{0}</h2><p>{1}{2}지형: {3}. {4}적 사령부 내구도 {5}, 아군 사령부 {6}/{7}.</p>{8}",$('#bName').textContent,boss?_t('적 사령부는 내구도가 높고 전차와 기관총이 미리 배치돼 있습니다. '):elite?_t('적이 진지를 미리 갖추고 있습니다. '):'',n.mod?MODS[n.mod].name+': '+MODS[n.mod].desc+'. ':'',[...new Set(CFG.terrain.feats.map(o=>FEAT[o.type].name))].join(', ')||_t('개활지'),rk()>1?_t("등급 {0} {1}. ",rk(),RANKS[rk()].name):'',CFG.ehq,RUN.hq,RUN.hqMax,loadoutPicker()),_t('작전 개시'),()=>{ov.hidden=true;S.paused=false;S.started=true;audioInit();soundLabel()});
 }
 function endBattle(win){
   if(S.over)return;S.over=true;RUN.kills+=S.kills;RUN.battles++;
   const n=CFG.node;
   if(win){
     RUN.hq=Math.min(RUN.hqMax,Math.max(1,Math.ceil(S.hq[1]))+(has('canteen')?15:0));if(CFG.elite)RUN.elites=(RUN.elites||0)+1;
-    if(CFG.boss){overlay(`<h2>적 사령부 함락</h2><p>적 사살 ${S.kills} · 아군 손실 ${S.lost}</p>`,'결과 보기',()=>{RUN.path.push(n.id);gameOver(true)});return}
+    if(CFG.boss){overlay(_t("<h2>적 사령부 함락</h2><p>적 사살 {0} · 아군 손실 {1}</p>",S.kills,S.lost),_t('결과 보기'),()=>{RUN.path.push(n.id);gameOver(true)});return}
     const gain=Math.round((25+CFG.f*5+(CFG.elite?35:0))*(has('coin')?1.5:1));RUN.supply+=gain;
-    overlay(`<h2>전선 돌파</h2><p>적 사살 ${S.kills} · 아군 손실 ${S.lost} · 사령부 ${RUN.hq}/${RUN.hqMax}</p>`,'보상 고르기',()=>showReward(n,gain));
+    overlay(_t("<h2>전선 돌파</h2><p>적 사살 {0} · 아군 손실 {1} · 사령부 {2}/{3}</p>",S.kills,S.lost,RUN.hq,RUN.hqMax),_t('보상 고르기'),()=>showReward(n,gain));
   }else{
-    overlay(`<h2>아군 사령부 함락</h2><p>적 사살 ${S.kills} · 아군 손실 ${S.lost}</p>`,'결과 보기',()=>gameOver(false));
+    overlay(_t("<h2>아군 사령부 함락</h2><p>적 사살 {0} · 아군 손실 {1}</p>",S.kills,S.lost),_t('결과 보기'),()=>gameOver(false));
   }
 }
 
@@ -1365,7 +1761,10 @@ function frame(now){
 /* ---------- test hook (tests/ 시뮬레이션 전용, 게임 로직은 쓰지 않음) ---------- */
 window.__TL={get S(){return S},get RUN(){return RUN},set RUN(v){RUN=v},get CFG(){return CFG},U,PERKS,RELICS,
   genMap,hashSeed,startBattle,step,spawn,setStance,callBarrage,callSupport,supReady,SUP,gameOver,newRun,getMeta,mkRun:(over)=>({seed:'SIM',map:genMap(1),path:[],hq:250,hqMax:250,supply:20,units:['rifle','assault','mg','at','sniper','mortar','tank'],perks:{},relics:[],support:['bar'],loadout:['bar'],kills:0,battles:0,recruits:0,elites:0,...(over||{})})};
-if(/-dev\.|localhost|127\.0\.0\.1/.test(location.hostname))$('#devTag').hidden=false;
+if(/^dev\.|-dev\.|localhost|127\.0\.0\.1/.test(location.hostname))$('#devTag').hidden=false;
+$('#bLang').textContent=LANG==='en'?'한국어':'English';$('#bLang').lang=LANG==='en'?'ko':'en';
+$('#bLang').onclick=()=>setLang(LANG==='en'?'ko':'en');
+translateDOM();
 showTitle();
 cloudInit();
 requestAnimationFrame(frame);

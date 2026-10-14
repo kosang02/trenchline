@@ -5,7 +5,7 @@
 ## 역할
 - **팀장 (Opus 세션)**: 모든 코드 작업(시스템, 구조, 기능, 버그, 스프라이트), 배포, 다른 세션 작업 검토와 최종 결정.
 - **팀원 (Sonnet 세션)**: 기획과 밸런스 설계, 세계관·문구, 측정 결과 분석. 결과물은 `docs/`의 문서와 `NOTES.md`로 낸다.
-  - 팀원은 `public/index.html`의 **데이터 값과 문구만** 직접 고칠 수 있다(`U`·`PERKS`·`RELICS`·`SUP`·`EVENTS`·`ORIGINS`·`RANKS`의 숫자와 텍스트). 함수나 로직은 고치지 않는다.
+  - 팀원은 `public/index.html`의 **데이터 값과 문구만** 직접 고칠 수 있다(`U`·`PERKS`·`RELICS`·`SUP`·`EVENTS`·`ORIGINS`·`RANKS`의 숫자와 텍스트, 번역 표 `I18N_EN`). 함수나 로직은 고치지 않는다.
   - 로직이 필요한 제안은 `NOTES.md`의 "팀장 확인 필요"에 적는다.
 
 ## 작업 순서 (충돌 방지)
@@ -15,7 +15,7 @@
 4. 푸시 전 검사: `node --check`로 스크립트 문법 확인(아래 명령), 가능하면 `python3 tests/smoke.py`.
 5. 끝나면 `NOTES.md`의 변경 기록에 한 줄 남긴다.
 
-문법 검사:
+문법 검사(번역 표를 건드렸으면 `node tests/i18n_check.mjs`도):
 ```
 sed -n '/<script>/,/<\/script>/p' public/index.html | sed '1d;$d' > /tmp/g.js && node --check /tmp/g.js
 ```
@@ -48,6 +48,7 @@ sed -n '/<script>/,/<\/script>/p' public/index.html | sed '1d;$d' > /tmp/g.js &&
 | 사건 | `EVENTS` |
 | 지형·바이옴 | `BIOMES`, `FEAT`, `genTerrain()`, `buildGround()` |
 | 스프라이트 | `pixel sprites` 섹션 — 문자 격자 + 팔레트(`PAL`) |
+| 번역(한/영) | `i18n` 섹션(스크립트 맨 위): `I18N_EN` 표, `LANG`, `_t()`, `translateDOM()`, `setLang()` |
 | 저장 | `storage`, `cloud save` 섹션. localStorage 키 `trenchline.run/meta/code/savedAt` |
 
 ## 도트 규칙
@@ -57,6 +58,13 @@ sed -n '/<script>/,/<\/script>/p' public/index.html | sed '1d;$d' > /tmp/g.js &&
 - 유닛: 높이 12px 안팎, 팔레트 `PAL[1]`(아군)·`PAL[-1]`(적)의 같은 글자를 써서 두 진영 색이 자동으로 갈리게 한다.
 - 유물 아이콘: `RELIC_ICON`에 12×12, 팔레트 `RELIC_PAL`만 사용. 외곽선은 `k`(진한 갈색), 하이라이트 1~2픽셀. 새 유물을 추가하면 아이콘도 같이 넣는다. 없으면 ◆로 대체된다.
 - 색을 새로 넣지 말고 기존 팔레트 글자를 쓴다. 꼭 필요하면 NOTES에 적고 팀장 확인.
+
+## 번역 (한국어/영어)
+- 언어: 저장값 `trenchline.lang`이 있으면 그것, 없으면 기기 언어가 한국어일 때 `ko`, 그 밖은 `en`. 첫 화면 버튼으로 바꾸면 새로고침된다.
+- 화면에 나오는 새 문구는 반드시 `_t('한국어 원문')`으로 쓴다. 값이 들어가면 `_t('{0}명 남음', n)`처럼 자리표시를 쓴다. 정적 HTML 문구는 `translateDOM()`이 자동으로 바꾼다.
+- `I18N_EN`은 한국어 원문 → 영어. 빈 값이면 한국어가 나온다. 자리표시 `{0}`·태그는 그대로 둔다.
+- **한국어 문구를 고치면 표의 키도 같이 고친다.** 확인: `node tests/i18n_check.mjs` (표에 없음·안 쓰임·자리표시 불일치가 0이어야 한다).
+- 번역된 글자를 로직 비교에 쓰지 않는다(`name===...` 금지). 구분은 id(`k`, `short` 등)로 한다.
 
 ## 지켜야 할 것
 - 세이브 호환성: `RUN`/`META` 필드를 지우거나 이름을 바꾸지 않는다. 새 필드는 기본값을 둔다.
