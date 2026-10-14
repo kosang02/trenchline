@@ -19,7 +19,7 @@ JS = """({x,budget,n,patch})=>{const T=window.__TL;for(const k in patch)Object.a
  return res}"""
 with sync_playwright() as p:
     b = p.chromium.launch(); pg = b.new_page(); pg.goto('http://127.0.0.1:8797/')
-    for x in ['rifle','assault','mg','at','sniper','mortar','tank']:
+    for x in os.environ.get('UNITS','rifle,assault,mg,at,sniper,mortar,tank,flame').split(','):
         r = pg.evaluate(JS, {'x': x, 'budget': BUDGET, 'n': N, 'patch': PATCH})
         w = sum(i['xw'] for i in r); xl = sum(i['xl'] for i in r)/len(r); rl = sum(i['rl'] for i in r)/len(r)
         print(f"소총수 {r[0]['cr']:2d} vs {x:7s} {r[0]['cx']:2d} | {x} 승 {w:2d}/{len(r)}  남은 CP {x} {xl:4.0%} / 소총 {rl:4.0%}")
