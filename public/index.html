@@ -45,7 +45,19 @@ h1 small{font-family:var(--pix);font-size:10px;color:var(--muted);margin-left:6p
 .status{display:flex;gap:6px 18px;flex-wrap:wrap;align-items:center;font-size:13px;color:var(--muted)}
 .status b{font-family:var(--pix);font-weight:400;color:var(--fg);font-variant-numeric:tabular-nums;margin-left:4px}
 .chips{display:flex;gap:5px;flex-wrap:wrap}
-.chip{font-size:11px;padding:3px 7px;border:1px solid var(--line);background:var(--panel);color:var(--fg)}
+.chip{font:inherit;font-size:11px;padding:3px 7px;border:1px solid var(--line);background:var(--panel);color:var(--fg);cursor:pointer;display:inline-flex;align-items:center;gap:4px;touch-action:manipulation}
+.chip:hover,.chip.on{border-color:var(--alert)}
+.ico{image-rendering:pixelated;image-rendering:crisp-edges;flex:none}
+.ico.sm{width:14px;height:14px}
+.ico.lg{width:36px;height:36px}
+.choice .ico.lg{margin-bottom:2px}
+.relic-list li .ico{vertical-align:-3px;margin-right:4px}
+.tip{box-sizing:border-box;position:fixed;z-index:50;background:var(--panel2);border:2px solid #8a6f3a;padding:10px 12px;box-shadow:0 6px 18px rgba(0,0,0,.5);display:flex;flex-direction:column;gap:6px}
+.tip-h{display:flex;gap:10px;align-items:center}
+.tip-h em{display:block;font-style:normal;font-family:var(--pix);font-size:9px;letter-spacing:.1em;color:var(--alert)}
+.tip-h b{font-size:15px}
+.tip p{margin:0;font-size:13px;line-height:1.5;color:var(--fg)}
+.tip p.lore{color:var(--muted);font-size:12px}
 .chip.u{border-color:var(--friend-dim)}
 .chip.r{border-color:#8a6f3a;color:#e8c98a}
 .relic-list{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
@@ -133,6 +145,7 @@ body.pc .keys{display:block}
 .hint{font-size:12px;color:var(--muted);margin:0;line-height:1.5}
 </style>
 
+<div id="tip" class="tip" role="tooltip" hidden></div>
 <div class="app">
   <header><h1>참호전선 <small>TRENCH LINE</small></h1></header>
 
@@ -377,6 +390,30 @@ for(const s of [1,-1]){
   o.wreck=bake(MAPS.wreck,P);o.corpse=bake(MAPS.corpse,P);o.hq=bake(MAPS.hq,P);
 }
 const SHELL=bake(MAPS.shell,BASE);
+const RELIC_PAL={k:'#17140e',s:'#c9c2a8',S:'#8a8472',g:'#d9b25a',G:'#9a7a32',b:'#7a5532',B:'#4e3620',r:'#a8432e',w:'#efe6cc',o:'#6b7a3a',O:'#48532a',c:'#b9a67a',l:'#7fa0b0',p:'#e0d6b8',P:'#b8ab88',m:'#5a6e32'};
+// 유물 아이콘: 12×12 문자 격자. 새 유물은 같은 크기·팔레트(RELIC_PAL)로 추가. 아이콘이 없으면 ◆ 표시.
+const RELIC_ICON={
+  whistle:["............", "........kk..", ".......kgGk.", "..kkkkkkkGk.", ".kSssssssk..", "kSsskkssSk..", "kSsk..ksSk..", "kSSskksSSk..", ".kSSSSSSk...", "..kkkkkk....", "............", "............"],
+  binocs:["............", "..kkk..kkk..", ".kOOOkkOOOk.", ".kOoOkkOoOk.", ".kOOOOOOOOk.", ".kOOOkkOOOk.", ".kSSSkkSSSk.", ".kSlSk.kSlSk", ".klwlk.klwlk", ".kllk..kllk.", "..kk....kk..", "............"],
+  coin:["............", "....kkkk....", "..kkggggkk..", ".kggGGGGggk.", ".kgGggggGgk.", "kggGgGGgGggk", "kggGgGGgGggk", ".kgGggggGgk.", ".kggGGGGggk.", "..kkggggkk..", "....kkkk....", "............"],
+  canteen:["....kkk.....", "....kSk.....", "...kkSkk.b..", "..kOOOOOkb..", ".kOoooooOkb.", ".kOoOOOoOkb.", ".kOoooooOkb.", ".kOoooooOkb.", ".kOOOOOOOk..", "..kOOOOOk...", "...kkkkk....", "............"],
+  rosary:["...kk.kk....", "..kbk.kbk...", ".kbk...kbk..", ".kbk...kbk..", "..kbk.kbk...", "...kbkbk....", "....kbk.....", "...kkgkk....", "..kgggggk...", "...kkgkk....", "....kgk.....", ".....k......"],
+  ammobox:["............", "...kkkkkk...", "..kSSSSSSk..", ".kkkkkkkkkk.", ".kOOOOOOOOk.", ".kOggOOggOk.", ".kOGGOOGGOk.", ".kOOOOOOOOk.", ".kOwwwwwwOk.", ".kOOOOOOOOk.", ".kkkkkkkkkk.", "............"],
+  gramophone:["......kkkkk.", ".....kgggggk", "....kgGGGgk.", "...kgGkkgk..", "..kgGk.kk...", "..kgk.......", "..kSk.......", ".kkkkkkkk...", ".kbbbbbbk...", ".kbBgBBbk...", ".kbbbbbbk...", ".kkkkkkkk..."],
+  netting:["............", "kmkOkmkOkmk.", ".k.k.k.k.k..", "kOkmkOkmkOk.", ".k.k.k.k.k..", "kmkOkmkOkmk.", ".k.k.k.k.k..", "kOkmkOkmkOk.", ".k.k.k.k.k..", "kmkOkmkOkmk.", "............", "............"],
+  map:["............", ".kkkkkkkkkk.", ".kppPppPppk.", ".kprrpPpppk.", ".kpPrppPppk.", ".kpPprrrPpk.", ".kppPppPrpk.", ".kpPppPpprk.", ".kppPppPpgk.", ".kkkkkkkkkk.", "............", "............"],
+  watch:["....kgk.....", "...kkgkk....", "..kgggggk...", ".kgwwwwwgk..", "kgwwwkwwwgk.", "kgwwwkwwwgk.", "kgwwwkkkwgk.", "kgwwwwwwwgk.", ".kgwwwwwgk..", "..kgggggk...", "...kkkkk....", "............"],
+  gloves:["..k.k.k.....", ".kbkbkbk....", ".kbkbkbkk...", ".kbbbbbbbk..", ".kbbbbbbbk..", ".kbbbbbbbbk.", ".kbbbbbbbk..", ".kbbbbbbk...", ".kBBBBBBk...", ".kSSSSSSk...", ".kkkkkkkk...", "............"],
+  dossier:["............", "..kkkk......", ".kPPPPkkkkk.", ".kPPPPPPPPk.", ".kppppppppk.", ".kpkkkkkppk.", ".kppppppppk.", ".kpkkkkpppk.", ".kpppprrrpk.", ".kpppprrrpk.", ".kkkkkkkkkk.", "............"],
+  wagon:["............", "..kkkkkkk...", ".kcccccccck.", ".kcPcPcPcck.", ".kcccccccck.", "kkbbbbbbbbkk", "kbbBbbbbBbbk", ".kkkkkkkkkk.", "..kSk..kSk..", ".kSkSkkSkSk.", "..kSk..kSk..", "............"],
+  letter:["............", "............", ".kkkkkkkkkk.", ".kpPppppPpk.", ".kppPppPppk.", ".kpppPPpppk.", ".kppppppppk.", ".kppppppppk.", ".kkkkkrkkkk.", ".....kr.....", "......r.....", "............"],
+  railway:["............", "..kS....Sk..", "kbbbbbbbbbbk", "..kS....Sk..", "..kS....Sk..", "kbbbbbbbbbbk", "..kS....Sk..", "..kS....Sk..", "kbbbbbbbbbbk", "..kS....Sk..", "..kS....Sk..", "............"],
+  banner:[".kgk........", ".kgk........", ".kkkoooooook", ".kSkoOOOOook", ".kSkoOwwOook", ".kSkoOOOOook", ".kSkooooook.", ".kSkooook...", ".kSk........", ".kSk........", ".kSk........", ".kkk........"]
+};
+const ICON_URL={};
+function relicIcon(k){if(ICON_URL[k]!==undefined)return ICON_URL[k];const m=RELIC_ICON[k];ICON_URL[k]=m?bake(m,RELIC_PAL).toDataURL():'';return ICON_URL[k]}
+const iconImg=(k,cls)=>{const u=relicIcon(k);return u?`<img class="${cls||'ico'}" src="${u}" alt="">`:'◆ '};
+
 const WHITE=new WeakMap();
 function whiteOf(img){let c=WHITE.get(img);if(!c){c=document.createElement('canvas');c.width=img.width;c.height=img.height;const x=c.getContext('2d');x.drawImage(img,0,0);x.globalCompositeOperation='source-in';x.fillStyle='#fff6dc';x.fillRect(0,0,c.width,c.height);WHITE.set(img,c)}return c}
 
@@ -389,7 +426,7 @@ function hashSeed(str){let h=2166136261;for(const ch of String(str))h=Math.imul(
 function seeded(seed,fn){const o=Math.random;Math.random=mulberry(seed);try{return fn()}finally{Math.random=o}}
 const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
 function mk(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;return [c,c.getContext('2d')]}
-function show(v){for(const id of ['vTitle','vMap','vPanel','vBattle'])$('#'+id).hidden=id!==v;window.scrollTo(0,0)}
+function show(v){if(typeof hideTip==='function')hideTip();for(const id of ['vTitle','vMap','vPanel','vBattle'])$('#'+id).hidden=id!==v;window.scrollTo(0,0)}
 
 /* ---------- title art ---------- */
 {const t=$('#titleArt').getContext('2d');t.imageSmoothingEnabled=false;
@@ -454,9 +491,9 @@ function statusHTML(){
   return `<span>시드<b>${RUN.seed||'-'}</b></span><span>사령부<b>${RUN.hq}/${RUN.hqMax}</b></span><span>보급<b>${RUN.supply}</b></span><span>전선<b>${c?c.f+1:0}/${FLOORS}</b></span><span>사살<b>${RUN.kills}</b></span>`;
 }
 function chipsHTML(){
-  let s=RUN.units.map(u=>`<span class="chip u">${U[u].name}</span>`).join('');
-  for(const k of RUN.relics||[])s+=`<span class="chip r" title="${RELICS[k].desc}">◆ ${RELICS[k].name}</span>`;
-  for(const k in RUN.perks)s+=`<span class="chip" title="${PERKS[k].desc}">${PERKS[k].name}${RUN.perks[k]>1?`<i>${RUN.perks[k]}</i>`:''}</span>`;
+  let s=RUN.units.map(u=>`<button type="button" class="chip u" data-k="unit:${u}">${U[u].name}</button>`).join('');
+  for(const k of RUN.relics||[])s+=`<button type="button" class="chip r" data-k="relic:${k}">${iconImg(k,'ico sm')}${RELICS[k].name}</button>`;
+  for(const k in RUN.perks)s+=`<button type="button" class="chip" data-k="perk:${k}">${PERKS[k].name}${RUN.perks[k]>1?`<i>${RUN.perks[k]}</i>`:''}</button>`;
   return s;
 }
 function showMap(){
@@ -485,11 +522,29 @@ function enterNode(n){
 function finishNode(n){RUN.path.push(n.id);saveRun();showMap()}
 
 /* ---------- panels ---------- */
+function tipFor(key){
+  const [t,k]=key.split(':');
+  if(t==='relic'){const r=RELICS[k];return {icon:iconImg(k,'ico lg'),tag:'유물',name:r.name,desc:r.desc,lore:r.lore}}
+  if(t==='perk'){const p=PERKS[k],l=lv(k);return {tag:`특성 · ${l}/${p.max}단계`,name:p.name,desc:p.desc+(l>1?` (×${l})`:'')}}
+  if(t==='unit'){const u=U[k];return {tag:'병과',name:u.name,desc:(UNIT_DESC[k]?UNIT_DESC[k]+' ':'')+`비용 ${u.cost} · 체력 ${u.hp} · 사거리 ${u.range}`}}
+}
+function showTip(btn){
+  const tp=$('#tip'),d=tipFor(btn.dataset.k);if(!d)return;
+  if(tp.dataset.k===btn.dataset.k&&!tp.hidden){hideTip();return}
+  tp.dataset.k=btn.dataset.k;
+  tp.innerHTML=`<div class="tip-h">${d.icon||''}<div><em>${d.tag}</em><b>${d.name}</b></div></div><p>${d.desc}</p>${d.lore?`<p class="lore">${d.lore}</p>`:''}`;
+  tp.hidden=false;const r=btn.getBoundingClientRect(),w=Math.min(280,innerWidth-32);tp.style.width=w+'px';
+  tp.style.left=Math.max(16,Math.min(innerWidth-w-16,r.left))+'px';tp.style.top=(r.bottom+6)+'px';
+  document.querySelectorAll('.chip.on').forEach(c=>c.classList.remove('on'));btn.classList.add('on');
+}
+function hideTip(){const tp=$('#tip');if(tp){tp.hidden=true;tp.dataset.k=''}document.querySelectorAll('.chip.on').forEach(c=>c.classList.remove('on'))}
+document.addEventListener('click',e=>{const c=e.target.closest('.chip[data-k]');if(c){showTip(c);return}if(!e.target.closest('#tip'))hideTip()});
+addEventListener('scroll',hideTip,{passive:true});addEventListener('resize',hideTip);
 function panel(title,text,choices,skip){
   show('vPanel');$('#panelStatus').innerHTML=statusHTML();$('#pTitle').textContent=title;$('#pText').textContent=text;
   const box=$('#pChoices');box.innerHTML='';
   for(const c of choices){const b=document.createElement('button');b.className='choice';b.disabled=!!c.disabled;
-    b.innerHTML=`${c.tag?`<em class="tag">${c.tag}</em>`:''}<b>${c.name}</b><span>${c.desc}</span>${c.price!=null?`<em class="price">${c.price} 보급</em>`:''}`;
+    b.innerHTML=`${c.icon?c.icon:''}${c.tag?`<em class="tag">${c.tag}</em>`:''}<b>${c.name}</b><span>${c.desc}</span>${c.price!=null?`<em class="price">${c.price} 보급</em>`:''}`;
     b.onclick=c.go;box.append(b)}
   const sk=$('#pSkip');sk.hidden=!skip;if(skip){sk.textContent=skip.label;sk.onclick=skip.go}
 }
@@ -513,7 +568,7 @@ function showReward(n,gain,keep){
   panel(n.type==='elite'?'정예 부대 격파':'전선 돌파',`보급 ${gain}을 확보했습니다. 보상을 하나 고르세요.`,ch,
     {label:'건너뛰기 (보급 +20)',go:()=>{RUN.supply+=20;if(n.type==='elite')relicChoice(n,'정예 전리품','정예 부대의 물자에서 유물을 하나 고르세요.');else finishNode(n)}});
 }
-function relicView(k,isNew){return {tag:'RELIC'+(isNew?' · NEW':''),name:'◆ '+RELICS[k].name,desc:RELICS[k].desc}}
+function relicView(k,isNew){return {icon:iconImg(k,'ico lg'),tag:'RELIC'+(isNew?' · NEW':''),name:RELICS[k].name,desc:RELICS[k].desc}}
 function relicChoice(n,title,text,count){
   const pool=relicPool().slice(0,count||2),M=getMeta();
   if(!pool.length)return panel(title,'더 얻을 유물이 없습니다.',[],{label:'지도로',go:()=>finishNode(n)});
@@ -578,7 +633,7 @@ function showMeta(){
   panel('사령부 보급창',`공적으로 모든 작전에 남는 강화를 삽니다. 보유 공적 ${M.merit}. 도감 유물 ${L.n}/${Object.keys(RELICS).length}개 · 영구 보너스 CP 수입 +${Math.round(L.inc*100)}%, 사령부 +${L.hq}.${M.heir?` 다음 작전 계승 유물: ${RELICS[M.heir].name}.`:''}`,ch.map(c=>({...c,price:c.price})),{label:'새 작전 시작',go:newRun});
   const box=$('#pChoices');box.querySelectorAll('.price').forEach(e=>e.textContent=e.textContent.replace('보급','공적'));
   const ul=document.createElement('ul');ul.className='relic-list';ul.style.gridColumn='1/-1';
-  ul.innerHTML='<li style="margin-top:6px"><b style="color:var(--fg)">유물 도감</b></li>'+Object.entries(RELICS).map(([k,r])=>M.found.includes(k)?`<li><b>◆ ${r.name}</b> · ${r.desc}</li>`:'<li class="no"><b>◇ ???</b> · 아직 발견하지 못함</li>').join('');
+  ul.innerHTML='<li style="margin-top:6px"><b style="color:var(--fg)">유물 도감</b></li>'+Object.entries(RELICS).map(([k,r])=>M.found.includes(k)?`<li>${iconImg(k,'ico sm')}<b>${r.name}</b> · ${r.desc}</li>`:'<li class="no"><b>◇ ???</b> · 아직 발견하지 못함</li>').join('');
   box.append(ul);
 }
 function showTitle(){
