@@ -51,6 +51,10 @@ h1 small{font-family:var(--pix);font-size:10px;color:var(--muted);margin-left:6p
 .ico.sm{width:14px;height:14px}
 .ico.lg{width:36px;height:36px}
 .choice .ico.lg{margin-bottom:2px}
+.og{width:96px;height:auto;image-rendering:pixelated;image-rendering:crisp-edges;margin-bottom:4px}
+.og.sm{width:28px;margin:0 4px 0 0;vertical-align:-3px}
+.choice:disabled .og{filter:grayscale(1) brightness(.6)}
+.og-st{display:inline-flex;align-items:center}
 .relic-list li .ico{vertical-align:-3px;margin-right:4px}
 .tip{box-sizing:border-box;position:fixed;z-index:50;background:var(--panel2);border:2px solid #8a6f3a;padding:10px 12px;box-shadow:0 6px 18px rgba(0,0,0,.5);display:flex;flex-direction:column;gap:6px}
 .tip-h{display:flex;gap:10px;align-items:center}
@@ -165,7 +169,7 @@ body.pc .keys{display:block}
   <section class="view" id="vTitle">
     <div class="title">
       <div class="logo">TRENCH LINE</div>
-      <canvas id="titleArt" width="200" height="40"></canvas>
+      <canvas id="titleArt" width="400" height="80"></canvas>
       <p>죽을 때마다 공적이 쌓여 영구 강화를 사고, 처음 발견한 유물은 도감에 남아 다음 작전에도 보너스를 줍니다. 열 개의 전선을 돌파해 적 사령부까지 진격하는 작전입니다. 전투에서 이기면 특성이나 새 병과를 얻고, 사령부 피해는 다음 전투까지 이어집니다. 사령부가 무너지면 처음부터 다시 시작합니다.</p>
       <div class="row">
         <input id="seedIn" class="seed" maxlength="16" placeholder="시드 (비우면 무작위)" aria-label="시드" autocomplete="off">
@@ -316,12 +320,23 @@ const META_UP={
 const META_DEF={merit:0,earned:0,up:{},found:[],heir:null,runs:0,best:0,wins:0,rank:1,clears:{}};
 // 지휘관 출신: 작전 시작 때 고른다. 장점 하나와 대가. 시작 혜택은 작전 내내 유지된다.
 const ORIGINS={
+  acad: {name:'사관학교 출신',line:'정규 교육을 마친 신임 지휘관',pro:'표준 편성과 포격 지원',con:'없음',hq:0,supply:0,unlock:()=>true,lock:''},
   inf:  {name:'보병 출신',line:'소총 중대를 이끌던 중위',pro:'선발대·고참병 특성으로 시작',con:'포격 대신 연막탄 · 사령부 -40',perks:{vanguard:1,veteran:1},support:['smoke'],hq:-40,supply:0,unlock:()=>true,lock:''},
   art:  {name:'포병 출신',line:'포병 관측장교',pro:'야포 사격 카드 추가',con:'시작 보급 0 · 사령부 -40',support:['bar','howitzer'],hq:-40,supply:-20,unlock:M=>M.best>=3,lock:'3번째 전선 도달'},
   arm:  {name:'기갑 출신',line:'시제 전차 시험대대',pro:'전차를 처음부터 편성',con:'포격 대신 연막탄 · 사령부 -20',units:['tank'],support:['smoke'],hq:-20,supply:0,unlock:M=>M.earned>=200,lock:'누적 공적 200'},
   intel:{name:'정보 출신',line:'참모본부 정보과',pro:'노획 지도 유물(적이 CP 0으로 시작)',con:'포격 대신 구급 지원 · 사령부 -40 · 시작 보급 0',relics:['map'],support:['aid'],hq:-40,supply:-20,unlock:M=>M.found.length>=6,lock:'유물 도감 6종'},
 };
-const ORIGIN_ORDER=['inf','art','arm','intel'];
+const ORIGIN_ORDER=['acad','inf','art','arm','intel'];
+// 출신 그림: 병과 무기. 24×14, RELIC_PAL. 화면에는 Scale2x로 다듬어 보여준다.
+const ORIGIN_ART={
+  acad:["......................kk","....................kkwk","..................kkwsk.","................kkwsk...","..............kkwsk.....","............kkwsk.......","..........kkwsk.........",".....kk.kkwsk...........",".....kgkkwsk............","......kgksk.............",".....kgGgk..............","....kgk.kgk.............","...kbk...k..............","...kk..................."],
+  inf:["........................","........................","........................","..............k.........","kkk.....kkkkkkkkkkkkkkkw","kbbkkkkkbbbbbbbbbSSSSSSk","kbbbbbbbbkSkbbbbbkkkkkk.","kBbbbbbbkkkSk...........",".kBBBbbk...k............","..kkkkkk................","........................","........................","........................","........................"],
+  art:["........................","...................kk...","................kkkSSk..",".............kkkSSSkk...","..........kkkSSSkk......",".......kkkSSSSkk........","......kOOOOOOk..........",".....kOkkkkkOOk.........","....kOk.kSk.kOk.........","kk..kOkkSSSkkOk.........","bbkkkOk.kSk.kOkkk.......","..kbbkOkkkkkOk..bbk.....","......kOOOOOk.....kbbk..",".......kkkkk............"],
+  arm:["........................","........................","........kkkkkkk.........",".......kOOOOOOOkkkkkkkkk",".......kOoOOOOOSSSSSSSSk",".......kOOOOOOOkkkkkkkkk","...kkkkkkkkkkkkkkkk.....","..kOOOOOOOOOOOOOOOOk....","..kOoooooooooooooOOk....",".kkkkkkkkkkkkkkkkkkkk...","kSkSkSkSkSkSkSkSkSkSkk..","kkSkkSkkSkkSkkSkkSkkSk..",".kkkkkkkkkkkkkkkkkkkk...","........................"],
+  intel:["........................","...kkkk......kkkk.......","..kOOOOk....kOOOOk......","..kOoOOkkkkkkOoOOk......","..kOOOOkSSSSkOOOOk......","..kOOOOkkkkkkOOOOk......","..kSSSSk....kSSSSk......","..klwlSk....klwlSk......","..kllllk....kllllk......","...kkkk......kkkk.......","..kkkkkkkkkkkkkkkkkkkk..","..kppPpprrrpPppppPppk...","..kpPppppPprrrrpppPpk...","..kkkkkkkkkkkkkkkkkkkk.."],
+};
+const OG_URL={};
+function originArt(k,cls){if(!OG_URL[k]){const m=ORIGIN_ART[k].map(r=>(r+'........................').slice(0,24));OG_URL[k]=epx(bake(m,RELIC_PAL)).toDataURL()}return `<img class="${cls||'og'}" src="${OG_URL[k]}" alt="">`}
 // 작전 등급: 클리어하면 다음 등급이 열린다. 규칙은 누적된다.
 const RANKS=[null,
   {name:'회랑 정찰',rule:'기본 규칙'},
@@ -432,6 +447,18 @@ for(const s of [1,-1]){
   o.tank={a:bake(MAPS.tankA,P),b:bake(MAPS.tankB,P),s:bake(MAPS.tankA,P)};
   o.wreck=bake(MAPS.wreck,P);o.corpse=bake(MAPS.corpse,P);o.hq=bake(MAPS.hq,P);
 }
+// 2배 해상도: Scale2x(EPX)로 모든 전장 스프라이트를 윤곽선 보정해 2배로 만든다. lw/lh는 월드 단위 크기.
+const SC=2;
+function epx(src){
+  const w=src.width,h=src.height,p=new Uint32Array(src.getContext('2d').getImageData(0,0,w,h).data.buffer);
+  const c=document.createElement('canvas');c.width=w*2;c.height=h*2;const x2=c.getContext('2d'),o=x2.createImageData(w*2,h*2),q=new Uint32Array(o.data.buffer);
+  const g=(x,y)=>x<0||y<0||x>=w||y>=h?0:p[y*w+x];
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){const P=g(x,y),A=g(x,y-1),B=g(x+1,y),C=g(x-1,y),D=g(x,y+1);
+    let e1=P,e2=P,e3=P,e4=P;if(C===A&&C!==D&&A!==B)e1=A;if(A===B&&A!==C&&B!==D)e2=B;if(D===C&&D!==B&&C!==A)e3=C;if(B===D&&B!==A&&D!==C)e4=D;
+    const i=(2*y)*(2*w)+2*x;q[i]=e1;q[i+1]=e2;q[i+2*w]=e3;q[i+2*w+1]=e4}
+  x2.putImageData(o,0,0);c.lw=w;c.lh=h;return c;
+}
+(function up(o){for(const k in o){const v=o[k];if(v instanceof HTMLCanvasElement)o[k]=epx(v);else if(v&&typeof v==='object')up(v)}})(SPR);
 const SHELL=bake(MAPS.shell,BASE);
 const RELIC_PAL={k:'#17140e',s:'#c9c2a8',S:'#8a8472',g:'#d9b25a',G:'#9a7a32',b:'#7a5532',B:'#4e3620',r:'#a8432e',w:'#efe6cc',o:'#6b7a3a',O:'#48532a',c:'#b9a67a',l:'#7fa0b0',p:'#e0d6b8',P:'#b8ab88',m:'#5a6e32'};
 // 유물 아이콘: 12×12 문자 격자. 새 유물은 같은 크기·팔레트(RELIC_PAL)로 추가. 아이콘이 없으면 ◆ 표시.
@@ -469,7 +496,7 @@ function relicIcon(k){if(ICON_URL[k]!==undefined)return ICON_URL[k];const m=RELI
 const iconImg=(k,cls)=>{const u=relicIcon(k);return u?`<img class="${cls||'ico'}" src="${u}" alt="">`:'◆ '};
 
 const WHITE=new WeakMap();
-function whiteOf(img){let c=WHITE.get(img);if(!c){c=document.createElement('canvas');c.width=img.width;c.height=img.height;const x=c.getContext('2d');x.drawImage(img,0,0);x.globalCompositeOperation='source-in';x.fillStyle='#fff6dc';x.fillRect(0,0,c.width,c.height);WHITE.set(img,c)}return c}
+function whiteOf(img){let c=WHITE.get(img);if(!c){c=document.createElement('canvas');c.width=img.width;c.height=img.height;c.lw=img.lw;c.lh=img.lh;const x=c.getContext('2d');x.drawImage(img,0,0);x.globalCompositeOperation='source-in';x.fillStyle='#fff6dc';x.fillRect(0,0,c.width,c.height);WHITE.set(img,c)}return c}
 
 /* ---------- helpers ---------- */
 const $=s=>document.querySelector(s);
@@ -480,12 +507,13 @@ function hashSeed(str){let h=2166136261;for(const ch of String(str))h=Math.imul(
 function seeded(seed,fn){const o=Math.random;Math.random=mulberry(seed);try{return fn()}finally{Math.random=o}}
 const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
 function mk(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;return [c,c.getContext('2d')]}
+function mk2(w,h){const c=document.createElement('canvas');c.width=w*SC;c.height=h*SC;const x=c.getContext('2d');x.scale(SC,SC);c.lw=w;c.lh=h;return [c,x]}
 function show(v){if(typeof hideTip==='function')hideTip();for(const id of ['vTitle','vMap','vPanel','vBattle'])$('#'+id).hidden=id!==v;window.scrollTo(0,0)}
 
 /* ---------- title art ---------- */
-{const t=$('#titleArt').getContext('2d');t.imageSmoothingEnabled=false;
+{const t=$('#titleArt').getContext('2d');t.imageSmoothingEnabled=false;t.scale(2,2);
  t.fillStyle='#3e3526';t.fillRect(0,30,200,10);t.fillStyle='#1f1a12';t.fillRect(60,30,30,10);t.fillRect(130,30,24,10);
- const put=(img,x,f)=>{if(f){t.save();t.translate(x,0);t.scale(-1,1);t.drawImage(img,-img.width/2|0,31-img.height);t.restore()}else t.drawImage(img,x-img.width/2|0,31-img.height)};
+ const put=(img,x,f)=>{const w=img.lw||img.width,h=img.lh||img.height;if(f){t.save();t.translate(x,0);t.scale(-1,1);t.drawImage(img,-w/2|0,31-h,w,h);t.restore()}else t.drawImage(img,x-w/2|0,31-h,w,h)};
  put(SPR[1].tank.a,24);put(SPR[1].rifle.a,50);put(SPR[1].at.s,66);put(SPR[1].mg.s,80);put(SPR[1].assault.b,100);
  put(SPR[-1].rifle.s,138,1);put(SPR[-1].mortar.s,150,1);put(SPR[-1].tank.a,178,1);
  t.fillStyle='rgba(255,214,130,.9)';t.fillRect(86,24,40,1);}
@@ -503,7 +531,7 @@ function relicPool(){return shuffle(Object.keys(RELICS).filter(k=>!RUN.relics.in
 function startSetup(){
   const M=getMeta(),last=store.get('trenchline.lastSetup')||{};
   panel('지휘관 부임','새 지휘관의 출신을 고르세요. 출신의 장점은 작전 내내 유지됩니다.',ORIGIN_ORDER.map(k=>{const o=ORIGINS[k],ok=o.unlock(M);
-    return {tag:ok?(last.origin===k?'지난번 선택':'출신'):'잠김 · '+o.lock,name:o.name,desc:ok?`${o.line}. 장점: ${o.pro}. 대가: ${o.con}.`:`해금 조건: ${o.lock}.`,disabled:!ok,
+    return {icon:originArt(k),tag:ok?(last.origin===k?'지난번 선택':'출신'):'잠김 · '+o.lock,name:o.name,desc:ok?`${o.line}. 장점: ${o.pro}. 대가: ${o.con}.`:`해금 조건: ${o.lock}.`,disabled:!ok,
       go:()=>{if(M.rank>1)pickRank(k);else newRun(k,1)}}}),{label:'돌아가기',go:showTitle});
 }
 function pickRank(origin){
@@ -513,7 +541,7 @@ function pickRank(origin){
   panel('작전 등급','등급이 높을수록 규칙이 하나씩 더해집니다. 클리어하면 다음 등급이 열립니다.',ch.reverse(),{label:'돌아가기',go:startSetup});
 }
 function newRun(origin,rank){
-  origin=ORIGINS[origin]?origin:'inf';rank=Math.max(1,Math.min(6,rank||1));
+  origin=ORIGINS[origin]?origin:'acad';rank=Math.max(1,Math.min(6,rank||1));
   try{store.set('trenchline.lastSetup',{origin,rank})}catch(e){}
   const M=getMeta(),L=legacy(),hq=250+20*(M.up.hq||0)+L.hq;
   const sIn=($('#seedIn').value||'').trim(),seedStr=sIn||Math.floor(Math.random()*1e8).toString(36).toUpperCase();
@@ -563,7 +591,7 @@ function reachable(){const c=curNode();if(!c)return RUN.map[0].map(n=>n.id);if(c
 function statusHTML(){
   if(!RUN){const M=getMeta();return `<span>보유 공적<b class="merit">${M.merit}</b></span><span>유물 도감<b>${M.found.length}/${Object.keys(RELICS).length}</b></span>`}
   const c=curNode();
-  return `<span>${ORIGINS[RUN.origin||'inf'].name.replace(' 출신','')}<b>${rk()}등급</b></span><span>시드<b>${RUN.seed||'-'}</b></span><span>사령부<b>${RUN.hq}/${RUN.hqMax}</b></span><span>보급<b>${RUN.supply}</b></span><span>전선<b>${c?c.f+1:0}/${FLOORS}</b></span><span>사살<b>${RUN.kills}</b></span>`;
+  return `<span class="og-st">${originArt(RUN.origin||'acad','og sm')}${ORIGINS[RUN.origin||'acad'].name.replace(' 출신','')}<b>${rk()}등급</b></span><span>시드<b>${RUN.seed||'-'}</b></span><span>사령부<b>${RUN.hq}/${RUN.hqMax}</b></span><span>보급<b>${RUN.supply}</b></span><span>전선<b>${c?c.f+1:0}/${FLOORS}</b></span><span>사살<b>${RUN.kills}</b></span>`;
 }
 function chipsHTML(){
   let s=RUN.units.map(u=>`<button type="button" class="chip u" data-k="unit:${u}">${U[u].name}</button>`).join('');
@@ -697,7 +725,7 @@ function showEvent(n){
 }
 function gameOver(win){
   const c=curNode(),floor=win?FLOORS:(CFG?CFG.f+1:c?c.f+1:0);
-  const M=getMeta(),R=rk(),og=RUN.origin||'inf',merit=Math.round((5+floor*12+(RUN.elites||0)*15+Math.floor(RUN.kills/8)+(win?100:0))*(1+.1*(R-1)));
+  const M=getMeta(),R=rk(),og=RUN.origin||'acad',merit=Math.round((5+floor*12+(RUN.elites||0)*15+Math.floor(RUN.kills/8)+(win?100:0))*(1+.1*(R-1)));
   let unlocked='';
   if(win){M.clears[og+':'+R]=true;if(R>=M.rank&&R<6){M.rank=R+1;unlocked=` 작전 등급 ${R+1}(${RANKS[R+1].name})이 열렸습니다.`}}
   M.merit+=merit;M.earned+=merit;if(floor>M.best)M.best=floor;if(win)M.wins++;setMeta(M);store.del('trenchline.run');
@@ -726,7 +754,7 @@ function showMeta(){
 }
 function showTitle(){
   show('vTitle');renderAccount();const sv=store.get('trenchline.run');$('#bCont').hidden=!sv;
-  const M=getMeta();$('#best').innerHTML=M.runs?`최고 기록 ${M.best}번째 전선 · 작전 완수 ${M.wins}회 · 열린 등급 ${M.rank} · 명부 ${Object.keys(M.clears).length}/24 · 보유 공적 <span class="merit">${M.merit}</span> · 유물 도감 ${M.found.length}/${Object.keys(RELICS).length}`:'';
+  const M=getMeta();$('#best').innerHTML=M.runs?`최고 기록 ${M.best}번째 전선 · 작전 완수 ${M.wins}회 · 열린 등급 ${M.rank} · 명부 ${Object.keys(M.clears).length}/${ORIGIN_ORDER.length*6} · 보유 공적 <span class="merit">${M.merit}</span> · 유물 도감 ${M.found.length}/${Object.keys(RELICS).length}`:'';
 }
 $('#bNew').onclick=startSetup;
 $('#bMeta').onclick=showMeta;
@@ -774,17 +802,17 @@ const inTrenchSpan=(T,y)=>y>=T.y0-2&&y<=T.y1+2;
 let sky,cloud,hill,HW;
 function buildBackdrop(biome){
   const BB=BIOMES[biome||'mud'];
-  let sx,cx,hx;cv.width=VW;cv.height=VH;ctx.imageSmoothingEnabled=false;$('.stage').style.aspectRatio=VW+'/'+VH;
-  [sky,sx]=mk(VW,GY+2);
+  let sx,cx,hx;cv.width=VW*SC;cv.height=VH*SC;ctx.imageSmoothingEnabled=false;$('.stage').style.aspectRatio=VW+'/'+VH;
+  [sky,sx]=mk2(VW,GY+2);
   {const g=sx.createLinearGradient(0,0,0,GY);g.addColorStop(0,BB.sky[0]);g.addColorStop(.55,BB.sky[1]);g.addColorStop(1,BB.sky[2]);sx.fillStyle=g;sx.fillRect(0,0,VW,GY+2);
-   for(let i=0;i<VW*3;i++){sx.fillStyle=`rgba(0,0,0,${R(.02,.07)})`;sx.fillRect(R(0,VW)|0,R(0,GY)|0,1,1)}}
-  [cloud,cx]=mk(VW*2,40);
-  for(let i=0;i<VW/11;i++){const x=R(0,VW*2),y=R(2,22),w=R(20,60);cx.fillStyle=`rgba(30,28,24,${R(.18,.35)})`;for(let k=0;k<w;k+=2)cx.fillRect((x+k)%(VW*2)|0,(y+Math.sin(k*.3)*2)|0,3,R(2,5)|0)}
+   for(let i=0;i<VW*10;i++){sx.fillStyle=`rgba(0,0,0,${R(.02,.07)})`;sx.fillRect(Math.round(R(0,VW)*2)/2,Math.round(R(0,GY)*2)/2,.5,.5)}}
+  [cloud,cx]=mk2(VW*2,40);
+  for(let i=0;i<VW/11;i++){const x=R(0,VW*2),y=R(2,22),w=R(20,60);cx.fillStyle=`rgba(30,28,24,${R(.18,.35)})`;for(let k=0;k<w;k+=1)cx.fillRect(((x+k)%(VW*2)*2|0)/2,((y+Math.sin(k*.3)*2)*2|0)/2,1.5,(R(2,5)*2|0)/2)}
   HW=Math.ceil(VW+(WORLD-VW)*.35)+4;
-  [hill,hx]=mk(HW,GY+2);
+  [hill,hx]=mk2(HW,GY+2);
   {const H=GY;let h1=H*.7,h2=H*.85;
-   for(let x=0;x<HW;x++){h1+=R(-.6,.6);h1=Math.max(H*.55,Math.min(H*.82,h1));hx.fillStyle=BB.hill[0];hx.fillRect(x,h1|0,1,GY+2-h1)}
-   for(let x=0;x<HW;x++){h2+=R(-.5,.5);h2=Math.max(H*.78,Math.min(H*.93,h2));hx.fillStyle=BB.hill[1];hx.fillRect(x,h2|0,1,GY+2-h2)}
+   for(let x=0;x<HW;x+=.5){h1+=R(-.3,.3);h1=Math.max(H*.55,Math.min(H*.82,h1));hx.fillStyle=BB.hill[0];const hy=Math.round(h1*2)/2;hx.fillRect(x,hy,.5,GY+2-hy)}
+   for(let x=0;x<HW;x+=.5){h2+=R(-.25,.25);h2=Math.max(H*.78,Math.min(H*.93,h2));hx.fillStyle=BB.hill[1];const hy=Math.round(h2*2)/2;hx.fillRect(x,hy,.5,GY+2-hy)}
    for(let i=0;i<14;i++){const x=R(4,HW-4)|0,h=R(4,9)|0,b=H*.9|0;hx.fillStyle='#1f1e17';hx.fillRect(x,b-h,1,h);if(Math.random()<.7)hx.fillRect(x+1,b-h+2,2,1);if(Math.random()<.5)hx.fillRect(x-2,b-h+4,2,1)}
    for(const bx of [HW*.3|0,HW*.72|0]){const y=H*.66|0;hx.fillStyle='#1f1e17';hx.fillRect(bx,y,12,10);hx.fillRect(bx+3,y-4,3,4);hx.fillStyle='#34342c';hx.fillRect(bx+3,y+3,2,2);hx.fillRect(bx+8,y+4,2,2)}}
 }
@@ -793,14 +821,15 @@ let MODE=store.get('trenchline.mode')||(matchMedia('(pointer:fine) and (min-widt
 function applyMode(){VW=MODE==='pc'?380:240;document.body.classList.toggle('pc',MODE==='pc');buildBackdrop(CUR_BIOME);
   const b=$('#bMode');if(b)b.textContent=MODE==='pc'?'화면: PC':'화면: 모바일';}
 applyMode();
-const [grd,gx]=mk(WORLD,VH-GY);
+const [grd,gx]=mk(WORLD*SC,(VH-GY)*SC);
 function buildGround(TER){
   const B=BIOMES[TER.biome],trs=TER.trs;
-  const id=gx.createImageData(WORLD,VH-GY),d=id.data,cols=B.cols;
-  for(let y=0;y<VH-GY;y++)for(let x=0;x<WORLD;x++){let c=cols[(Math.random()*4)|0];
-    if(y<3&&Math.random()<.65)c=B.top;else if(Math.random()<.012)c=B.speck;
-    const i=(y*WORLD+x)*4;d[i]=c[0];d[i+1]=c[1];d[i+2]=c[2];d[i+3]=255}
-  gx.putImageData(id,0,0);
+  const GW=WORLD*SC,GH=(VH-GY)*SC,id=gx.createImageData(GW,GH),d=id.data,cols=B.cols;
+  gx.setTransform(1,0,0,1,0,0);
+  for(let y=0;y<GH;y++)for(let x=0;x<GW;x++){let c=cols[(Math.random()*4)|0];
+    if(y<3*SC&&Math.random()<.65)c=B.top;else if(Math.random()<.006)c=B.speck;
+    const i=(y*GW+x)*4;d[i]=c[0];d[i+1]=c[1];d[i+2]=c[2];d[i+3]=255}
+  gx.putImageData(id,0,0);gx.setTransform(SC,0,0,SC,0,0);
   const snow=TER.biome==='snow';
   // features on the ground layer
   for(const o of TER.feats){const cx=o.x,cy=o.y-GY;
@@ -922,7 +951,7 @@ const surge=()=>1+.2*Math.floor(S.t/60);
 function payAmount(s){if(s!==1)return PAY_BASE*S.inc[-1]*surge();return Math.round((PAY_BASE+3*mlv('payroll'))*S.inc[1]*(has('gramophone')&&S.t<30?2:1)*surge())}
 function hit(t,amt){if(t.hq){S.hq[t.hq]-=amt*.6;return}if(t.side===1&&!t.saved&&t.hp-amt<=0&&t.hp>0&&has('rosary')&&!U[t.type].armor){t.saved=true;t.hp=1;t.hitT=.3;floatText(t.x,t.y-14,'SAVED','232,201,138');return}t.hp-=amt;t.hitT=.12}
 function fire(u,t){
-  const d=S.ST[u.side][u.type],s=u.side,w=sprOf(u).width;
+  const d=S.ST[u.side][u.type],s=u.side,w=sprOf(u).lw||sprOf(u).width;
   const tip={x:u.x+s*(w/2),y:u.y-(u.type==='tank'?8:u.type==='mortar'?11:u.type==='at'?10:7)};
   S.flashes.push({x:tip.x,y:tip.y,life:.07,max:.07,dir:s,big:u.type==='tank'||u.type==='at'});
   const dist=Math.hypot(t.x-u.x,t.hq?0:t.y-u.y);
@@ -1157,20 +1186,20 @@ function sfx(type,x,mul){
 
 /* ---------- render ---------- */
 function drawSpr(img,x,foot,flip,sink,alpha){
-  const w=img.width,h=img.height,hh=sink?h-4:h,top=Math.round(foot-h+(sink?4:0));
+  const w=img.lw||img.width,h=img.lh||img.height,k=img.width/w,hh=sink?h-4:h,top=Math.round(foot-h+(sink?4:0));
   if(alpha!=null)ctx.globalAlpha=alpha;
-  if(!flip)ctx.drawImage(img,0,0,w,hh,Math.round(x-w/2),top,w,hh);
-  else{ctx.save();ctx.translate(Math.round(x),0);ctx.scale(-1,1);ctx.drawImage(img,0,0,w,hh,-Math.floor(w/2),top,w,hh);ctx.restore()}
+  if(!flip)ctx.drawImage(img,0,0,w*k,hh*k,Math.round(x-w/2),top,w,hh);
+  else{ctx.save();ctx.translate(Math.round(x),0);ctx.scale(-1,1);ctx.drawImage(img,0,0,w*k,hh*k,-Math.floor(w/2),top,w,hh);ctx.restore()}
   ctx.globalAlpha=1;
 }
 function render(){
   const ox=Math.round(S.shake?R(-S.shake,S.shake):0),oy=Math.round(S.shake?R(-S.shake,S.shake)*.6:0),cam=Math.round(S.cam);
-  ctx.setTransform(1,0,0,1,0,0);ctx.drawImage(sky,0,0);
-  const cl=(S.t*2+cam*.15)%(VW*2);ctx.drawImage(cloud,-cl,4);ctx.drawImage(cloud,VW*2-cl,4);
+  ctx.setTransform(SC,0,0,SC,0,0);ctx.drawImage(sky,0,0,VW,GY+2);
+  const cl=(S.t*2+cam*.15)%(VW*2);ctx.drawImage(cloud,-cl,4,VW*2,40);ctx.drawImage(cloud,VW*2-cl,4,VW*2,40);
   for(const g of S.glows){const a=g.life/g.max;const gr=ctx.createRadialGradient(g.x,GY*.85,0,g.x,GY*.85,g.w);gr.addColorStop(0,`rgba(255,170,90,${.45*a})`);gr.addColorStop(1,'rgba(255,170,90,0)');ctx.fillStyle=gr;ctx.fillRect(g.x-g.w,0,g.w*2,GY+2)}
-  ctx.drawImage(hill,-Math.round(cam*.35),0);
-  ctx.setTransform(1,0,0,1,ox-cam,oy);
-  ctx.drawImage(grd,0,GY);
+  ctx.drawImage(hill,-Math.round(cam*.35*SC)/SC,0,HW,GY+2);
+  ctx.setTransform(SC,0,0,SC,(ox-cam)*SC,oy*SC);
+  ctx.drawImage(grd,0,GY,WORLD,VH-GY);
   for(const s of [1,-1]){drawSpr(SPR[s].hq,HQ[s],FMID+5,s===-1);
     const hp=Math.max(0,S.hq[s]/S.hqMax[s]);ctx.fillStyle='#000';ctx.fillRect(HQ[s]-11,FMID-16,22,3);ctx.fillStyle=s===1?'#8fa04a':'#8ea3b6';ctx.fillRect(HQ[s]-10,FMID-15,Math.round(20*hp),1)}
   for(const T of S.trench){const y=FY0-24;ctx.fillStyle='#2a241a';ctx.fillRect(T.x+11,y,1,12);ctx.fillStyle=T.own===1?'#8fa04a':T.own===-1?'#8ea3b6':'#cfc6ad';ctx.fillRect(T.x+12,y,5,3)}
@@ -1189,13 +1218,13 @@ function render(){
     const img=sprOf(u),d=S.ST[u.side][u.type];
     drawSpr(img,u.x,u.y,u.side===-1,u.inTrench);
     if(u.hitT>0)drawSpr(whiteOf(img),u.x,u.y,u.side===-1,u.inTrench,.75);
-    if(u.hp<u.max){const top=u.y-img.height-3+(u.inTrench?4:0);ctx.fillStyle='#000';ctx.fillRect(Math.round(u.x-4),top,8,2);ctx.fillStyle=u.hp/u.max>.4?'#9cc04a':'#c8553d';ctx.fillRect(Math.round(u.x-4),top,Math.max(1,Math.round(8*u.hp/u.max)),1)}
+    if(u.hp<u.max){const top=u.y-(img.lh||img.height)-3+(u.inTrench?4:0);ctx.fillStyle='#000';ctx.fillRect(Math.round(u.x-4),top,8,2);ctx.fillStyle=u.hp/u.max>.4?'#9cc04a':'#c8553d';ctx.fillRect(Math.round(u.x-4),top,Math.max(1,Math.round(8*u.hp/u.max)),1)}
     if(d.setup&&u.setupT<d.setup&&u.setupT>0){ctx.fillStyle='#d98b3a';ctx.fillRect(Math.round(u.x-4),u.y+1,Math.round(8*u.setupT/d.setup),1)}}
   while(pi<props.length)drawProp(props[pi++]);
   for(const b of S.bullets){const sp=Math.hypot(b.vx,b.vy),ux=b.vx/sp,uy=b.vy/sp;
-    ctx.fillStyle='rgba(200,150,70,.45)';ctx.fillRect(Math.round(b.x-ux*3),Math.round(b.y-uy*3),1,1);
-    ctx.fillStyle='rgba(230,180,90,.75)';ctx.fillRect(Math.round(b.x-ux*1.5),Math.round(b.y-uy*1.5),1,1);
-    ctx.fillStyle='#fff0c0';ctx.fillRect(Math.round(b.x),Math.round(b.y),1,1);if(b.snipe){ctx.fillStyle='rgba(255,240,200,.35)';for(let k=4;k<12;k+=2)ctx.fillRect(Math.round(b.x-ux*k),Math.round(b.y-uy*k),1,1)}}
+    const h2=v=>Math.round(v*2)/2;
+    for(let k=4;k>0;k--){ctx.fillStyle=`rgba(230,180,90,${.18*(5-k)})`;ctx.fillRect(h2(b.x-ux*k*.8),h2(b.y-uy*k*.8),.5,.5)}
+    ctx.fillStyle='#fff0c0';ctx.fillRect(h2(b.x),h2(b.y),1,.5);if(b.snipe){ctx.fillStyle='rgba(255,240,200,.35)';for(let k=4;k<14;k+=1)ctx.fillRect(h2(b.x-ux*k),h2(b.y-uy*k),.5,.5)}}
   for(const p of S.proj){const k=p.t/p.dur,x=p.x0+(p.x1-p.x0)*k,y=p.y0+(p.y1-p.y0)*k-Math.sin(k*Math.PI)*p.arc;
     ctx.fillStyle=p.falling?'#eee':p.rocket?'#ffcf70':'#1a1a1a';ctx.fillRect(Math.round(x),Math.round(y),p.small?1:2,p.falling?3:1)}
   for(const p of S.parts){const a=Math.max(0,p.life/p.max);
@@ -1218,7 +1247,7 @@ function render(){
   for(const h of S.heals){ctx.strokeStyle=`rgba(185,204,106,${Math.min(1,h.life)*.5})`;ctx.beginPath();ctx.ellipse(h.x,h.y,h.r,h.r*.77,0,0,7);ctx.stroke()}
   for(const pl of S.planes){const sx=pl.x-60+pl.t*120,yy=FY0-30+pl.t*4;ctx.fillStyle='rgba(10,8,4,.35)';ctx.fillRect(Math.round(pl.x-6),Math.round(FY0+(FY1-FY0)*Math.min(1,pl.t/1.0)),12,2);ctx.fillStyle=pl.side===1?'#3e4524':'#3c4650';ctx.fillRect(Math.round(sx-6),Math.round(yy),13,2);ctx.fillRect(Math.round(sx-1),Math.round(yy-2),3,6);ctx.fillRect(Math.round(sx-6),Math.round(yy-1),2,1)}
   for(const b of S.barr)if(b.t<0){ctx.fillStyle=b.side===1?`rgba(217,139,58,${.4+.4*Math.sin(S.t*20)})`:`rgba(220,70,50,${.4+.4*Math.sin(S.t*20)})`;ctx.strokeStyle=ctx.fillStyle;ctx.beginPath();ctx.ellipse(b.x,b.y,26,20,0,0,7);ctx.stroke()}
-  ctx.setTransform(1,0,0,1,0,0);
+  ctx.setTransform(SC,0,0,SC,0,0);
   ctx.fillStyle='rgba(190,180,160,.35)';for(const a of S.ash)ctx.fillRect(Math.round(a.x),Math.round(a.y),1,1);
   if(S.hq[1]/S.hqMax[1]<.3&&!S.over){const a=.18+.14*Math.sin(S.t*6);ctx.fillStyle=`rgba(200,60,40,${a})`;ctx.fillRect(0,0,VW,2);ctx.fillRect(0,VH-2,VW,2);ctx.fillRect(0,0,2,VH);ctx.fillRect(VW-2,0,2,VH)}
   mx.fillStyle='#211e16';mx.fillRect(0,0,240,12);const k=240/WORLD;
