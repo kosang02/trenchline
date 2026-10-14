@@ -136,7 +136,7 @@ h1 small{font-family:var(--pix);font-size:10px;color:var(--muted);margin-left:6p
 .seg button[aria-pressed="true"]{background:var(--friend);color:#14130c;font-weight:700}
 .tools{display:flex;gap:6px;margin-left:auto}
 .tools .btn{padding:6px 10px;font-size:12px}
-.cards{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:6px}
 .cards.sup{grid-template-columns:repeat(6,1fr)}
 .card.sup{border-color:#5a4a2a;background:linear-gradient(var(--panel),#2a2216)}
 .card.sup canvas{height:22px}
@@ -223,7 +223,7 @@ body.pc .keys{display:block}
     </div>
     <div class="cards" id="cards"></div>
     <div class="cards sup" id="supCards"></div>
-    <p class="keys">단축키: <kbd>1</kbd>~<kbd>8</kbd> 병력·포격 · <kbd>Q</kbd><kbd>W</kbd><kbd>E</kbd> 전진·사수·후퇴 · <kbd>A</kbd><kbd>D</kbd>/<kbd>←</kbd><kbd>→</kbd> 화면 이동(화면 가장자리에 마우스를 대도 이동) · <kbd>F</kbd> 전선 보기 · <kbd>Space</kbd> 일시정지 · <kbd>Tab</kbd> 배속 · <kbd>Esc</kbd> 포격 취소</p>
+    <p class="keys">단축키: <kbd>1</kbd>~<kbd>0</kbd> 병력 · <kbd>Z</kbd><kbd>X</kbd><kbd>C</kbd> 지원 카드 · <kbd>Q</kbd><kbd>W</kbd><kbd>E</kbd> 전진·사수·후퇴 · <kbd>A</kbd><kbd>D</kbd>/<kbd>←</kbd><kbd>→</kbd> 화면 이동(화면 가장자리에 마우스를 대도 이동) · <kbd>F</kbd> 전선 보기 · <kbd>Space</kbd> 일시정지 · <kbd>Tab</kbd> 배속 · <kbd>Esc</kbd> 포격 취소</p>
     <p class="hint">보병은 한두 발에 쓰러지고 멀수록·움직일수록·참호 안일수록 덜 맞습니다. 기관총은 보병을, 대전차병은 전차를, 박격포와 지원 카드는 뭉친 적을 잡습니다. 지원 카드는 누른 뒤 전장을 탭. 붉은 표식은 적의 포격·공습 예고이니 피하세요. 60초마다 양쪽 보급이 20%씩 늘어납니다.</p>
   </section>
 </div>
@@ -244,7 +244,8 @@ const I18N_EN={
   "전선 보기 ·":"View front ·",
   "화면 이동(화면 가장자리에 마우스를 대도 이동) ·":"Pan (or push the cursor to the screen edge) ·",
   "전진·사수·후퇴 ·":"Advance / Hold / Fall Back ·",
-  "병력·포격 ·":"Troops / Barrage ·",
+  "병력 ·":"Troops ·",
+  "지원 카드 ·":"Support ·",
   "단축키:":"Keys:",
   "소리":"Sound",
   "전선 보기":"View Front",
@@ -611,7 +612,17 @@ const I18N_EN={
   "결과 보기":"View Results",
   "<h2>전선 돌파</h2><p>적 사살 {0} · 아군 손실 {1} · 사령부 {2}/{3}</p>":"<h2>Front Breached</h2><p>Kills {0} · Losses {1} · HQ {2}/{3}</p>",
   "보상 고르기":"Pick Reward",
-  "<h2>아군 사령부 함락</h2><p>적 사살 {0} · 아군 손실 {1}</p>":"<h2>Your HQ Has Fallen</h2><p>Kills {0} · Losses {1}</p>"
+  "<h2>아군 사령부 함락</h2><p>적 사살 {0} · 아군 손실 {1}</p>":"<h2>Your HQ Has Fallen</h2><p>Kills {0} · Losses {1}</p>",
+  "화염방사병":"Flamethrower",
+  "위생병":"Medic",
+  "관측병":"Spotter",
+  "수송차":"Transport",
+  "짧은 사거리에서 불을 뿜습니다. 불은 참호와 엄폐를 무시하고 3초 동안 탑니다. 참호를 비울 때 씁니다.":"Sprays fire at short range. Flames ignore trenches and cover and burn for 3 s. Use it to clear trenches.",
+  "무기가 없습니다. 최전방 바로 뒤를 따라가며 반경 안 아군 보병을 초당 3씩 치료합니다.":"Unarmed. Follows just behind the front line and heals nearby infantry 3 HP per second.",
+  "무기가 없습니다. 반경 70 안의 아군 박격포·포격 탄착을 35% 모으고, 곁의 박격포 사거리를 20% 늘립니다.":"Unarmed. Tightens friendly mortar and barrage spread by 35% within 70, and extends nearby mortar range by 20%.",
+  "보병 5명(소총수·돌격조·대전차병·위생병)을 태워 최전방 참호까지 실어 나릅니다. 카드를 누르면 차가 나오고, 그다음 산 병력이 탑승합니다. 다시 누르면 바로 출발합니다. 파괴되면 탑승병 절반이 살아남습니다.":"Carries 5 infantry (Rifleman, Assault Team, Anti-Tank, Medic) to the front trench. Tap the card to bring up a truck; troops you deploy next climb aboard. Tap again to leave early. If destroyed, half the passengers survive.",
+  "차량 중대":"Motor Pool",
+  "수송차를 동시에 3대까지 운용":"Run up to 3 transports at once"
 };
 const LANG=(()=>{try{const v=localStorage.getItem('trenchline.lang');if(v==='ko'||v==='en')return v}catch(e){}return /^ko\b/i.test(navigator.language||'')?'ko':'en'})();
 function _t(k,...a){const s=LANG==='en'&&I18N_EN[k]?I18N_EN[k]:k;return a.length?s.replace(/\{(\d+)\}/g,(m,i)=>a[+i]):s}
@@ -635,10 +646,18 @@ const U={
   assault:{name:_t('돌격조'),  cost:20, hp:18, dmg:8, range:24,rof:.6, spd:15,cd:4,  kind:'small',acc:.62,grenade:true,gEvery:4,gDmg:14,gArmor:30},
   mg:     {name:_t('기관총'),  cost:35, hp:30, dmg:10,range:62,rof:.15,spd:7, cd:8,  kind:'small',acc:.26,setup:1.2},
   at:     {name:_t('대전차병'),cost:25, hp:10, dmg:10,armorDmg:66,range:52,rof:3,spd:10,cd:6,kind:'at',acc:.5,armorAcc:.82},
-  sniper: {name:_t('저격수'),  cost:40, hp:20, dmg:30,range:112,rof:2.4,spd:9,cd:12,kind:'small',acc:.8,decay:.12,prio:true,snipe:true},
+  sniper: {name:_t('저격수'),  cost:40, hp:20, dmg:30,range:96,rof:3,spd:9,cd:12,kind:'small',acc:.7,decay:.12,prio:true,snipe:true},
   mortar: {name:_t('박격포'),  cost:50, hp:20, dmg:12,range:72,min:28,rof:4.4,spd:7,cd:12,kind:'shell',splash:10,flight:1.1,arc:42,scatter:6,spread:.32},
   tank:   {name:_t('전차'),    cost:110,hp:130,dmg:16,range:52,rof:3.2,spd:6, cd:35, kind:'shell',splash:6,flight:.22,arc:0,scatter:3,armor:true},
+  // 화염방사병: 맞힌 자리에 불을 붙인다(초당 dmg, burn초, 반경 fr). 불은 참호·엄폐를 무시. 장갑에는 armorMul.
+  flame:  {name:_t('화염방사병'),cost:30,hp:30,dmg:14,range:28,rof:1,  spd:10,cd:8, kind:'flame',burn:3,fr:12,armorMul:.3},
+  // 위생병·관측병: 무기 없음(aux). 아군 최전방 바로 뒤를 따라간다.
+  corpsman:{name:_t('위생병'), cost:30, hp:10, dmg:0, range:0, rof:9,  spd:11,cd:8,  kind:'aux',aux:true,heal:3,hr:22},
+  observer:{name:_t('관측병'), cost:20, hp:8,  dmg:0, range:0, rof:9,  spd:11,cd:10, kind:'aux',aux:true,sr:70},
+  // 수송차: 사령부에서 보병 cap명을 태우고 아군 최전방 참호에 내려준 뒤 돌아온다. 무장 없음.
+  apc:    {name:_t('수송차'),  cost:30, hp:60, dmg:0, range:0, rof:9,  spd:26,cd:25, kind:'apc',armor:true,cap:5},
 };
+const APC_RIDE={rifle:1,assault:1,at:1,corpsman:1};
 const BAR={name:_t('포격'),cost:70,cd:40,n:8};
 // 지원 카드. shape: circle(반경 r) | line(세로 줄, 폭 ±r). delay: 경고 표식이 뜬 뒤 효과까지 걸리는 초.
 const SUP={
@@ -650,8 +669,8 @@ const SUP={
   strafe:  {name:_t('기총소사'), cost:90,cd:50,delay:2.5,r:9, shape:'line',  desc:_t('2.5초 뒤 전투기가 세로 한 줄을 두 번 훑습니다. 참호 한 줄 소탕용.')},
 };
 const SUP_ORDER=['bar','smoke','mines','aid','howitzer','strafe'];
-const ORDER=['rifle','assault','mg','at','sniper','mortar','tank'];
-const UNIT_DESC={sniper:_t('사거리가 아주 길고 한 발이면 쓰러뜨립니다. 기관총·박격포·대전차병·저격수를 먼저 노립니다. 연사가 느립니다.'),mortar:_t('곡사로 범위 피해를 줍니다. 멀리 쏠수록 탄착이 크게 흩어지고, 가까운 적은 못 쏩니다. 저격수에게 약합니다.'),tank:_t('튼튼하고 범위 포격을 합니다. 대전차병과 수류탄에 약합니다.')};
+const ORDER=['rifle','assault','mg','at','flame','sniper','mortar','tank','corpsman','observer','apc'];
+const UNIT_DESC={flame:_t('짧은 사거리에서 불을 뿜습니다. 불은 참호와 엄폐를 무시하고 3초 동안 탑니다. 참호를 비울 때 씁니다.'),corpsman:_t('무기가 없습니다. 최전방 바로 뒤를 따라가며 반경 안 아군 보병을 초당 3씩 치료합니다.'),observer:_t('무기가 없습니다. 반경 70 안의 아군 박격포·포격 탄착을 35% 모으고, 곁의 박격포 사거리를 20% 늘립니다.'),apc:_t('보병 5명(소총수·돌격조·대전차병·위생병)을 태워 최전방 참호까지 실어 나릅니다. 카드를 누르면 차가 나오고, 그다음 산 병력이 탑승합니다. 다시 누르면 바로 출발합니다. 파괴되면 탑승병 절반이 살아남습니다.'),sniper:_t('사거리가 아주 길고 한 발이면 쓰러뜨립니다. 기관총·박격포·대전차병·저격수를 먼저 노립니다. 연사가 느립니다.'),mortar:_t('곡사로 범위 피해를 줍니다. 멀리 쏠수록 탄착이 크게 흩어지고, 가까운 적은 못 쏩니다. 저격수에게 약합니다.'),tank:_t('튼튼하고 범위 포격을 합니다. 대전차병과 수류탄에 약합니다.')};
 const PERKS={
   rifleDmg:{name:_t('정밀 사격'),desc:_t('소총수 명중률 +30%'),max:2},
   mgSetup:{name:_t('신속 거치'),desc:_t('기관총 사격 준비 시간 절반'),max:1},
@@ -663,6 +682,7 @@ const PERKS={
   logistics:{name:_t('병참 체계'),desc:_t('보급 주기 -12%'),max:3},
   startCP:{name:_t('사전 비축'),desc:_t('전투 시작 CP +30'),max:2},
   trench:{name:_t('참호 보강'),desc:_t('참호 안에서 받는 피해 -15%'),max:2},
+  motor:{name:_t('차량 중대'),desc:_t('수송차를 동시에 3대까지 운용'),max:1,req:'apc'},
   medic:{name:_t('야전 붕대'),desc:_t('참호 안 보병이 초당 체력 2 회복'),max:1},
   barrage:{name:_t('포병 연대'),desc:_t('포격 탄 +4발, 재사용 대기 -25%'),max:2},
   cheap:{name:_t('대량 징집'),desc:_t('모든 병력 비용 -10%'),max:2},
@@ -813,7 +833,10 @@ const CAP={1:["...oooo....","..oooooo..."],'-1':["....ooo....","...ooooo..."]};
 const BODY={
   rifle:["....sss....","....ss.....","..ouuuu....","..ouuuggggm","..ouuuw....","...uuu....."],
   assault:["....sss....","..ccccc....","..cuouu....","..uouuoggg.","..uuouugg..","...uuu....."],
-  at:["....sss....","zzqzsszzzzk","zzqzsszzzzk","..ooouu....","..oouuu....","...uuu....."]};
+  at:["....sss....","zzqzsszzzzk","zzqzsszzzzk","..ooouu....","..oouuu....","...uuu....."],
+  flame:["....sss....",".BB.ss.....","BybBuuu....","BybBuuggggq","BybBuuw..q.",".BB.uuu...."],
+  corpsman:["....sss....","....ss.....","..unuuu....","..nqnuu.B..","..unuuuwB..","...uuu.BB.."],
+  observer:["....sggk...","....ss.....","..ouuuu....","..ouuuu....","..ouuwwk...","...uuu....."]};
 const LEGS={a:["...ddd.....","...d.d.....","..d...d....","..k...k...."],
             b:["...ddd.....","...dd......","...dd......","...kk......"],
             s:["...ddd.....","...d.d.....","...d.d.....","...k.k....."]};
@@ -826,9 +849,11 @@ const MAPS={
   wreck:["........kkkkkk..........",".......kkkkkkkkkgg......",".......kMMMMMMk.........","...kkkkkkkkkkkkkkkk.....","..kMMMkkkMMMkkkMMMMk....","..kkkkkkkkkkkkkkkkkk....",".rrrrrrrrrrrrrrrrrrrr...","rkrkrkrkrkrkrkrkrkrkr...","rrrrrrrrrrrrrrrrrrrrr...",".rrrrrrrrrrrrrrrrrrr...."],
   corpse:[".hhuuuudd.","shuuuuuddk","..gggg...."],
   hq:["......kkkkkkkk........",".....kmmmmmmmmk.......","....kmmmmmmmmmmk......","...kmmmmmmmmmmmmk.....","..kmmmkkkkkkkmmmmk....","..kmmmkkkkkkkmmmmk....","..kMMMMMMMMMMMMMMk....",".kMMMMMMMMMMMMMMMMk...",".kbbbbbbbbbbbbbbbbbk..","kbBbBbBbBbBbBbBbBbBbk.","kbbbbbbbbbbbbbbbbbbbbk"],
+  apcA:["......................","....tttttttttttttt....","...tTTTTTTTTTTTTTTt...","...ttkkkttttkkkttttt..","..tttttttttttttttttttt","..TTTTTTTTTTTTTTTTTTTk","..TTTTTTTTTTTTTTTTTTTk",".rrrr..rrrr...rrrr....",".rRRr..rRRr...rRRr....","..rr....rr.....rr....."],
   shell:["..kk..",".gggg.",".gyyg.",".gggg.",".gggg.",".gggg.","kkkkkk"],
 };
 MAPS.tankB=MAPS.tankA.map((r,i)=>i===7?"RrRrRrRrRrRrRrRrRrRrR...":r);
+MAPS.apcB=MAPS.apcA.map((r,i)=>i===8?".rRrr..rRrr...rRrr....":r);
 function bake(map,pal){
   const h=map.length,w=map[0].length,c=document.createElement('canvas');c.width=w;c.height=h;
   const x=c.getContext('2d');
@@ -838,10 +863,11 @@ function bake(map,pal){
 const SPR={1:{},'-1':{}};
 for(const s of [1,-1]){
   const P=PAL[s],o=SPR[s];
-  for(const t of ['rifle','assault','at']){o[t]={};const hd=t==='assault'?CAP[s]:HEAD[s],lg=t==='assault'?RUN_LEGS:LEGS;for(const l in lg)o[t][l]=bake([...hd,...BODY[t],...lg[l]],P)}
+  for(const t of ['rifle','assault','at','flame','corpsman','observer']){o[t]={};const hd=t==='assault'?CAP[s]:HEAD[s],lg=t==='assault'?RUN_LEGS:LEGS;for(const l in lg)o[t][l]=bake([...hd,...BODY[t],...lg[l]],P)}
   o.sniper={};for(const l in LEGS)o.sniper[l]=bake([...SNIPER,...LEGS[l].map(r=>r+'..')],P);
   o.mg={s:bake(MAPS.mg,P)};o.mortar={s:bake(MAPS.mortar,P)};
   o.tank={a:bake(MAPS.tankA,P),b:bake(MAPS.tankB,P),s:bake(MAPS.tankA,P)};
+  o.apc={a:bake(MAPS.apcA,P),b:bake(MAPS.apcB,P),s:bake(MAPS.apcA,P)};
   o.wreck=bake(MAPS.wreck,P);o.corpse=bake(MAPS.corpse,P);o.hq=bake(MAPS.hq,P);
 }
 // 2배 해상도: Scale2x(EPX)로 모든 전장 스프라이트를 윤곽선 보정해 2배로 만든다. lw/lh는 월드 단위 크기.
@@ -1053,7 +1079,7 @@ function panel(title,text,choices,skip){
 function optionPool(){
   const pool=[];
   for(const k in PERKS){const p=PERKS[k];if(lv(k)<p.max&&(!p.req||RUN.units.includes(p.req)))pool.push({kind:'perk',k})}
-  for(const u of ['sniper','mortar','tank'])if(!RUN.units.includes(u)){pool.push({kind:'unit',k:u});pool.push({kind:'unit',k:u})}
+  for(const u of ['sniper','mortar','tank','flame','corpsman','observer','apc'])if(!RUN.units.includes(u)){pool.push({kind:'unit',k:u});pool.push({kind:'unit',k:u})}
   for(const k of SUP_ORDER)if(!supOwned().includes(k)){pool.push({kind:'support',k});pool.push({kind:'support',k})}
   return shuffle(pool).filter((o,i,a)=>a.findIndex(p=>p.k===o.k&&p.kind===o.kind)===i);
 }
@@ -1299,7 +1325,7 @@ function newGame(cfg){
     stance:{1:'hold','-1':'hold'},cd:{1:{},'-1':{}},units:[],corpses:[],proj:[],tracers:[],bullets:[],rings:[],fires:[],smokes:[],mines:[],flares:[],glows:[],ash:[],nextFlare:R(6,14),nextGlow:1,warn:0,parts:[],flashes:[],barr:[],texts:[],
     trench:trs,terrain:TER,
     kills:0,lost:0,payT:{1:0,'-1':0},lastPay:0,payFlash:0,cam:0,follow:true,aim:false,shake:0,ai:{t:0,next:null},
-    eTypes:cfg.boss?ORDER:['rifle','assault','mg',...(cfg.f>=2?['at','mortar']:(RUN.units.includes('tank')?['at']:[])),...(cfg.f>=3?['tank','sniper']:(rk()>=2&&cfg.f>=2?['tank']:[]))]};
+    eTypes:cfg.boss?ORDER.filter(k=>k!=='apc'):['rifle','assault','mg',...(cfg.f>=2?['at','mortar']:(RUN.units.includes('tank')||RUN.units.includes('apc')?['at']:[])),...(cfg.f>=3?['tank','sniper','corpsman']:(rk()>=2&&cfg.f>=2?['tank']:[])),...(cfg.f>=4?['flame']:[]),...(cfg.f>=5?['observer']:[])]};
   setStance('hold');
   for(let i=0;i<2*lv('vanguard')+P.recruits;i++)spawn(1,'rifle',true);P.recruits=0;
   for(let i=0;i<5*lv('mines');i++){const T=[...S.trench].sort((a,b)=>a.x-b.x)[1];S.mines.push({x:T.x+R(22,70),y:R(FY0+4,FY1-4)})}
@@ -1310,9 +1336,55 @@ function newGame(cfg){
 }
 function spawn(side,type,free){
   const d=S.ST[side][type];
-  S.units.push({side,type,x:HQ[side]+side*(free?R(6,30):6),y:R(FY0,FY1)|0,hp:d.hp,max:d.hp,cd:R(.2,.8),anim:Math.random(),
-    slot:R(-5,5),setupT:0,shots:0,moving:false,inTrench:false,hitT:0});
+  const u={side,type,x:HQ[side]+side*(free?R(6,30):6),y:R(FY0,FY1)|0,hp:d.hp,max:d.hp,cd:R(.2,.8),anim:Math.random(),
+    slot:R(-5,5),setupT:0,shots:0,moving:false,inTrench:false,hitT:0};
   if(!free){S.cd[side][type]=d.cd;S.pts[side]-=d.cost}
+  if(type==='apc'){u.state=S.units.some(v=>v.type==='apc'&&v.side===side&&v.state==='load')?'wait':'load';u.cargo=[];u.x=HQ[side]+side*12;u.y=FMID}
+  const tr=!free&&APC_RIDE[type]&&S.units.find(v=>v.type==='apc'&&v.side===side&&v.state==='load');
+  if(tr){tr.cargo.push(u);if(tr.cargo.length>=S.ST[side].apc.cap)tr.state='go';return}
+  S.units.push(u);
+}
+const apcMax=()=>lv('motor')?3:2;
+// 병력 상한: 차량은 빼고 탑승병은 넣는다
+const popCount=side=>S.units.reduce((n,u)=>n+(u.side!==side?0:u.type==='apc'?u.cargo.length:1),0);
+function apcCard(){
+  const d=S.ST[1].apc,tr=S.units.find(v=>v.type==='apc'&&v.side===1&&v.state==='load');
+  if(tr){if(tr.cargo.length)tr.state='go';return}
+  if(S.units.filter(v=>v.type==='apc'&&v.side===1).length<apcMax()&&S.pts[1]>=d.cost&&!(S.cd[1].apc>0))spawn(1,'apc');
+}
+// 수송차: load(사령부 적재) → go(최전방 참호로) → drop(1명씩 하차) → back(복귀) → load 또는 wait(다른 차가 적재 중)
+function apcStep(u,d,L){
+  const s=u.side,home=HQ[s]+s*12;
+  if(u.state==='back'&&Math.abs(u.x-home)<=2)u.state=S.units.some(v=>v!==u&&v.type==='apc'&&v.side===s&&v.state==='load')?'wait':'load';
+  if(u.state==='wait'&&!S.units.some(v=>v!==u&&v.type==='apc'&&v.side===s&&v.state==='load'))u.state='load';
+  if(u.state==='load'&&u.cargo.length>=d.cap)u.state='go';
+  if(u.state==='go'||u.state==='drop'){
+    const dx=S.stance[s]==='fall'?L[s].fall:L[s].hold,T=S.trench.find(t=>Math.abs(t.x-dx)<2);
+    u.dropX=dx;u.dropT=T||null;
+    if(T){const my=(T.y0+T.y1)/2;if(Math.abs(u.y-my)>2)u.y=clampY(u.y+Math.sign(my-u.y)*d.spd*.5*S.dt)}
+    const stop=dx-s*12;
+    if(u.state==='go'){if(Math.abs(stop-u.x)<=2){u.state='drop';u.dropCd=.3}return stop}
+    return stop;
+  }
+  return home;
+}
+function apcUnload(u,dt){
+  u.dropCd-=dt;if(u.dropCd>0)return;
+  const c=u.cargo.shift();
+  if(c){const T=u.dropT;c.x=u.dropX+c.slot*.6+R(-2,2);c.y=T?R(T.y0+2,T.y1-2)|0:clampY(u.y+R(-10,10));c.cd=R(.2,.6);S.units.push(c);u.dropCd=.2}
+  if(!u.cargo.length)u.state='back';
+}
+const spotted=(side,x,y)=>S.units.some(o=>o.type==='observer'&&o.side===side&&Math.hypot(o.x-x,(o.y-y)*1.2)<S.ST[side].observer.sr);
+// 위생병·관측병 위치: 아군 최전방 보병 바로 뒤. 위생병은 가까운 부상병 쪽으로 붙는다.
+function auxWant(u,d,L){
+  const s=u.side;let front=null,fy=u.y,hurt=null,hd=60;
+  for(const v of S.units){if(v.side!==s||v===u||U[v.type].armor||U[v.type].aux)continue;
+    if(front===null||(v.x-front)*s>0){front=v.x;fy=v.y}
+    if(u.type==='corpsman'&&v.hp<v.max){const dd=Math.hypot(v.x-u.x,v.y-u.y);if(dd<hd){hd=dd;hurt=v}}}
+  const ty=hurt?hurt.y:fy;if(Math.abs(ty-u.y)>3)u.y=clampY(u.y+Math.sign(ty-u.y)*d.spd*.6*S.dt);
+  if(hurt)return hurt.x-s*5;
+  if(front===null)return L[s].hold-s*10;
+  return Math.min(front*s,L[s].hold*s+40)*s-s*12+u.slot*.5;
 }
 const owned=side=>S.trench.filter(t=>t.own===side).length;
 const isArmor=t=>t&&t.type&&U[t.type].armor;
@@ -1325,7 +1397,7 @@ function lines(side){
   return {hold,fall:prev};
 }
 function nearTrench(x,r){for(const t of S.trench)if(Math.abs(t.x-x)<r)return t;return null}
-const PRIO={mg:1,mortar:1,at:1,sniper:1};
+const PRIO={mg:1,mortar:1,at:1,sniper:1,flame:1,corpsman:1,observer:1};
 function findTarget(u){
   const d=S.ST[u.side][u.type],mn=d.min||-4;let best=null,bd=1e9,armor=false;
   for(const e of S.units){if(e.side===u.side)continue;const fx=(e.x-u.x)*u.side;if(fx<mn)continue;const dist=Math.hypot(fx,e.y-u.y);if(dist>d.range*(u.rangeMul||1))continue;
@@ -1336,7 +1408,7 @@ function findTarget(u){
 }
 function sprOf(u){
   const o=SPR[u.side][u.type];
-  if(u.type==='tank')return u.moving&&(u.anim*6|0)%2?o.b:o.a;
+  if(u.type==='tank'||u.type==='apc')return u.moving&&(u.anim*6|0)%2?o.b:o.a;
   if(!o.a)return o.s;
   return u.moving?((u.anim*4|0)%2?o.a:o.b):o.s;
 }
@@ -1365,9 +1437,16 @@ function fire(u,t){
     const a=isArmor(t);
     sfx('rocket',u.x);
     S.proj.push({x0:tip.x,y0:tip.y,x1:t.x,y1:t.y-5,t:0,dur:.12+dist/220,arc:2,side:s,rocket:true,target:t,dmg:t.hq?20:a?d.armorDmg:d.dmg,acc:t.hq?1:a?d.armorAcc*(1-.3*dist/d.range):hitChance(d.acc,dist,d.range,t,null,u)});
+  }else if(d.kind==='flame'){
+    sfx('flame',u.x);
+    const fx=t.hq?HQ[t.hq]-t.hq*0:t.x,fy=t.hq?u.y:t.y;
+    for(let i=0;i<9;i++){const k=Math.random();S.parts.push({x:tip.x+(fx-tip.x)*k,y:tip.y+(fy-3-tip.y)*k+R(-1,1),vx:s*R(4,14),vy:R(-10,-2),g:-4,life:R(.15,.4),max:.4,c:Math.random()<.5?'#ff9a3a':'#ffd36a',sz:1})}
+    if(t.hq){hit(t,d.dmg*1.5);return}
+    const f=S.fires.find(f=>f.flame&&f.side===s&&Math.hypot(f.x-fx,f.y-fy)<6);
+    if(f)f.life=Math.max(f.life,d.burn);else S.fires.push({x:fx,y:fy,r:d.fr,life:d.burn,side:s,dps:d.dmg,arm:d.armorMul,flame:true});
   }else{
     sfx(u.type==='tank'?'tank':'thump',u.x);if(u.type==='tank')for(let i=0;i<3;i++)S.parts.push({x:tip.x+s*2,y:tip.y,vx:s*R(6,14),vy:R(-6,-1),g:0,life:R(.5,.9),max:.9,c:'smoke',sz:R(2,4)});
-    const sc=d.scatter+(d.spread||0)*dist,ang=R(0,6.283),rr=Math.sqrt(Math.random())*sc;
+    const sc=(d.scatter+(d.spread||0)*dist)*(u.type==='mortar'&&spotted(s,t.x,t.y)?.65:1),ang=R(0,6.283),rr=Math.sqrt(Math.random())*sc;
     S.proj.push({x0:tip.x,y0:tip.y,x1:t.x+Math.cos(ang)*rr,y1:clampY(t.y+Math.sin(ang)*rr*.8),t:0,dur:d.flight*(u.type==='mortar'?(.7+dist/d.range*.5):1),arc:d.arc,side:s,dmg:d.dmg,splash:d.splash,big:u.type==='tank',fire:d.fire});
   }
 }
@@ -1414,12 +1493,12 @@ function strength(side){let v=0;for(const u of S.units)if(u.side===side)v+=S.ST[
 function aiStep(dt){
   const A=S.ai;A.t-=dt;if(A.t>0)return;A.t=.6;
   const pu=S.units.filter(u=>u.side===1),cnt=k=>pu.filter(u=>u.type===k).length;
-  const pTank=cnt('tank'),pInf=pu.length-pTank,pTr=pu.filter(u=>u.inTrench).length;
+  const pTank=cnt('tank')+cnt('apc')*.5,pInf=pu.filter(u=>!U[u.type].armor).length,pTr=pu.filter(u=>u.inTrench).length,eCnt=k=>S.units.filter(u=>u.side===-1&&u.type===k).length;
   const rushed=pu.some(u=>(HQ[-1]-u.x)<170);
   if(rushed&&A.next&&S.ST[-1][A.next].cost>35)A.next=null;
   if(!A.next){
-    const w={rifle:4,assault:1.5+pTank*1.5+(pTr>3?2:0),mg:1.2+(pInf>5?2.2:0),at:.4+pTank*4,mortar:.8+(pTr>3?2:0)+(pInf>8?1:0),sniper:.5+(cnt('mg')+cnt('mortar')+cnt('at'))*.5,tank:S.t>(rk()>=2?30:45)?.5+(pInf>7?1:0)+(CFG.boss?1:0):0};
-    if(rushed){w.mg+=3;w.rifle+=2;w.tank=0;w.mortar=0;w.sniper=0}
+    const w={rifle:4,assault:1.5+pTank*1.5+(pTr>3?2:0),mg:1.2+(pInf>5?2.2:0),at:.4+pTank*4,mortar:.8+(pTr>3?2:0)+(pInf>8?1:0),sniper:S.units.filter(u=>u.side===-1&&u.type==='sniper').length>=(CFG.boss||CFG.f>=6?2:1)?0:.5+Math.min(4,cnt('mg')+cnt('mortar')+cnt('at'))*.4,tank:S.t>(rk()>=2?30:45)?.5+(pInf>7?1:0)+(CFG.boss?1:0):0,flame:eCnt('flame')>=3?0:.3+(pTr>3?.9:0),corpsman:eCnt('corpsman')>=1?0:.5+(S.units.length>30?.6:0),observer:eCnt('observer')>=1||!eCnt('mortar')?0:.9,apc:0};
+    if(rushed){w.mg+=3;w.rifle+=2;w.tank=0;w.mortar=0;w.sniper=0;w.observer=0;w.corpsman=0}
     let sum=0;for(const k of S.eTypes)sum+=w[k];let r=Math.random()*sum;
     for(const k of S.eTypes){r-=w[k];if(r<=0){A.next=k;break}}
   }
@@ -1469,10 +1548,13 @@ function step(dt){
   aiStep(dt);
   const L={1:lines(1),'-1':lines(-1)};
   const medic=lv('medic');
+  S.dt=dt;
   for(const u of S.units){
     const d=S.ST[u.side][u.type],s=u.side;u.cd-=dt;u.anim+=dt;if(u.rally>0)u.rally-=dt;u.hitT=Math.max(0,u.hitT-dt);
-    const t=findTarget(u);let want=null;
-    if(t){
+    const t=d.aux||d.kind==='apc'?null:findTarget(u);let want=null;
+    if(d.kind==='apc'){if(u.state==='drop')apcUnload(u,dt);else want=apcStep(u,d,L)}
+    else if(d.aux)want=auxWant(u,d,L);
+    else if(t){
       if(d.setup)u.setupT=Math.min(d.setup,u.setupT+dt);
       if((!d.setup||u.setupT>=d.setup)&&u.cd<=0){fire(u,t);
         if(d.doubleTap&&!u.dt&&d.kind==='small'&&Math.random()<.3){u.dt=true;u.cd=.16}else{u.dt=false;u.cd=d.rof*R(.85,1.15)*(u.rally>0?.67:1)}}
@@ -1493,18 +1575,27 @@ function step(dt){
     u.inTrench=!d.armor&&S.trench.some(T=>Math.abs(T.x-u.x)<=8&&inTrenchSpan(T,u.y));
     {const o=featAt(u.x,u.y),F=o&&FEAT[o.type];u.feat=o?o.type:null;
      if(d.armor){u.cover=1;u.scov=1;u.slow=F&&F.tankSlow?F.tankSlow:1;u.rangeMul=F&&F.range?F.range:1;u.accMul=1}
-     else{u.cover=F?F.cover:1;u.scov=F?F.splash:1;u.slow=F?F.slow:1;u.rangeMul=F&&F.range?F.range:1;u.accMul=F&&F.acc?F.acc:1}}
+     else{u.cover=F?F.cover:1;u.scov=F?F.splash:1;u.slow=F?F.slow:1;u.rangeMul=F&&F.range?F.range:1;u.accMul=F&&F.acc?F.acc:1}
+     if(u.type==='mortar'&&spotted(s,u.x,u.y))u.rangeMul*=1.2}
     if(medic&&s===1&&u.inTrench)u.hp=Math.min(u.max,u.hp+2*dt);
   }
+  // 위생병 치료: 여러 명이 겹쳐도 한 명분만
+  const healers=S.units.filter(u=>u.type==='corpsman');
+  if(healers.length)for(const v of S.units){if(U[v.type].armor||v.hp>=v.max)continue;
+    const h=healers.find(h=>h.side===v.side&&Math.hypot(h.x-v.x,(h.y-v.y)*1.2)<S.ST[h.side].corpsman.hr);
+    if(h){v.hp=Math.min(v.max,v.hp+S.ST[h.side].corpsman.heal*dt);if(Math.random()<dt*4)S.parts.push({x:v.x+R(-2,2),y:v.y-10,vx:0,vy:-8,g:0,life:.5,max:.5,c:'#b9cc6a',sz:1})}}
   for(const T of S.trench){
     let a=0,b=0;for(const u of S.units)if(Math.abs(u.x-T.x)<10&&inTrenchSpan(T,u.y)){u.side===1?a++:b++}
     const prev=T.own;if(a&&!b)T.own=1;else if(b&&!a)T.own=-1;
     if(T.own===1&&prev!==1){floatText(T.x,FY0-16,'TAKEN','185,204,106');if(lv('capture')){S.pts[1]+=15;floatText(T.x,FY0-8,'+15 CP')}}
     if(T.own===-1&&prev!==-1&&prev!==0)floatText(T.x,FY0-16,'LOST','200,85,61');
   }
-  for(let i=S.units.length-1;i>=0;i--){const u=S.units[i];if(u.hp>0)continue;
+  for(let i=S.units.length-1;i>=0;i--){const u=S.units[i];if(!u||u.hp>0)continue;
     S.units.splice(i,1);if(u.side===-1){S.kills++;if(lv('bounty'))S.pts[1]+=2*lv('bounty')}else{S.lost++;if(has('letter'))S.pts[1]+=2;
       if(lv('rally'))for(const v of S.units)if(v.side===1&&Math.hypot(v.x-u.x,v.y-u.y)<34)v.rally=4}
+    if(u.type==='apc'){boom(u.x,u.y,true);const n=Math.ceil(u.cargo.length/2);
+      for(const c of u.cargo.slice(0,n)){c.x=u.x+R(-6,6);c.y=clampY(u.y+R(-6,6));c.hp=c.max*.5;S.units.push(c)}
+      floatText(u.x,u.y-16,u.side===-1?'APC DOWN':'APC LOST',u.side===-1?'185,204,106':'200,85,61');continue}
     S.corpses.push({x:u.x-u.side*2,y:u.y,side:u.side,wreck:u.type==='tank',t:0});
     if(u.type==='tank'){boom(u.x,u.y,true);floatText(u.x,u.y-16,u.side===-1?'TANK DOWN':'TANK LOST',u.side===-1?'185,204,106':'200,85,61')}
     else{S.parts.push({x:u.x,y:u.y-10,gy:u.y,vx:-u.side*R(10,20),vy:R(-30,-15),g:120,life:1.2,max:1.2,c:PAL[u.side].h,sz:2});puff(u.x,u.y,3)}}
@@ -1515,7 +1606,7 @@ function step(dt){
     if(p.t>=p.dur){impact(p);p.done=true}}
   S.proj=S.proj.filter(p=>!p.done);
   for(const b of S.barr){b.t+=dt;if(b.t>=0&&!b.sm&&b.side===1&&lv('smoke')){b.sm=true;S.smokes.push({x:b.x,y:b.y,r:34,life:10,max:10,side:1})}while(b.t>=b.fired*.28&&b.t>=0&&b.fired<b.n){b.fired++;
-    const x=b.x+R(-26,26);S.proj.push({x0:x+R(-20,20),y0:-10,x1:x,y1:clampY(b.y+R(-20,20)),t:0,dur:.35,arc:0,side:b.side,dmg:22,splash:12,barrage:true,falling:true})}}
+    const k=spotted(b.side,b.x,b.y)?.65:1,x=b.x+R(-26,26)*k;S.proj.push({x0:x+R(-20,20),y0:-10,x1:x,y1:clampY(b.y+R(-20,20)*k),t:0,dur:.35,arc:0,side:b.side,dmg:22,splash:12,barrage:true,falling:true})}}
   S.barr=S.barr.filter(b=>b.fired<b.n);
   for(const p of S.parts){p.life-=dt;p.vy+=p.g*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;if(p.c!=='smoke'&&p.gy&&p.y>p.gy){p.y=p.gy;p.vx*=.3;p.vy=0}}
   S.parts=S.parts.filter(p=>p.life>0);
@@ -1526,7 +1617,7 @@ function step(dt){
   S.bullets=S.bullets.filter(b=>!b.done);
   for(const f of S.flashes)f.life-=dt;S.flashes=S.flashes.filter(f=>f.life>0);
   for(const f of S.texts){f.life-=dt;f.y-=dt*6}S.texts=S.texts.filter(f=>f.life>0);
-  for(const f of S.fires){f.life-=dt;for(const e of S.units)if(e.side!==f.side&&Math.hypot(e.x-f.x,e.y-f.y)<f.r)hit(e,(isArmor(e)?1:5)*dt);
+  for(const f of S.fires){f.life-=dt;for(const e of S.units)if(e.side!==f.side&&Math.hypot(e.x-f.x,e.y-f.y)<f.r)hit(e,(isArmor(e)?(f.arm!=null?f.dps*f.arm:1):(f.dps||5))*dt);
     if(Math.random()<dt*14)S.parts.push({x:f.x+R(-f.r,f.r)*.8,y:f.y+R(-4,4),vx:R(-2,2),vy:R(-14,-6),g:0,life:R(.3,.6),max:.6,c:Math.random()<.5?'#ff9a3a':'#ffd36a',sz:1});
     if(Math.random()<dt*3)S.parts.push({x:f.x+R(-6,6),y:f.y-4,vx:R(-2,2),vy:R(-8,-4),g:-1,life:1.2,max:1.2,c:'smoke',sz:R(2,4)})}
   S.fires=S.fires.filter(f=>f.life>0);
@@ -1569,7 +1660,7 @@ function audioInit(){
 }
 const SFX={rifle:{f:'bandpass',hz:1600,q:.9,dur:.14,g:.22,gap:.045},mg:{f:'bandpass',hz:1250,q:1.1,dur:.07,g:.13,gap:.035},
   boom:{f:'lowpass',hz:420,to:70,dur:1,g:.85,gap:.05},tank:{f:'lowpass',hz:900,to:150,dur:.55,g:.55,gap:.08},thump:{f:'lowpass',hz:500,to:200,dur:.25,g:.35,gap:.08},
-  rocket:{f:'bandpass',hz:2400,to:500,q:2,dur:.45,g:.22,gap:.1},pop:{f:'lowpass',hz:900,to:200,dur:.35,g:.4,gap:.06},far:{f:'lowpass',hz:160,to:60,dur:1.6,g:.35,gap:.4},pay:{f:'bandpass',hz:3200,to:2400,q:6,dur:.12,g:.12,gap:.3},snipe:{f:'bandpass',hz:2200,to:600,q:.7,dur:.35,g:.4,gap:.08}};
+  rocket:{f:'bandpass',hz:2400,to:500,q:2,dur:.45,g:.22,gap:.1},pop:{f:'lowpass',hz:900,to:200,dur:.35,g:.4,gap:.06},far:{f:'lowpass',hz:160,to:60,dur:1.6,g:.35,gap:.4},pay:{f:'bandpass',hz:3200,to:2400,q:6,dur:.12,g:.12,gap:.3},snipe:{f:'bandpass',hz:2200,to:600,q:.7,dur:.35,g:.4,gap:.08},flame:{f:'lowpass',hz:700,to:250,dur:.5,g:.3,gap:.18}};
 function sfx(type,x,mul){
   if(!AU.on||!AU.ctx||!S||S.paused)return;const c=AU.ctx,now=c.currentTime,P=SFX[type];
   if(AU.last[type]&&now-AU.last[type]<P.gap)return;
@@ -1605,7 +1696,7 @@ function render(){
   for(const f of S.fires){const a=Math.min(1,f.life);ctx.fillStyle=`rgba(255,120,40,${.18*a})`;ctx.beginPath();ctx.ellipse(f.x,f.y,f.r,f.r*.5,0,0,7);ctx.fill();
     for(let i=0;i<6;i++){ctx.fillStyle=Math.random()<.5?'#ff8a30':'#ffd060';ctx.fillRect(Math.round(f.x+R(-f.r,f.r)*.8),Math.round(f.y+R(-3,3)),1,R(1,3)|0)}}
   const us=[...S.units].sort((a,b)=>a.y-b.y);
-  ctx.fillStyle='rgba(10,8,4,.35)';for(const u of us){if(u.inTrench)continue;const w=u.type==='tank'?20:u.type==='mg'||u.type==='mortar'?10:7;ctx.fillRect(Math.round(u.x-w/2),Math.round(u.y),w,1)}
+  ctx.fillStyle='rgba(10,8,4,.35)';for(const u of us){if(u.inTrench)continue;const w=u.type==='tank'||u.type==='apc'?20:u.type==='mg'||u.type==='mortar'?10:7;ctx.fillRect(Math.round(u.x-w/2),Math.round(u.y),w,1)}
   const props=S.terrain.props;let pi=0;
   const drawProp=pr=>{const snow=S.terrain.biome==='snow',x=pr.x,y=pr.y;
     if(pr.k==='tree'){ctx.fillStyle='#2a1e12';ctx.fillRect(x,y-4,1,4);const c1=snow?'#2c3a30':'#33441f',c2=snow?'#e8ecec':'#5a6e32';ctx.fillStyle=c1;ctx.fillRect(x-2,y-9,5,5);ctx.fillRect(x-1,y-11,3,2);ctx.fillStyle=c2;ctx.fillRect(x-1,y-10,2,1);ctx.fillRect(x-2,y-8,1,1);if(pr.v>.5){ctx.fillStyle=c1;ctx.fillRect(x+2,y-7,2,2)}}
@@ -1616,6 +1707,7 @@ function render(){
     drawSpr(img,u.x,u.y,u.side===-1,u.inTrench);
     if(u.hitT>0)drawSpr(whiteOf(img),u.x,u.y,u.side===-1,u.inTrench,.75);
     if(u.hp<u.max){const top=u.y-(img.lh||img.height)-3+(u.inTrench?4:0);ctx.fillStyle='#000';ctx.fillRect(Math.round(u.x-4),top,8,2);ctx.fillStyle=u.hp/u.max>.4?'#9cc04a':'#c8553d';ctx.fillRect(Math.round(u.x-4),top,Math.max(1,Math.round(8*u.hp/u.max)),1)}
+    if(u.cargo&&u.cargo.length){ctx.fillStyle=u.side===1?'#b9cc6a':'#b6c9da';for(let i=0;i<u.cargo.length;i++)ctx.fillRect(Math.round(u.x-5+i*2),u.y-14,1,1)}
     if(d.setup&&u.setupT<d.setup&&u.setupT>0){ctx.fillStyle='#d98b3a';ctx.fillRect(Math.round(u.x-4),u.y+1,Math.round(8*u.setupT/d.setup),1)}}
   while(pi<props.length)drawProp(props[pi++]);
   for(const b of S.bullets){const sp=Math.hypot(b.vx,b.vy),ux=b.vx/sp,uy=b.vy/sp;
@@ -1649,23 +1741,25 @@ function render(){
   if(S.hq[1]/S.hqMax[1]<.3&&!S.over){const a=.18+.14*Math.sin(S.t*6);ctx.fillStyle=`rgba(200,60,40,${a})`;ctx.fillRect(0,0,VW,2);ctx.fillRect(0,VH-2,VW,2);ctx.fillRect(0,0,2,VH);ctx.fillRect(VW-2,0,2,VH)}
   mx.fillStyle='#211e16';mx.fillRect(0,0,240,12);const k=240/WORLD;
   for(const T of S.trench){mx.fillStyle=T.own===1?'#5d6a2e':T.own===-1?'#56697a':'#4a4436';mx.fillRect(Math.round(T.x*k)-1,Math.round((T.y0-FY0)/(FY1-FY0)*10),3,Math.max(2,Math.round((T.y1-T.y0)/(FY1-FY0)*12)))}
-  for(const u of S.units){mx.fillStyle=u.side===1?'#b9cc6a':'#b6c9da';mx.fillRect(Math.round(u.x*k),Math.round((u.y-FY0)/(FY1-FY0)*10),u.type==='tank'?2:1,u.type==='tank'?2:1)}
+  for(const u of S.units){mx.fillStyle=u.side===1?'#b9cc6a':'#b6c9da';mx.fillRect(Math.round(u.x*k),Math.round((u.y-FY0)/(FY1-FY0)*10),u.type==='tank'||u.type==='apc'?2:1,u.type==='tank'||u.type==='apc'?2:1)}
   mx.fillStyle='#8fa04a';mx.fillRect(HQ[1]*k-1,0,2,12);mx.fillStyle='#8ea3b6';mx.fillRect(HQ[-1]*k-1,0,2,12);
   mx.strokeStyle='#e9dec3';mx.strokeRect(Math.round(S.cam*k)+.5,.5,Math.round(VW*k)-1,11);
 }
 
 /* ---------- battle UI ---------- */
-let cards={},keyMap=[];
+let cards={},keyMap=[];const KEYS_UNIT='1234567890-=',KEYS_SUP='zxc';
 function buildCards(){
   const el=$('#cards'),sl=$('#supCards');el.innerHTML='';sl.innerHTML='';cards={};keyMap=[];
   const mk=(k,sup)=>{const d=sup?SUP[k]:S.ST[1][k],b=document.createElement('button');b.className='card'+(sup?' sup':'');
     const img=sup?supImg(k):SPR[1][k].s;const c=document.createElement('canvas');c.width=img.width;c.height=img.height;c.getContext('2d').drawImage(img,0,0);
-    c.style.height=(sup?22:k==='tank'?28:32)+'px';
-    b.append(c);b.insertAdjacentHTML('beforeend',`<kbd>${keyMap.length+1}</kbd><b>${d.name}</b><em>${d.cost}</em>`);
+    c.style.height=(sup?22:k==='tank'||k==='apc'?28:32)+'px';
+    const key=sup?KEYS_SUP[sl.children.length]:KEYS_UNIT[el.children.length];
+    b.append(c);b.insertAdjacentHTML('beforeend',`<kbd>${(key||'').toUpperCase()}</kbd><b>${d.name}</b><em>${d.cost}</em>`);
     b.onclick=()=>{if(!S||S.over||S.paused)return;
       if(sup){if(S.aim===k){S.aim=false;aimX=null;return}if(supReady(1,k)){S.aim=k}return}
-      if(S.pts[1]>=d.cost&&!(S.cd[1][k]>0)&&S.units.filter(u=>u.side===1).length<54)spawn(1,k)};
-    (sup?sl:el).append(b);cards[k]=b;keyMap.push(k)};
+      if(k==='apc'){apcCard();return}
+      if(S.pts[1]>=d.cost&&!(S.cd[1][k]>0)&&popCount(1)<54)spawn(1,k)};
+    (sup?sl:el).append(b);cards[k]=b;if(key)keyMap.push([key,k])};
   for(const k of ORDER.filter(t=>RUN.units.includes(t)))mk(k,false);
   for(const k of supLoadout())mk(k,true);
 }
@@ -1681,7 +1775,10 @@ function ui(){
   $('#cp').textContent=Math.floor(S.pts[1]);$('#cp').classList.toggle('pay',S.payFlash>0);$('#payAmt').textContent=_t("+{0} / {1}초",payAmount(1),payInterval(1).toFixed(1));$('#payBar').style.width=Math.min(100,S.payT[1]/payInterval(1)*100)+'%';
   $('#hpP').style.width=Math.max(0,S.hq[1]/S.hqMax[1]*100)+'%';$('#hpE').style.width=Math.max(0,S.hq[-1]/S.hqMax[-1]*100)+'%';
   for(const k in cards){const sup=!!SUP[k]&&!U[k],d=sup?{cost:SUP[k].cost,cd:supCd(1,k)}:S.ST[1][k],cd=S.cd[1][k]||0;
-    cards[k].style.setProperty('--cd',(cd/d.cd*100)+'%');cards[k].classList.toggle('poor',S.pts[1]<d.cost);cards[k].classList.toggle('aim',S.aim===k)}
+    let poor=S.pts[1]<d.cost;
+    if(k==='apc'){const tr=S.units.find(v=>v.type==='apc'&&v.side===1&&v.state==='load'),em=cards[k].querySelector('em');
+      em.textContent=tr?`${tr.cargo.length}/${d.cap} ▶`:d.cost;if(tr)poor=!tr.cargo.length;else if(S.units.filter(v=>v.type==='apc'&&v.side===1).length>=apcMax())poor=true}
+    cards[k].style.setProperty('--cd',(cd/d.cd*100)+'%');cards[k].classList.toggle('poor',poor);cards[k].classList.toggle('aim',S.aim===k)}
 }
 const ov=$('#ov');
 function overlay(html,btn,go){ov.hidden=false;ov.innerHTML=html+`<div><button class="btn primary" id="ovGo">${btn}</button></div>`;$('#ovGo').onclick=go}
@@ -1733,7 +1830,7 @@ mini.addEventListener('pointerdown',e=>{if(!S)return;const r=mini.getBoundingCli
 const keysDown=new Set();let mouseEdge=0;
 window.addEventListener('keydown',e=>{if($('#vBattle').hidden||!S||S.over)return;
   const k=e.key.toLowerCase();
-  const i=+e.key-1;if(i>=0&&i<keyMap.length)cards[keyMap[i]].click();
+  {const m=keyMap.find(p=>p[0]===k);if(m){cards[m[1]].click();return}}
   if(k==='q')setStance('advance');if(k==='w')setStance('hold');if(k==='e')setStance('fall');
   if(k==='f')S.follow=true;
   if(k===' '){e.preventDefault();$('#bPause').click()}
@@ -1760,7 +1857,7 @@ function frame(now){
 }
 /* ---------- test hook (tests/ 시뮬레이션 전용, 게임 로직은 쓰지 않음) ---------- */
 window.__TL={get S(){return S},get RUN(){return RUN},set RUN(v){RUN=v},get CFG(){return CFG},U,PERKS,RELICS,
-  genMap,hashSeed,startBattle,step,spawn,setStance,callBarrage,callSupport,supReady,SUP,gameOver,newRun,getMeta,mkRun:(over)=>({seed:'SIM',map:genMap(1),path:[],hq:250,hqMax:250,supply:20,units:['rifle','assault','mg','at','sniper','mortar','tank'],perks:{},relics:[],support:['bar'],loadout:['bar'],kills:0,battles:0,recruits:0,elites:0,...(over||{})})};
+  genMap,hashSeed,startBattle,step,spawn,setStance,callBarrage,callSupport,supReady,SUP,gameOver,newRun,getMeta,mkRun:(over)=>({seed:'SIM',map:genMap(1),path:[],hq:250,hqMax:250,supply:20,units:['rifle','assault','mg','at','sniper','mortar','tank','flame','corpsman','observer','apc'],perks:{},relics:[],support:['bar'],loadout:['bar'],kills:0,battles:0,recruits:0,elites:0,...(over||{})})};
 if(/^dev\.|-dev\.|localhost|127\.0\.0\.1/.test(location.hostname))$('#devTag').hidden=false;
 $('#bLang').textContent=LANG==='en'?'한국어':'English';$('#bLang').lang=LANG==='en'?'ko':'en';
 $('#bLang').onclick=()=>setLang(LANG==='en'?'ko':'en');

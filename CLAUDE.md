@@ -31,7 +31,7 @@ sed -n '/<script>/,/<\/script>/p' public/index.html | sed '1d;$d' > /tmp/g.js &&
 - `src/index.js` — Worker: 정적 파일 + 세이브 API(`/api/ping`, `POST /api/account`, `GET|PUT /api/save/:code`). KV 바인딩 `SAVES`.
 - `wrangler.toml` — Worker 설정. KV id는 비밀이 아니다.
 - `tests/smoke.py` — 브라우저 스모크 테스트.
-- `tests/sim.py` — 전략별 자동 전투 승률(`QUICK=1 N=8 PATCH='{"mg":{"hp":30}}' python3 tests/sim.py smart2`). `tests/duel.py` — 같은 CP 병과 대결.
+- `tests/sim.py` — 전략별 자동 전투 승률(`QUICK=1 N=8 PATCH='{"mg":{"hp":30}}' python3 tests/sim.py smart2`). `tests/duel.py` — 같은 CP 병과 대결. `tests/sniper.py` — 참호 사수 중 적 저격수 압박(`K=3 N=24`). `tests/assault.py` — 참호 돌파(`UNITS=rifle,flame D=10 BUDGET=150`).
 - 게임 끝의 `window.__TL`은 테스트 전용 훅이다. 게임 로직에서 쓰지 않는다.
 
 ## index.html 지도 (섹션 주석 `/* ---------- 이름 ---------- */` 기준)
@@ -44,6 +44,8 @@ sed -n '/<script>/,/<\/script>/p' public/index.html | sed '1d;$d' > /tmp/g.js &&
 | 지원 카드 | `SUP`(수치), `SUP_ORDER`, `SUP_ICON`, `callSupport()`(효과), `supCd()`, 적 사용은 `aiStep()` 끝부분. 보유 `RUN.support`, 출전 `RUN.loadout`(슬롯 `supSlots()`) |
 | 출신·등급 | `ORIGINS`, `RANKS`, `rk()`(현재 등급), `startSetup()`→`pickRank()`→`newRun(origin,rank)`. 기록 `META.rank`(열린 등급), `META.clears`("출신:등급") |
 | 적 난이도 | `startBattle()`의 `CFG.diff`(보급 배율), `buildStats()`의 적 분기 |
+| 위생병·관측병 | `auxWant()`(위치), 치료는 `step()`의 healers, 관측은 `spotted()` |
+| 수송차 | `APC_RIDE`(탑승 병과), `spawn()`(탑승), `apcCard()`, `apcStep()`/`apcUnload()`, `apcMax()`, `popCount()` |
 | 적 AI | `aiStep()` |
 | 사건 | `EVENTS` |
 | 지형·바이옴 | `BIOMES`, `FEAT`, `genTerrain()`, `buildGround()` |
