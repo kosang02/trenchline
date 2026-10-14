@@ -28,6 +28,8 @@ sed -n '/<script>/,/<\/script>/p' public/index.html | sed '1d;$d' > /tmp/g.js &&
 - `src/index.js` — Worker: 정적 파일 + 세이브 API(`/api/ping`, `POST /api/account`, `GET|PUT /api/save/:code`). KV 바인딩 `SAVES`.
 - `wrangler.toml` — Worker 설정. KV id는 비밀이 아니다.
 - `tests/smoke.py` — 브라우저 스모크 테스트.
+- `tests/sim.py` — 전략별 자동 전투 승률(`QUICK=1 N=8 PATCH='{"mg":{"hp":30}}' python3 tests/sim.py smart2`). `tests/duel.py` — 같은 CP 병과 대결.
+- 게임 끝의 `window.__TL`은 테스트 전용 훅이다. 게임 로직에서 쓰지 않는다.
 
 ## index.html 지도 (섹션 주석 `/* ---------- 이름 ---------- */` 기준)
 | 무엇 | 어디 |
