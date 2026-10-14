@@ -20,7 +20,7 @@ sed -n '/<script>/,/<\/script>/p' public/index.html | sed '1d;$d' > /tmp/g.js &&
 ```
 
 ## 배포
-`main`에 푸시하면 Cloudflare Workers Builds가 자동 배포한다(연결된 경우). 주소: https://trenchline.kosang0234.workers.dev
+`main`에 푸시하면 GitHub Actions(`.github/workflows/deploy.yml`)가 문법 검사 후 Cloudflare에 자동 배포한다. 저장소 Secret `CLOUDFLARE_API_TOKEN`이 필요하다. 배포 결과는 GitHub의 Actions 탭에서 확인. 주소: https://trenchline.kosang0234.workers.dev
 수동 배포는 `npx wrangler deploy` (API 토큰 필요, 토큰은 절대 커밋하지 않는다).
 
 ## 파일 구조
