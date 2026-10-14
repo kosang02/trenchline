@@ -635,7 +635,7 @@ const U={
   assault:{name:_t('돌격조'),  cost:20, hp:18, dmg:8, range:24,rof:.6, spd:15,cd:4,  kind:'small',acc:.62,grenade:true,gEvery:4,gDmg:14,gArmor:30},
   mg:     {name:_t('기관총'),  cost:35, hp:30, dmg:10,range:62,rof:.15,spd:7, cd:8,  kind:'small',acc:.26,setup:1.2},
   at:     {name:_t('대전차병'),cost:25, hp:10, dmg:10,armorDmg:66,range:52,rof:3,spd:10,cd:6,kind:'at',acc:.5,armorAcc:.82},
-  sniper: {name:_t('저격수'),  cost:40, hp:20, dmg:30,range:112,rof:2.4,spd:9,cd:12,kind:'small',acc:.8,decay:.12,prio:true,snipe:true},
+  sniper: {name:_t('저격수'),  cost:40, hp:20, dmg:30,range:96,rof:3,spd:9,cd:12,kind:'small',acc:.7,decay:.12,prio:true,snipe:true},
   mortar: {name:_t('박격포'),  cost:50, hp:20, dmg:12,range:72,min:28,rof:4.4,spd:7,cd:12,kind:'shell',splash:10,flight:1.1,arc:42,scatter:6,spread:.32},
   tank:   {name:_t('전차'),    cost:110,hp:130,dmg:16,range:52,rof:3.2,spd:6, cd:35, kind:'shell',splash:6,flight:.22,arc:0,scatter:3,armor:true},
 };
@@ -1418,7 +1418,7 @@ function aiStep(dt){
   const rushed=pu.some(u=>(HQ[-1]-u.x)<170);
   if(rushed&&A.next&&S.ST[-1][A.next].cost>35)A.next=null;
   if(!A.next){
-    const w={rifle:4,assault:1.5+pTank*1.5+(pTr>3?2:0),mg:1.2+(pInf>5?2.2:0),at:.4+pTank*4,mortar:.8+(pTr>3?2:0)+(pInf>8?1:0),sniper:.5+(cnt('mg')+cnt('mortar')+cnt('at'))*.5,tank:S.t>(rk()>=2?30:45)?.5+(pInf>7?1:0)+(CFG.boss?1:0):0};
+    const w={rifle:4,assault:1.5+pTank*1.5+(pTr>3?2:0),mg:1.2+(pInf>5?2.2:0),at:.4+pTank*4,mortar:.8+(pTr>3?2:0)+(pInf>8?1:0),sniper:S.units.filter(u=>u.side===-1&&u.type==='sniper').length>=(CFG.boss||CFG.f>=6?2:1)?0:.5+Math.min(4,cnt('mg')+cnt('mortar')+cnt('at'))*.4,tank:S.t>(rk()>=2?30:45)?.5+(pInf>7?1:0)+(CFG.boss?1:0):0};
     if(rushed){w.mg+=3;w.rifle+=2;w.tank=0;w.mortar=0;w.sniper=0}
     let sum=0;for(const k of S.eTypes)sum+=w[k];let r=Math.random()*sum;
     for(const k of S.eTypes){r-=w[k];if(r<=0){A.next=k;break}}
