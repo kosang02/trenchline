@@ -126,6 +126,13 @@ h1 small{font-family:var(--pix);font-size:10px;color:var(--muted);margin-left:6p
 .tools{display:flex;gap:6px;margin-left:auto}
 .tools .btn{padding:6px 10px;font-size:12px}
 .cards{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
+.cards.sup{grid-template-columns:repeat(6,1fr)}
+.card.sup{border-color:#5a4a2a;background:linear-gradient(var(--panel),#2a2216)}
+.card.sup canvas{height:22px}
+.chip.s{border-color:#5a4a2a;color:#e0c890}
+.lo{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.lo button{font:inherit;font-size:12px;color:var(--fg);background:var(--panel);border:2px solid var(--line);padding:5px 9px;display:inline-flex;gap:5px;align-items:center;cursor:pointer}
+.lo button[aria-pressed="true"]{border-color:var(--alert);background:#3a2e1c}
 body.pc .app{max-width:1280px}
 body.pc .card{padding:8px 4px 6px}
 body.pc .card canvas{height:38px}
@@ -134,7 +141,7 @@ body.pc .card kbd{display:block}
 .keys{display:none;font-size:12px;color:var(--muted);margin:0;line-height:1.7}
 body.pc .keys{display:block}
 .keys kbd{font-family:var(--pix);font-size:10px;border:1px solid var(--line);padding:0 4px;color:var(--fg);background:var(--panel)}
-@media (max-width:620px){.cards{grid-template-columns:repeat(4,1fr)}.tools{margin-left:0}}
+@media (max-width:620px){.cards{grid-template-columns:repeat(4,1fr)}.cards.sup{grid-template-columns:repeat(3,1fr)}.tools{margin-left:0}}
 .card{position:relative;overflow:hidden;font:inherit;color:var(--fg);background:var(--panel);border:2px solid var(--line);padding:6px 3px 5px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;touch-action:manipulation;min-width:0}
 .card canvas{height:32px;image-rendering:pixelated;max-width:100%}
 .card b{font-size:12px;font-weight:600;white-space:nowrap}
@@ -203,8 +210,9 @@ body.pc .keys{display:block}
       </div>
     </div>
     <div class="cards" id="cards"></div>
+    <div class="cards sup" id="supCards"></div>
     <p class="keys">단축키: <kbd>1</kbd>~<kbd>8</kbd> 병력·포격 · <kbd>Q</kbd><kbd>W</kbd><kbd>E</kbd> 전진·사수·후퇴 · <kbd>A</kbd><kbd>D</kbd>/<kbd>←</kbd><kbd>→</kbd> 화면 이동(화면 가장자리에 마우스를 대도 이동) · <kbd>F</kbd> 전선 보기 · <kbd>Space</kbd> 일시정지 · <kbd>Tab</kbd> 배속 · <kbd>Esc</kbd> 포격 취소</p>
-    <p class="hint">지형: 숲·폐허·토치카·포탄 구덩이는 엄폐(덜 맞음), 철조망·늪은 이동을 크게 늦추고, 고지는 사거리와 명중률을 올립니다. 배속은 ×1~×4. 병력은 넓은 전장의 아무 깊이에나 흩어져 나갑니다. 사거리와 폭발 범위는 가로·세로 거리를 모두 따지므로, 뭉친 병력만 포격에 크게 당합니다. 보병은 한두 발이면 쓰러지지만 명중률이 낮습니다. 멀수록, 표적이 움직일수록, 참호 안에 있을수록 잘 안 맞습니다. 전장을 끌어서 이동. 대전차병은 전차를 먼저 노리고, 소총은 전차에 거의 안 통합니다. 돌격조 수류탄은 참호에 강합니다. 박격포는 가까운 적을 못 쏩니다. 포격은 카드를 누른 뒤 전장을 탭.</p>
+    <p class="hint">보병은 한두 발에 쓰러지고 멀수록·움직일수록·참호 안일수록 덜 맞습니다. 기관총은 보병을, 대전차병은 전차를, 박격포와 지원 카드는 뭉친 적을 잡습니다. 지원 카드는 누른 뒤 전장을 탭. 붉은 표식은 적의 포격·공습 예고이니 피하세요. 60초마다 양쪽 보급이 20%씩 늘어납니다.</p>
   </section>
 </div>
 
@@ -224,6 +232,16 @@ const U={
   tank:   {name:'전차',    cost:110,hp:130,dmg:16,range:52,rof:3.2,spd:6, cd:35, kind:'shell',splash:6,flight:.22,arc:0,scatter:3,armor:true},
 };
 const BAR={name:'포격',cost:70,cd:40,n:8};
+// 지원 카드. shape: circle(반경 r) | line(세로 줄, 폭 ±r). delay: 경고 표식이 뜬 뒤 효과까지 걸리는 초.
+const SUP={
+  bar:     {name:'포격',     cost:70,cd:40,delay:1.6,r:26,shape:'circle',desc:'지정 지점 주변에 포탄 8발. 밀집한 보병에 강합니다.'},
+  smoke:   {name:'연막탄',   cost:25,cd:22,delay:.8, r:34,shape:'circle',desc:'10초간 연막. 연막 안에서 쏘는 적은 명중률이 절반이 됩니다.'},
+  mines:   {name:'지뢰 살포',cost:40,cd:45,delay:0,  r:24,shape:'circle',desc:'반경 안에 지뢰 6개를 깝니다. 밟은 적은 크게 다칩니다.'},
+  aid:     {name:'구급 지원',cost:45,cd:40,delay:0,  r:28,shape:'circle',desc:'반경 안 아군이 4초에 걸쳐 체력 12를 회복합니다.'},
+  howitzer:{name:'야포 사격',cost:80,cd:45,delay:4,  r:16,shape:'circle',desc:'4초 뒤 대형 포탄 한 발. 피해 80, 전차에도 통합니다. 움직이는 적은 피합니다.'},
+  strafe:  {name:'기총소사', cost:90,cd:50,delay:2.5,r:9, shape:'line',  desc:'2.5초 뒤 전투기가 세로 한 줄을 두 번 훑습니다. 참호 한 줄 소탕용.'},
+};
+const SUP_ORDER=['bar','smoke','mines','aid','howitzer','strafe'];
 const ORDER=['rifle','assault','mg','at','sniper','mortar','tank'];
 const UNIT_DESC={sniper:'사거리가 아주 길고 한 발이면 쓰러뜨립니다. 기관총·박격포·대전차병·저격수를 먼저 노립니다. 연사가 느립니다.',mortar:'곡사로 범위 피해를 줍니다. 멀리 쏠수록 탄착이 크게 흩어지고, 가까운 적은 못 쏩니다. 저격수에게 약합니다.',tank:'튼튼하고 범위 포격을 합니다. 대전차병과 수류탄에 약합니다.'};
 const PERKS={
@@ -237,7 +255,7 @@ const PERKS={
   logistics:{name:'병참 체계',desc:'보급 주기 -12%',max:3},
   startCP:{name:'사전 비축',desc:'전투 시작 CP +30',max:2},
   trench:{name:'참호 보강',desc:'참호 안에서 받는 피해 -15%',max:2},
-  medic:{name:'위생병',desc:'참호 안 보병이 초당 체력 2 회복',max:1},
+  medic:{name:'야전 붕대',desc:'참호 안 보병이 초당 체력 2 회복',max:1},
   barrage:{name:'포병 연대',desc:'포격 탄 +4발, 재사용 대기 -25%',max:2},
   cheap:{name:'대량 징집',desc:'모든 병력 비용 -10%',max:2},
   capture:{name:'점령 포상',desc:'참호를 빼앗을 때마다 CP +15',max:1},
@@ -267,7 +285,7 @@ const RELICS={
   gramophone:{name:'축음기',desc:'전투 시작 30초간 보급량 2배'},
   netting:{name:'위장망',desc:'참호 안 아군이 맞을 확률 추가 -15%'},
   map:{name:'노획 지도',desc:'적이 CP 0으로 전투를 시작'},
-  watch:{name:'금장 회중시계',desc:'포격 재사용 대기 -30%'},
+  watch:{name:'금장 회중시계',desc:'모든 지원 카드 재사용 대기 -30%'},
   gloves:{name:'전차병 장갑',desc:'아군 전차 비용 -30%'},
   dossier:{name:'심문 기록',desc:'정예·사령부 전투의 적 사전 배치 병력 절반'},
   wagon:{name:'보급 마차',desc:'보급소 가격 -25%'},
@@ -285,6 +303,7 @@ const META_UP={
   mortarDoc:{name:'박격포 교범',desc:'작전 시작부터 박격포 편성',max:1,cost:[50]},
   sniperDoc:{name:'저격 교범',desc:'작전 시작부터 저격수 편성',max:1,cost:[50]},
   chest:{name:'전리품 상자',desc:'작전 시작 시 무작위 유물 1개',max:1,cost:[90]},
+  slots:{name:'지원 참모부',desc:'지원 카드 출전 슬롯 +1 (2칸 → 3칸)',max:1,cost:[80]},
 };
 
 /* ---------- storage ---------- */
@@ -410,6 +429,17 @@ const RELIC_ICON={
   railway:["............", "..kS....Sk..", "kbbbbbbbbbbk", "..kS....Sk..", "..kS....Sk..", "kbbbbbbbbbbk", "..kS....Sk..", "..kS....Sk..", "kbbbbbbbbbbk", "..kS....Sk..", "..kS....Sk..", "............"],
   banner:[".kgk........", ".kgk........", ".kkkoooooook", ".kSkoOOOOook", ".kSkoOwwOook", ".kSkoOOOOook", ".kSkooooook.", ".kSkooook...", ".kSk........", ".kSk........", ".kSk........", ".kkk........"]
 };
+const SUP_ICON={
+  bar:["..k...k.....",".kgk.kgk....","kgGgkgGgk...",".kgGGGgk....","..kgggk.....","...kSk......","..kSSSk.....",".kSsSSSk....",".kSsSSSk....",".kSsSSSk....",".kGGGGGk....",".kkkkkkk...."],
+  smoke:["....ww.w....","...wwwwww...","..wwPwwPww..","...wwwwww...",".....kk.....","....kSSk....","...kOOOOk...","...kOoOOk...","...kOOOOk...","...kOoOOk...","...kOOOOk...","....kkkk...."],
+  mines:["............","............","............",".....kk.....","....kggk....","..kkkkkkkk..",".kOOOOOOOOk.","kOoOoOoOoOOk","kOOOOOOOOOOk",".kkkkkkkkkk.","............","............"],
+  aid:["............","....kkkk....","...kk..kk...",".kkkkkkkkkk.",".kOOOOOOOOk.",".kOOOwwOOOk.",".kOOwwwwOOk.",".kOOwwwwOOk.",".kOOOwwOOOk.",".kOOOOOOOOk.",".kkkkkkkkkk.","............"],
+  howitzer:["....kkkk....","...kGggGk...","...kgggGk...","..kSSSSSSk..","..kSsSSSSk..","..kSsSSSSk..","..kSsSSSSk..","..kSsSSSSk..","..kSsSSSSk..","..kGGGGGGk..","..kggggggk..","..kkkkkkkk.."],
+  strafe:[".....kk.....",".....kk.....","....kSSk....","kkkkkSSkkkkk","kSSSSSSSSSSk","kkkkkSSkkkkk","....kSSk....",".....SS.....","....kSSk....","...kkSSkk...","...kSSSSk...","....kkkk...."],
+};
+const SUP_URL={};
+function supIcon(k){if(SUP_URL[k])return SUP_URL[k];const c=bake(SUP_ICON[k],RELIC_PAL);SUP_URL[k]=c.toDataURL();return SUP_URL[k]}
+function supImg(k){return bake(SUP_ICON[k],RELIC_PAL)}
 const ICON_URL={};
 function relicIcon(k){if(ICON_URL[k]!==undefined)return ICON_URL[k];const m=RELIC_ICON[k];ICON_URL[k]=m?bake(m,RELIC_PAL).toDataURL():'';return ICON_URL[k]}
 const iconImg=(k,cls)=>{const u=relicIcon(k);return u?`<img class="${cls||'ico'}" src="${u}" alt="">`:'◆ '};
@@ -449,7 +479,7 @@ function relicPool(){return shuffle(Object.keys(RELICS).filter(k=>!RUN.relics.in
 function newRun(){
   const M=getMeta(),L=legacy(),hq=250+20*(M.up.hq||0)+L.hq;
   const sIn=($('#seedIn').value||'').trim(),seedStr=sIn||Math.floor(Math.random()*1e8).toString(36).toUpperCase();
-  RUN={seed:seedStr,map:genMap(hashSeed(seedStr)),path:[],hq,hqMax:hq,supply:20+25*(M.up.supply||0),units:['rifle','assault','mg','at'],perks:{},relics:[],kills:0,battles:0,recruits:0,elites:0};
+  RUN={seed:seedStr,map:genMap(hashSeed(seedStr)),path:[],hq,hqMax:hq,supply:20+25*(M.up.supply||0),units:['rifle','assault','mg','at'],perks:{},relics:[],support:['bar'],loadout:['bar'],kills:0,battles:0,recruits:0,elites:0};
   if(M.up.mortarDoc)RUN.units.push('mortar');if(M.up.sniperDoc)RUN.units.push('sniper');
   if(M.up.chest)RUN.relics.push(relicPool()[0]);
   if(M.heir&&RELICS[M.heir]&&!RUN.relics.includes(M.heir))RUN.relics.push(M.heir);
@@ -492,6 +522,7 @@ function statusHTML(){
 }
 function chipsHTML(){
   let s=RUN.units.map(u=>`<button type="button" class="chip u" data-k="unit:${u}">${U[u].name}</button>`).join('');
+  for(const k of supOwned())s+=`<button type="button" class="chip s" data-k="sup:${k}"><img class="ico sm" src="${supIcon(k)}" alt="">${SUP[k].name}</button>`;
   for(const k of RUN.relics||[])s+=`<button type="button" class="chip r" data-k="relic:${k}">${iconImg(k,'ico sm')}${RELICS[k].name}</button>`;
   for(const k in RUN.perks)s+=`<button type="button" class="chip" data-k="perk:${k}">${PERKS[k].name}${RUN.perks[k]>1?`<i>${RUN.perks[k]}</i>`:''}</button>`;
   return s;
@@ -526,6 +557,7 @@ function tipFor(key){
   const [t,k]=key.split(':');
   if(t==='relic'){const r=RELICS[k];return {icon:iconImg(k,'ico lg'),tag:'유물',name:r.name,desc:r.desc,lore:r.lore}}
   if(t==='perk'){const p=PERKS[k],l=lv(k);return {tag:`특성 · ${l}/${p.max}단계`,name:p.name,desc:p.desc+(l>1?` (×${l})`:'')}}
+  if(t==='sup'){const d=SUP[k];return {icon:`<img class="ico lg" src="${supIcon(k)}" alt="">`,tag:'지원 카드',name:d.name,desc:d.desc+` 비용 ${d.cost} · 대기 ${d.cd}초`}}
   if(t==='unit'){const u=U[k];return {tag:'병과',name:u.name,desc:(UNIT_DESC[k]?UNIT_DESC[k]+' ':'')+`비용 ${u.cost} · 체력 ${u.hp} · 사거리 ${u.range}`}}
 }
 function showTip(btn){
@@ -552,13 +584,18 @@ function optionPool(){
   const pool=[];
   for(const k in PERKS){const p=PERKS[k];if(lv(k)<p.max&&(!p.req||RUN.units.includes(p.req)))pool.push({kind:'perk',k})}
   for(const u of ['sniper','mortar','tank'])if(!RUN.units.includes(u)){pool.push({kind:'unit',k:u});pool.push({kind:'unit',k:u})}
-  return shuffle(pool).filter((o,i,a)=>a.findIndex(p=>p.k===o.k)===i);
+  for(const k of SUP_ORDER)if(!supOwned().includes(k)){pool.push({kind:'support',k});pool.push({kind:'support',k})}
+  return shuffle(pool).filter((o,i,a)=>a.findIndex(p=>p.k===o.k&&p.kind===o.kind)===i);
 }
-function optView(o){return o.kind==='unit'?{tag:'NEW UNIT',name:U[o.k].name+' 편성',desc:UNIT_DESC[o.k]}:{tag:'PERK'+(lv(o.k)?` LV${lv(o.k)+1}`:''),name:PERKS[o.k].name,desc:PERKS[o.k].desc}}
+function optView(o){if(o.kind==='support')return {icon:`<img class="ico lg" src="${supIcon(o.k)}" alt="">`,tag:'NEW SUPPORT',name:SUP[o.k].name+' 지원',desc:SUP[o.k].desc+` 비용 ${SUP[o.k].cost} · 대기 ${SUP[o.k].cd}초`};return o.kind==='unit'?{tag:'NEW UNIT',name:U[o.k].name+' 편성',desc:UNIT_DESC[o.k]}:{tag:'PERK'+(lv(o.k)?` LV${lv(o.k)+1}`:''),name:PERKS[o.k].name,desc:PERKS[o.k].desc}}
 function applyOpt(o){
   if(o.kind==='unit'){RUN.units.push(o.k);return}
+  if(o.kind==='support'){const own=supOwned();if(!own.includes(o.k))own.push(o.k);const lo=supLoadout();if(lo.length<supSlots()&&!lo.includes(o.k))lo.push(o.k);return}
   RUN.perks[o.k]=lv(o.k)+1;if(o.k==='hqArmor'){RUN.hqMax+=60;RUN.hq=Math.min(RUN.hqMax,RUN.hq+60)}
 }
+function supOwned(){if(!RUN.support)RUN.support=['bar'];return RUN.support}
+function supSlots(){return 2+mlv('slots')}
+function supLoadout(){if(!RUN.loadout)RUN.loadout=supOwned().slice(0,supSlots());RUN.loadout=RUN.loadout.filter(k=>SUP[k]&&supOwned().includes(k)).slice(0,supSlots());return RUN.loadout}
 function grantRandom(){const o=optionPool().find(o=>o.kind==='perk');if(!o)return '얻을 특성이 없습니다.';applyOpt(o);return `${PERKS[o.k].name} 획득.`}
 function showReward(n,gain,keep){
   if(!keep){RUN.rr=mlv('reroll')}
@@ -578,7 +615,7 @@ function relicChoice(n,title,text,count){
 function showCache(n){relicChoice(n,'버려진 유물 상자','무너진 벙커에서 상자를 찾았습니다. 하나만 챙길 수 있습니다.',3)}
 function showShop(n){
   const disc=has('wagon')?.75:1;
-  if(!n.stock){n.stock=optionPool().slice(0,3).map(o=>({...o,price:Math.round((o.kind==='unit'?110:R(55,85))*disc/5)*5}));const rk=relicPool()[0];if(rk)n.stock.push({kind:'relic',k:rk,price:Math.round(R(120,150)*disc/5)*5});n.repair=true}
+  if(!n.stock){n.stock=optionPool().slice(0,3).map(o=>({...o,price:Math.round((o.kind==='unit'?110:o.kind==='support'?95:R(55,85))*disc/5)*5}));const rk=relicPool()[0];if(rk)n.stock.push({kind:'relic',k:rk,price:Math.round(R(120,150)*disc/5)*5});n.repair=true}
   const ch=n.stock.map((o,i)=>({...(o.kind==='relic'?relicView(o.k,!getMeta().found.includes(o.k)):optView(o)),price:o.price,disabled:RUN.supply<o.price,go:()=>{RUN.supply-=o.price;if(o.kind==='relic')gainRelic(o.k);else applyOpt(o);n.stock.splice(i,1);showShop(n)}}));
   if(n.repair)ch.push({tag:'REPAIR',name:'사령부 보수',desc:'사령부 내구도 +70',price:Math.round(40*disc),disabled:RUN.supply<Math.round(40*disc)||RUN.hq>=RUN.hqMax,go:()=>{RUN.supply-=Math.round(40*disc);RUN.hq=Math.min(RUN.hqMax,RUN.hq+70);n.repair=false;showShop(n)}});
   panel('후방 보급소','보급을 써서 특성이나 병과를 들입니다.',ch,{label:'떠나기',go:()=>{delete n.stock;finishNode(n)}});
@@ -781,7 +818,7 @@ function newGame(cfg){
     pts:{1:50+30*lv('startCP')+15*mlv('cp'),'-1':has('map')?0:45+cfg.f*6},hq:{1:P.hq,'-1':cfg.ehq},hqMax:{1:P.hqMax,'-1':cfg.ehq},
     ST:{1:buildStats(1,cfg),'-1':buildStats(-1,cfg)},
     inc:{1:(1+.15*lv('income'))*(1+legacy().inc),'-1':cfg.diff},trenchMul:{1:(1-.15*lv('trench'))*(has('netting')?.85:1),'-1':1},
-    barN:{1:BAR.n+4*lv('barrage'),'-1':BAR.n},barCd:{1:BAR.cd*(1-.25*lv('barrage'))*(has('watch')?.7:1),'-1':BAR.cd*(cfg.mod==='arty'?.5:1)},
+    barN:{1:BAR.n+4*lv('barrage'),'-1':BAR.n},strikes:[],heals:[],planes:[],
     stance:{1:'hold','-1':'hold'},cd:{1:{},'-1':{}},units:[],corpses:[],proj:[],tracers:[],bullets:[],rings:[],fires:[],smokes:[],mines:[],flares:[],glows:[],ash:[],nextFlare:R(6,14),nextGlow:1,warn:0,parts:[],flashes:[],barr:[],texts:[],
     trench:trs,terrain:TER,
     kills:0,lost:0,payT:{1:0,'-1':0},lastPay:0,payFlash:0,cam:0,follow:true,aim:false,shake:0,ai:{t:0,next:null},
@@ -829,7 +866,9 @@ function sprOf(u){
 // 보급 주기: 4초마다 고정 CP. 특성·유물·영구 강화로 양과 주기를 늘린다
 const PAY_INT=4,PAY_BASE=20;
 function payInterval(s){return s===1?PAY_INT*(1-.12*lv('logistics'))*(has('railway')?.85:1):PAY_INT}
-function payAmount(s){if(s!==1)return PAY_BASE*S.inc[-1];return Math.round((PAY_BASE+3*mlv('payroll'))*S.inc[1]*(has('gramophone')&&S.t<30?2:1))}
+// 증강: 60초마다 양쪽 보급 +20%. 교착을 깨고 전투가 끝을 향해 가게 한다.
+const surge=()=>1+.2*Math.floor(S.t/60);
+function payAmount(s){if(s!==1)return PAY_BASE*S.inc[-1]*surge();return Math.round((PAY_BASE+3*mlv('payroll'))*S.inc[1]*(has('gramophone')&&S.t<30?2:1)*surge())}
 function hit(t,amt){if(t.hq){S.hq[t.hq]-=amt*.6;return}if(t.side===1&&!t.saved&&t.hp-amt<=0&&t.hp>0&&has('rosary')&&!U[t.type].armor){t.saved=true;t.hp=1;t.hitT=.3;floatText(t.x,t.y-14,'SAVED','232,201,138');return}t.hp-=amt;t.hitT=.12}
 function fire(u,t){
   const d=S.ST[u.side][u.type],s=u.side,w=sprOf(u).width;
@@ -910,12 +949,36 @@ function aiStep(dt){
   if(A.next&&S.pts[-1]>=S.ST[-1][A.next].cost&&!(S.cd[-1][A.next]>0)&&S.units.length<75){spawn(-1,A.next);A.next=null}
   const es=strength(-1),ps=strength(1);
   S.stance[-1]=es>ps*1.15+20?'advance':es<ps*.55?'fall':'hold';
-  if(CFG.f>=1&&S.pts[-1]>=BAR.cost&&!(S.cd[-1].bar>0)){
+  // 적 지원 카드: 층이 깊을수록 종류가 늘어난다. 한 번 쓰면 6초는 쉰다.
+  S.ai.supT=(S.ai.supT||0)-.6;if(S.ai.supT>0)return;
+  const F=CFG.f+(CFG.elite?1:0)+(CFG.boss?3:0),use=(k,x,y)=>{callSupport(-1,k,x,y);S.ai.supT=6};
+  if(F>=1&&supReady(-1,'bar')){
     let bx=null,by=FMID,bn=0;for(const u of pu){const n=pu.filter(v=>Math.hypot(v.x-u.x,v.y-u.y)<26).length;if(n>bn){bn=n;bx=u.x;by=u.y}}
-    if(bn>=4)callBarrage(-1,bx,by);
+    if(bn>=4)return use('bar',bx,by);
+  }
+  if(F>=4&&supReady(-1,'howitzer')){
+    let best=null,bv=0;for(const u of pu){if(u.moving)continue;let v=0;for(const w of pu)if(Math.hypot(w.x-u.x,w.y-u.y)<16)v+=S.ST[1][w.type].cost;if(v>bv){bv=v;best=u}}
+    if(best&&bv>=60)return use('howitzer',best.x,best.y);
+  }
+  if(F>=6&&supReady(-1,'strafe')){
+    let bx=null,bn=0;for(const u of pu){const n=pu.filter(v=>Math.abs(v.x-u.x)<9).length;if(n>bn){bn=n;bx=u.x}}
+    if(bn>=5)return use('strafe',bx,FMID);
+  }
+  if(F>=3&&S.stance[-1]==='advance'&&supReady(-1,'smoke')){
+    const m=pu.find(u=>u.type==='mg'||u.type==='sniper');if(m)return use('smoke',m.x,m.y);
   }
 }
-function callBarrage(side,x,y){S.pts[side]-=BAR.cost;S.cd[side].bar=S.barCd[side];S.barr.push({side,x,y,t:-1.6,n:S.barN[side],fired:0})}
+function supCd(side,k){const b=SUP[k].cd;if(side===1)return b*(k==='bar'?1-.25*lv('barrage'):1)*(has('watch')?.7:1);return b*(CFG&&CFG.mod==='arty'?.5:1)}
+function supReady(side,k){return S.pts[side]>=SUP[k].cost&&!(S.cd[side][k]>0)}
+function callSupport(side,k,x,y){
+  const d=SUP[k];S.pts[side]-=d.cost;S.cd[side][k]=supCd(side,k);y=clampY(y);
+  if(k==='bar'){S.barr.push({side,x,y,t:-d.delay,n:S.barN[side],fired:0});return}
+  if(k==='mines'){for(let i=0;i<6;i++){const a=R(0,6.283),rr=Math.sqrt(Math.random())*d.r;S.mines.push({x:x+Math.cos(a)*rr,y:clampY(y+Math.sin(a)*rr*.8),side})}sfx('pop',x,.5);return}
+  if(k==='aid'){S.heals.push({x,y,r:d.r,life:4,side});return}
+  S.strikes.push({k,side,x,y,t:-d.delay,pass:0});
+  if(side===-1&&(k==='howitzer'||k==='strafe'))floatText(x,FY0-14,k==='strafe'?'AIR RAID':'INCOMING','200,85,61');
+}
+function callBarrage(side,x,y){callSupport(side,'bar',x,y)}
 
 /* ---------- step ---------- */
 function step(dt){
@@ -990,7 +1053,21 @@ function step(dt){
     if(Math.random()<dt*3)S.parts.push({x:f.x+R(-6,6),y:f.y-4,vx:R(-2,2),vy:R(-8,-4),g:-1,life:1.2,max:1.2,c:'smoke',sz:R(2,4)})}
   S.fires=S.fires.filter(f=>f.life>0);
   for(const m of S.smokes)m.life-=dt;S.smokes=S.smokes.filter(m=>m.life>0);
-  for(const m of S.mines){for(const e of S.units)if(e.side===-1&&Math.hypot(e.x-m.x,e.y-m.y)<5){m.gone=true;impact({x1:m.x,y1:m.y,side:1,dmg:28,armorDmg:40,splash:11,grenade:true});break}}
+  for(const m of S.mines){const ms=m.side||1;for(const e of S.units)if(e.side!==ms&&Math.hypot(e.x-m.x,e.y-m.y)<5){m.gone=true;impact({x1:m.x,y1:m.y,side:ms,dmg:28,armorDmg:40,splash:11,grenade:true});break}}
+  for(const h of S.heals){h.life-=dt;for(const u of S.units)if(u.side===h.side&&!U[u.type].armor&&Math.hypot(u.x-h.x,u.y-h.y)<h.r)u.hp=Math.min(u.max,u.hp+3*dt);
+    if(Math.random()<dt*10)S.parts.push({x:h.x+R(-h.r,h.r)*.7,y:h.y+R(-h.r,h.r)*.5,vx:0,vy:-8,g:0,life:.6,max:.6,c:'#b9cc6a',sz:1})}
+  S.heals=S.heals.filter(h=>h.life>0);
+  for(const st of S.strikes){st.t+=dt;if(st.t<0)continue;
+    if(st.k==='smoke'&&!st.done){st.done=true;S.smokes.push({x:st.x,y:st.y,r:SUP.smoke.r,life:10,max:10,side:st.side});sfx('pop',st.x,.6)}
+    if(st.k==='howitzer'&&!st.done){st.done=true;impact({x1:st.x,y1:st.y,side:st.side,dmg:80,armorDmg:80,splash:SUP.howitzer.r,big:true});S.shake=Math.max(S.shake,4)}
+    if(st.k==='strafe'){
+      while(st.pass<2&&st.t>=st.pass*1.2){st.pass++;S.planes.push({x:st.x,t:0,side:st.side});sfx('mg',st.x,1.4);
+        for(const e of S.units)if(e.side!==st.side&&Math.abs(e.x-st.x)<SUP.strafe.r){hit(e,isArmor(e)?1:(e.inTrench?12*.55*S.trenchMul[e.side]:12))}
+        for(let i=0;i<22;i++)puff(st.x+R(-7,7),R(FY0,FY1),2)}
+      if(st.pass>=2)st.done=true}
+  }
+  S.strikes=S.strikes.filter(st=>!st.done);
+  for(const pl of S.planes)pl.t+=dt;S.planes=S.planes.filter(pl=>pl.t<1.2);
   S.mines=S.mines.filter(m=>!m.gone);
   for(const g of S.rings){g.life-=dt;g.r+=(g.max-g.r)*Math.min(1,dt*14)}S.rings=S.rings.filter(g=>g.life>0);
   S.nextFlare-=dt;if(S.nextFlare<=0){S.nextFlare=R(10,22);const T=pick(S.trench);S.flares.push({x:T.x,y:FY0,vx:R(-6,6),vy:-70,life:7})}
@@ -1046,7 +1123,7 @@ function render(){
     const hp=Math.max(0,S.hq[s]/S.hqMax[s]);ctx.fillStyle='#000';ctx.fillRect(HQ[s]-11,FMID-16,22,3);ctx.fillStyle=s===1?'#8fa04a':'#8ea3b6';ctx.fillRect(HQ[s]-10,FMID-15,Math.round(20*hp),1)}
   for(const T of S.trench){const y=FY0-24;ctx.fillStyle='#2a241a';ctx.fillRect(T.x+11,y,1,12);ctx.fillStyle=T.own===1?'#8fa04a':T.own===-1?'#8ea3b6':'#cfc6ad';ctx.fillRect(T.x+12,y,5,3)}
   for(const c of S.corpses)drawSpr(c.wreck?SPR[c.side].wreck:SPR[c.side].corpse,c.x,c.y,c.side===-1,false,c.wreck?1:Math.min(1,(25-c.t)/5));
-  for(const m of S.mines){ctx.fillStyle='#1a160f';ctx.fillRect(Math.round(m.x)-1,Math.round(m.y),3,1);ctx.fillStyle='#8a7a50';ctx.fillRect(Math.round(m.x),Math.round(m.y)-1,1,1)}
+  for(const m of S.mines){if((m.side||1)!==1)continue;ctx.fillStyle='#1a160f';ctx.fillRect(Math.round(m.x)-1,Math.round(m.y),3,1);ctx.fillStyle='#8a7a50';ctx.fillRect(Math.round(m.x),Math.round(m.y)-1,1,1)}
   for(const f of S.fires){const a=Math.min(1,f.life);ctx.fillStyle=`rgba(255,120,40,${.18*a})`;ctx.beginPath();ctx.ellipse(f.x,f.y,f.r,f.r*.5,0,0,7);ctx.fill();
     for(let i=0;i<6;i++){ctx.fillStyle=Math.random()<.5?'#ff8a30':'#ffd060';ctx.fillRect(Math.round(f.x+R(-f.r,f.r)*.8),Math.round(f.y+R(-3,3)),1,R(1,3)|0)}}
   const us=[...S.units].sort((a,b)=>a.y-b.y);
@@ -1080,8 +1157,15 @@ function render(){
   for(const f of S.flares){const gr=ctx.createRadialGradient(f.x,f.y,0,f.x,f.y,46);gr.addColorStop(0,'rgba(255,245,215,.22)');gr.addColorStop(1,'rgba(255,245,215,0)');ctx.fillStyle=gr;ctx.fillRect(f.x-46,f.y-46,92,92);ctx.fillStyle='#fffbe8';ctx.fillRect(Math.round(f.x),Math.round(f.y),1,1);ctx.fillStyle='rgba(200,200,190,.4)';ctx.fillRect(Math.round(f.x),Math.round(f.y)-3,1,2)}
   ctx.font='6px Silkscreen, monospace';ctx.textAlign='center';
   for(const f of S.texts){ctx.fillStyle='rgba(10,8,4,'+Math.min(1,f.life)*.8+')';ctx.fillText(f.txt,Math.round(f.x)+1,Math.round(f.y)+1);ctx.fillStyle=`rgba(${f.col},${Math.min(1,f.life)})`;ctx.fillText(f.txt,Math.round(f.x),Math.round(f.y))}
-  if(S.aim&&aimX!=null){ctx.strokeStyle='#d98b3a';ctx.setLineDash([2,2]);ctx.beginPath();ctx.ellipse(aimX,aimY,26,20,0,0,7);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#d98b3a';ctx.fillRect(aimX,aimY-3,1,7);ctx.fillRect(aimX-3,aimY,7,1)}
-  for(const b of S.barr)if(b.t<0){ctx.fillStyle=`rgba(217,139,58,${.4+.4*Math.sin(S.t*20)})`;ctx.strokeStyle=ctx.fillStyle;ctx.beginPath();ctx.ellipse(b.x,b.y,26,20,0,0,7);ctx.stroke()}
+  const ring=(x,y,r,col,dash)=>{ctx.strokeStyle=col;if(dash)ctx.setLineDash([2,2]);ctx.beginPath();ctx.ellipse(x,y,r,r*.77,0,0,7);ctx.stroke();ctx.setLineDash([])};
+  const band=(x,r,col,a)=>{ctx.fillStyle=col.replace('A',a);ctx.fillRect(Math.round(x-r),FY0-6,r*2,FY1-FY0+12)};
+  if(S.aim&&aimX!=null){const d=SUP[S.aim];if(d.shape==='line'){band(aimX,d.r,'rgba(217,139,58,A)',.18);ctx.fillStyle='#d98b3a';ctx.fillRect(aimX,FY0-6,1,FY1-FY0+12)}else{ring(aimX,aimY,d.r,'#d98b3a',true);ctx.fillStyle='#d98b3a';ctx.fillRect(aimX,aimY-3,1,7);ctx.fillRect(aimX-3,aimY,7,1)}}
+  for(const st of S.strikes)if(st.t<0){const d=SUP[st.k],pulse=.45+.4*Math.sin(S.t*18),col=st.side===1?`rgba(217,139,58,${pulse})`:`rgba(220,70,50,${pulse})`;
+    if(d.shape==='line')band(st.x,d.r,st.side===1?'rgba(217,139,58,A)':'rgba(220,70,50,A)',.12+.1*pulse);
+    else{ring(st.x,st.y,d.r,col);ring(st.x,st.y,d.r*(-st.t/d.delay),col)}}
+  for(const h of S.heals){ctx.strokeStyle=`rgba(185,204,106,${Math.min(1,h.life)*.5})`;ctx.beginPath();ctx.ellipse(h.x,h.y,h.r,h.r*.77,0,0,7);ctx.stroke()}
+  for(const pl of S.planes){const sx=pl.x-60+pl.t*120,yy=FY0-30+pl.t*4;ctx.fillStyle='rgba(10,8,4,.35)';ctx.fillRect(Math.round(pl.x-6),Math.round(FY0+(FY1-FY0)*Math.min(1,pl.t/1.0)),12,2);ctx.fillStyle=pl.side===1?'#3e4524':'#3c4650';ctx.fillRect(Math.round(sx-6),Math.round(yy),13,2);ctx.fillRect(Math.round(sx-1),Math.round(yy-2),3,6);ctx.fillRect(Math.round(sx-6),Math.round(yy-1),2,1)}
+  for(const b of S.barr)if(b.t<0){ctx.fillStyle=b.side===1?`rgba(217,139,58,${.4+.4*Math.sin(S.t*20)})`:`rgba(220,70,50,${.4+.4*Math.sin(S.t*20)})`;ctx.strokeStyle=ctx.fillStyle;ctx.beginPath();ctx.ellipse(b.x,b.y,26,20,0,0,7);ctx.stroke()}
   ctx.setTransform(1,0,0,1,0,0);
   ctx.fillStyle='rgba(190,180,160,.35)';for(const a of S.ash)ctx.fillRect(Math.round(a.x),Math.round(a.y),1,1);
   if(S.hq[1]/S.hqMax[1]<.3&&!S.over){const a=.18+.14*Math.sin(S.t*6);ctx.fillStyle=`rgba(200,60,40,${a})`;ctx.fillRect(0,0,VW,2);ctx.fillRect(0,VH-2,VW,2);ctx.fillRect(0,0,2,VH);ctx.fillRect(VW-2,0,2,VH)}
@@ -1095,16 +1179,17 @@ function render(){
 /* ---------- battle UI ---------- */
 let cards={},keyMap=[];
 function buildCards(){
-  const el=$('#cards');el.innerHTML='';cards={};keyMap=[];
-  for(const k of [...ORDER.filter(t=>RUN.units.includes(t)),'bar']){
-    const d=k==='bar'?{name:BAR.name,cost:BAR.cost}:S.ST[1][k],b=document.createElement('button');b.className='card';
-    const img=k==='bar'?SHELL:SPR[1][k].s;const c=document.createElement('canvas');c.width=img.width;c.height=img.height;c.getContext('2d').drawImage(img,0,0);
-    c.style.height=(k==='tank'?28:k==='bar'?24:32)+'px';
+  const el=$('#cards'),sl=$('#supCards');el.innerHTML='';sl.innerHTML='';cards={};keyMap=[];
+  const mk=(k,sup)=>{const d=sup?SUP[k]:S.ST[1][k],b=document.createElement('button');b.className='card'+(sup?' sup':'');
+    const img=sup?supImg(k):SPR[1][k].s;const c=document.createElement('canvas');c.width=img.width;c.height=img.height;c.getContext('2d').drawImage(img,0,0);
+    c.style.height=(sup?22:k==='tank'?28:32)+'px';
     b.append(c);b.insertAdjacentHTML('beforeend',`<kbd>${keyMap.length+1}</kbd><b>${d.name}</b><em>${d.cost}</em>`);
     b.onclick=()=>{if(!S||S.over||S.paused)return;
-      if(k==='bar'){if(S.aim){S.aim=false;return}if(S.pts[1]>=BAR.cost&&!(S.cd[1].bar>0))S.aim=true;return}
+      if(sup){if(S.aim===k){S.aim=false;aimX=null;return}if(supReady(1,k)){S.aim=k}return}
       if(S.pts[1]>=d.cost&&!(S.cd[1][k]>0)&&S.units.filter(u=>u.side===1).length<54)spawn(1,k)};
-    el.append(b);cards[k]=b;keyMap.push(k)}
+    (sup?sl:el).append(b);cards[k]=b;keyMap.push(k)};
+  for(const k of ORDER.filter(t=>RUN.units.includes(t)))mk(k,false);
+  for(const k of supLoadout())mk(k,true);
 }
 function setStance(st){S.stance[1]=st;document.querySelectorAll('.seg button[data-st]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.st===st))}
 document.querySelectorAll('.seg button[data-st]').forEach(b=>b.onclick=()=>S&&setStance(b.dataset.st));
@@ -1117,11 +1202,18 @@ $('#bPause').onclick=e=>{if(!S||S.over||!S.started)return;S.paused=!S.paused;e.t
 function ui(){
   $('#cp').textContent=Math.floor(S.pts[1]);$('#cp').classList.toggle('pay',S.payFlash>0);$('#payAmt').textContent=`+${payAmount(1)} / ${payInterval(1).toFixed(1)}초`;$('#payBar').style.width=Math.min(100,S.payT[1]/payInterval(1)*100)+'%';
   $('#hpP').style.width=Math.max(0,S.hq[1]/S.hqMax[1]*100)+'%';$('#hpE').style.width=Math.max(0,S.hq[-1]/S.hqMax[-1]*100)+'%';
-  for(const k in cards){const d=k==='bar'?{cost:BAR.cost,cd:S.barCd[1]}:S.ST[1][k],cd=S.cd[1][k]||0;
-    cards[k].style.setProperty('--cd',(cd/d.cd*100)+'%');cards[k].classList.toggle('poor',S.pts[1]<d.cost);cards[k].classList.toggle('aim',k==='bar'&&S.aim)}
+  for(const k in cards){const sup=!!SUP[k]&&!U[k],d=sup?{cost:SUP[k].cost,cd:supCd(1,k)}:S.ST[1][k],cd=S.cd[1][k]||0;
+    cards[k].style.setProperty('--cd',(cd/d.cd*100)+'%');cards[k].classList.toggle('poor',S.pts[1]<d.cost);cards[k].classList.toggle('aim',S.aim===k)}
 }
 const ov=$('#ov');
 function overlay(html,btn,go){ov.hidden=false;ov.innerHTML=html+`<div><button class="btn primary" id="ovGo">${btn}</button></div>`;$('#ovGo').onclick=go}
+function loadoutPicker(){
+  const own=supOwned();if(own.length<=supSlots())return '';
+  const lo=supLoadout();return `<p>출전 지원 카드 ${lo.length}/${supSlots()}</p><div class="lo">${own.map(k=>`<button type="button" data-lo="${k}" aria-pressed="${lo.includes(k)}"><img class="ico sm" src="${supIcon(k)}" alt="">${SUP[k].name}</button>`).join('')}</div>`;
+}
+function bindLoadout(){ov.querySelectorAll('[data-lo]').forEach(b=>b.onclick=()=>{const k=b.dataset.lo,lo=supLoadout();
+  if(lo.includes(k)){if(lo.length>1)lo.splice(lo.indexOf(k),1)}else{if(lo.length>=supSlots())lo.shift();lo.push(k)}
+  ov.querySelectorAll('[data-lo]').forEach(x=>x.setAttribute('aria-pressed',lo.includes(x.dataset.lo)));const p=ov.querySelector('.lo').previousElementSibling;if(p)p.textContent=`출전 지원 카드 ${lo.length}/${supSlots()}`;buildCards();ui();saveRun()})}
 function startBattle(n){
   const f=n.f,boss=n.type==='boss',elite=n.type==='elite';
   CFG={node:n,f,boss,elite,mod:n.mod,diff:(.82+f*.055)*(elite?1.1:1)*(boss?1.15:1),ehq:boss?520:200+f*18};
@@ -1130,7 +1222,8 @@ function startBattle(n){
   const m=$('#bMod');m.hidden=!n.mod;if(n.mod){m.textContent=MODS[n.mod].name;m.title=MODS[n.mod].desc}
   $('#bPause').textContent='일시정지';$('#bSpeed').textContent='×1';
   render();ui();
-  overlay(`<h2>${$('#bName').textContent}</h2><p>${boss?'적 사령부는 내구도가 높고 전차와 기관총이 미리 배치돼 있습니다. ':elite?'적이 진지를 미리 갖추고 있습니다. ':''}${n.mod?MODS[n.mod].name+': '+MODS[n.mod].desc+'. ':''}지형: ${[...new Set(CFG.terrain.feats.map(o=>FEAT[o.type].name))].join(', ')||'개활지'}. 적 사령부 내구도 ${CFG.ehq}, 아군 사령부 ${RUN.hq}/${RUN.hqMax}.</p>`,'작전 개시',()=>{ov.hidden=true;S.paused=false;S.started=true;audioInit();soundLabel()});
+  setTimeout(bindLoadout,0);
+  overlay(`<h2>${$('#bName').textContent}</h2><p>${boss?'적 사령부는 내구도가 높고 전차와 기관총이 미리 배치돼 있습니다. ':elite?'적이 진지를 미리 갖추고 있습니다. ':''}${n.mod?MODS[n.mod].name+': '+MODS[n.mod].desc+'. ':''}지형: ${[...new Set(CFG.terrain.feats.map(o=>FEAT[o.type].name))].join(', ')||'개활지'}. 적 사령부 내구도 ${CFG.ehq}, 아군 사령부 ${RUN.hq}/${RUN.hqMax}.</p>${loadoutPicker()}`,'작전 개시',()=>{ov.hidden=true;S.paused=false;S.started=true;audioInit();soundLabel()});
 }
 function endBattle(win){
   if(S.over)return;S.over=true;RUN.kills+=S.kills;RUN.battles++;
@@ -1155,7 +1248,7 @@ cv.addEventListener('pointermove',e=>{if(!S)return;if(S.aim){aimX=Math.round(toW
   if(Math.abs(e.clientX-drag.x)>6)drag.moved=true;
   if(drag.moved){S.follow=false;S.cam=Math.max(0,Math.min(WORLD-VW,drag.cam-dx))}});
 cv.addEventListener('pointerup',e=>{if(!S||!drag)return;
-  if(!drag.moved&&S.aim){const x=toWorld(e);if(S.pts[1]>=BAR.cost)callBarrage(1,x,clampY(toY(e)));S.aim=false;aimX=null}
+  if(!drag.moved&&S.aim){const x=toWorld(e);if(supReady(1,S.aim))callSupport(1,S.aim,x,toY(e));S.aim=false;aimX=null}
   drag=null});
 cv.addEventListener('wheel',e=>{if(!S)return;e.preventDefault();S.follow=false;S.cam=Math.max(0,Math.min(WORLD-VW,S.cam+(e.deltaX||e.deltaY)*.3))},{passive:false});
 mini.addEventListener('pointerdown',e=>{if(!S)return;const r=mini.getBoundingClientRect();S.follow=false;S.cam=Math.max(0,Math.min(WORLD-VW,(e.clientX-r.left)/r.width*WORLD-VW/2))});
@@ -1189,7 +1282,7 @@ function frame(now){
 }
 /* ---------- test hook (tests/ 시뮬레이션 전용, 게임 로직은 쓰지 않음) ---------- */
 window.__TL={get S(){return S},get RUN(){return RUN},set RUN(v){RUN=v},get CFG(){return CFG},U,PERKS,RELICS,
-  genMap,hashSeed,startBattle,step,spawn,setStance,callBarrage,mkRun:(over)=>({seed:'SIM',map:genMap(1),path:[],hq:250,hqMax:250,supply:20,units:['rifle','assault','mg','at','sniper','mortar','tank'],perks:{},relics:[],kills:0,battles:0,recruits:0,elites:0,...(over||{})})};
+  genMap,hashSeed,startBattle,step,spawn,setStance,callBarrage,callSupport,supReady,SUP,mkRun:(over)=>({seed:'SIM',map:genMap(1),path:[],hq:250,hqMax:250,supply:20,units:['rifle','assault','mg','at','sniper','mortar','tank'],perks:{},relics:[],support:['bar'],loadout:['bar'],kills:0,battles:0,recruits:0,elites:0,...(over||{})})};
 showTitle();
 cloudInit();
 requestAnimationFrame(frame);

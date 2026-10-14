@@ -37,7 +37,8 @@ sed -n '/<script>/,/<\/script>/p' public/index.html | sed '1d;$d' > /tmp/g.js &&
 | 병과 수치 | `const U={...}` (cost, hp, dmg, range, rof=발사 간격, acc, cd=재배치 대기) |
 | 특성 / 유물 / 영구 강화 | `PERKS`, `RELICS`, `META_UP` |
 | 특성·유물 효과 적용 | `buildStats()`(스탯), `newGame()`(전투 시작값), `hit()`/`hitChance()`(전투 중) |
-| 보급(CP) | `PAY_INT`, `PAY_BASE`, `payInterval()`, `payAmount()` |
+| 보급(CP) | `PAY_INT`, `PAY_BASE`, `payInterval()`, `payAmount()`, 증강 `surge()`(60초마다 +20%) |
+| 지원 카드 | `SUP`(수치), `SUP_ORDER`, `SUP_ICON`, `callSupport()`(효과), `supCd()`, 적 사용은 `aiStep()` 끝부분. 보유 `RUN.support`, 출전 `RUN.loadout`(슬롯 `supSlots()`) |
 | 적 난이도 | `startBattle()`의 `CFG.diff`(보급 배율), `buildStats()`의 적 분기 |
 | 적 AI | `aiStep()` |
 | 사건 | `EVENTS` |
