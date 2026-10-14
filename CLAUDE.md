@@ -1,0 +1,50 @@
+# 참호전선 (Trench Line) — 작업 규칙
+
+도트 그래픽 참호 줄다리기 RTS + 로그라이크. 사용자: 고상혁(kosang02). 이 문서는 이 저장소에서 일하는 모든 Claude 세션이 따른다.
+
+## 역할
+- **팀장 (Opus 세션)**: 시스템 설계, 밸런스 방향, 구조 변경, 다른 세션 작업 검토. 큰 변경은 팀장이 먼저 방향을 정한다.
+- **팀원 (Sonnet 세션)**: 버그 수정, 수치 조정, 도트 스프라이트·UI 손질, 배포 확인.
+- 팀원이 구조를 바꿔야 할 것 같으면 직접 바꾸지 말고 `NOTES.md`의 "팀장 확인 필요"에 적는다.
+
+## 작업 순서 (충돌 방지)
+1. 시작 전 반드시 `git pull`.
+2. 한 번에 한 세션만 `public/index.html`을 고친다. 사용자가 누구 차례인지 정한다.
+3. 작고 의미 있는 단위로 커밋하고 바로 `git push`. 커밋 메시지는 한국어로, 무엇을 왜 바꿨는지.
+4. 푸시 전 검사: `node --check`로 스크립트 문법 확인(아래 명령), 가능하면 `python3 tests/smoke.py`.
+5. 끝나면 `NOTES.md`의 변경 기록에 한 줄 남긴다.
+
+문법 검사:
+```
+sed -n '/<script>/,/<\/script>/p' public/index.html | sed '1d;$d' > /tmp/g.js && node --check /tmp/g.js
+```
+
+## 배포
+`main`에 푸시하면 Cloudflare Workers Builds가 자동 배포한다(연결된 경우). 주소: https://trenchline.kosang0234.workers.dev
+수동 배포는 `npx wrangler deploy` (API 토큰 필요, 토큰은 절대 커밋하지 않는다).
+
+## 파일 구조
+- `public/index.html` — 게임 전체(HTML+CSS+JS 한 파일). 이게 유일한 원본.
+- `src/index.js` — Worker: 정적 파일 + 세이브 API(`/api/ping`, `POST /api/account`, `GET|PUT /api/save/:code`). KV 바인딩 `SAVES`.
+- `wrangler.toml` — Worker 설정. KV id는 비밀이 아니다.
+- `tests/smoke.py` — 브라우저 스모크 테스트.
+
+## index.html 지도 (섹션 주석 `/* ---------- 이름 ---------- */` 기준)
+| 무엇 | 어디 |
+|---|---|
+| 병과 수치 | `const U={...}` (cost, hp, dmg, range, rof=발사 간격, acc, cd=재배치 대기) |
+| 특성 / 유물 / 영구 강화 | `PERKS`, `RELICS`, `META_UP` |
+| 특성·유물 효과 적용 | `buildStats()`(스탯), `newGame()`(전투 시작값), `hit()`/`hitChance()`(전투 중) |
+| 보급(CP) | `PAY_INT`, `PAY_BASE`, `payInterval()`, `payAmount()` |
+| 적 난이도 | `startBattle()`의 `CFG.diff`(보급 배율), `buildStats()`의 적 분기 |
+| 적 AI | `aiStep()` |
+| 사건 | `EVENTS` |
+| 지형·바이옴 | `BIOMES`, `FEAT`, `genTerrain()`, `buildGround()` |
+| 스프라이트 | `pixel sprites` 섹션 — 문자 격자 + 팔레트(`PAL`) |
+| 저장 | `storage`, `cloud save` 섹션. localStorage 키 `trenchline.run/meta/code/savedAt` |
+
+## 지켜야 할 것
+- 세이브 호환성: `RUN`/`META` 필드를 지우거나 이름을 바꾸지 않는다. 새 필드는 기본값을 둔다.
+- 시드 재현성: 지도·지형 생성 안에서는 `seeded()` 밖의 난수를 쓰지 않는다.
+- 색은 아군 올리브, 적 회청색 톤을 유지한다.
+- 외부 라이브러리 없이 한 파일로 유지한다.
