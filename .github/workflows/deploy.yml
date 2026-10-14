@@ -1,4 +1,4 @@
-# main → 실제 서버(trenchline), dev → 테스트 서버(trenchline-dev). public·src·wrangler.toml·이 파일이 바뀔 때.
+# main → 실제 서버(trenchline), dev → 테스트 서버(trenchline-dev). public·src·wrangler.toml·이 파일이 바뀔 때. 
 # 필요한 저장소 Secret: CLOUDFLARE_API_TOKEN ("Cloudflare Workers 편집" 템플릿 토큰)
 name: deploy
 on:
