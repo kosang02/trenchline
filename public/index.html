@@ -477,8 +477,8 @@ const I18N_EN={
   " 비용 {0} · 대기 {1}초":" Cost {0} · Cooldown {1}s",
   "병과":"Units",
   "비용 {0} · 체력 {1} · 사거리 {2}":"Cost {0} · HP {1} · Range {2}",
-  " 지원":" Card",
-  " 편성":" Unit",
+  "{0} 지원":"{0} Card",
+  "{0} 편성":"{0} Unit",
   "얻을 특성이 없습니다.":"No Perks left to gain.",
   "{0} 획득.":"Gained {0}.",
   "정예 전리품":"Elite Spoils",
@@ -560,7 +560,7 @@ const I18N_EN={
   "참호 보강 특성을 얻었습니다.":"Gained the Reinforced Trench perk.",
   "사령부를 20 보강했습니다.":"Reinforced HQ by 20.",
   " 작전 등급 {0}({1})이 열렸습니다.":" Operation Rank {0} ({1}) unlocked.",
-  "전투 {0}회 · 적 사살 {1} · 공적 +{2} (보유 {3})":"Battles {0} · Kills {1} · Merit +{2} (total {3})",
+  "전투 {0}회 · 적 사살 {1} · 공적 +{2} (보유 {3}).":"Battles {0} · Kills {1} · Merit +{2} (total {3}).",
   "{0} {1}등급으로 적 사령부를 함락했습니다.{2} ":"{0} took the enemy HQ at Rank {1}.{2} ",
   "{0}번째 전선에서 사령부가 무너졌습니다. 최고 기록은 {1}번째 전선입니다. ":"Your HQ fell at Front {0}. Best: Front {1}. ",
   "작전 완수":"Operation Complete",
@@ -619,6 +619,7 @@ function translateDOM(){
   document.documentElement.lang=LANG;
   if(LANG!=='en')return;
   document.title=I18N_EN['참호전선']||'Trench Line';
+  const sub=document.querySelector('header h1 small');if(sub)sub.remove();
   const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let n;
   while((n=w.nextNode())){const v=n.nodeValue,k=v.trim();if(k&&I18N_EN[k])n.nodeValue=v.replace(k,I18N_EN[k])}
   for(const el of document.querySelectorAll('[placeholder],[aria-label],[title]'))
@@ -1056,7 +1057,7 @@ function optionPool(){
   for(const k of SUP_ORDER)if(!supOwned().includes(k)){pool.push({kind:'support',k});pool.push({kind:'support',k})}
   return shuffle(pool).filter((o,i,a)=>a.findIndex(p=>p.k===o.k&&p.kind===o.kind)===i);
 }
-function optView(o){if(o.kind==='support')return {icon:`<img class="ico lg" src="${supIcon(o.k)}" alt="">`,tag:'NEW SUPPORT',name:SUP[o.k].name+_t(' 지원'),desc:SUP[o.k].desc+_t(" 비용 {0} · 대기 {1}초",SUP[o.k].cost,SUP[o.k].cd)};return o.kind==='unit'?{tag:'NEW UNIT',name:U[o.k].name+_t(' 편성'),desc:UNIT_DESC[o.k]}:{tag:'PERK'+(lv(o.k)?` LV${lv(o.k)+1}`:''),name:PERKS[o.k].name,desc:PERKS[o.k].desc}}
+function optView(o){if(o.kind==='support')return {icon:`<img class="ico lg" src="${supIcon(o.k)}" alt="">`,tag:'NEW SUPPORT',name:_t('{0} 지원',SUP[o.k].name),desc:SUP[o.k].desc+_t(" 비용 {0} · 대기 {1}초",SUP[o.k].cost,SUP[o.k].cd)};return o.kind==='unit'?{tag:'NEW UNIT',name:_t('{0} 편성',U[o.k].name),desc:UNIT_DESC[o.k]}:{tag:'PERK'+(lv(o.k)?` LV${lv(o.k)+1}`:''),name:PERKS[o.k].name,desc:PERKS[o.k].desc}}
 function applyOpt(o){
   if(o.kind==='unit'){RUN.units.push(o.k);return}
   if(o.kind==='support'){const own=supOwned();if(!own.includes(o.k))own.push(o.k);const lo=supLoadout();if(lo.length<supSlots()&&!lo.includes(o.k))lo.push(o.k);return}
@@ -1125,8 +1126,8 @@ function gameOver(win){
   let unlocked='';
   if(win){M.clears[og+':'+R]=true;if(R>=M.rank&&R<6){M.rank=R+1;unlocked=_t(" 작전 등급 {0}({1})이 열렸습니다.",R+1,RANKS[R+1].name)}}
   M.merit+=merit;M.earned+=merit;if(floor>M.best)M.best=floor;if(win)M.wins++;setMeta(M);store.del('trenchline.run');
-  const relics=[...(RUN.relics||[])],stats=_t("전투 {0}회 · 적 사살 {1} · 공적 +{2} (보유 {3})",RUN.battles,RUN.kills,merit,M.merit);
-  const text=(win?_t("{0} {1}등급으로 적 사령부를 함락했습니다.{2} ",ORIGINS[og].name,R,unlocked):_t("{0}번째 전선에서 사령부가 무너졌습니다. 최고 기록은 {1}번째 전선입니다. ",floor,M.best))+stats+'.';
+  const relics=[...(RUN.relics||[])],stats=_t("전투 {0}회 · 적 사살 {1} · 공적 +{2} (보유 {3}).",RUN.battles,RUN.kills,merit,M.merit);
+  const text=(win?_t("{0} {1}등급으로 적 사령부를 함락했습니다.{2} ",ORIGINS[og].name,R,unlocked):_t("{0}번째 전선에서 사령부가 무너졌습니다. 최고 기록은 {1}번째 전선입니다. ",floor,M.best))+stats;
   RUN=null;
   if(relics.length){
     panel(win?_t('작전 완수'):_t('작전 실패'),text+_t(' 이번 작전의 유물 하나를 다음 작전에 가져갈 수 있습니다.'),
