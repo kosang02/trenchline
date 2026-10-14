@@ -1,9 +1,9 @@
-# main에 푸시하면 Cloudflare Worker로 자동 배포한다. (public·src·wrangler.toml·이 파일이 바뀔 때)
+# main → 실제 서버(trenchline), dev → 테스트 서버(trenchline-dev). public·src·wrangler.toml·이 파일이 바뀔 때.
 # 필요한 저장소 Secret: CLOUDFLARE_API_TOKEN ("Cloudflare Workers 편집" 템플릿 토큰)
 name: deploy
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
     paths: ['public/**', 'src/**', 'wrangler.toml', '.github/workflows/deploy.yml']
   workflow_dispatch:
 concurrency: deploy
@@ -18,7 +18,7 @@ jobs:
       - name: 문법 검사
         run: sed -n '/<script>/,/<\/script>/p' public/index.html | sed '1d;$d' > /tmp/g.js && node --check /tmp/g.js
       - name: 배포
-        run: npx --yes wrangler@4 deploy
+        run: npx --yes wrangler@4 deploy ${{ github.ref_name == 'dev' && '--env dev' || '' }}
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: d90ec98e7b0eb49affe848bd93b2218a

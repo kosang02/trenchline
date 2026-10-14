@@ -19,6 +19,7 @@ body{font-family:var(--body);padding:0 16px;-webkit-tap-highlight-color:transpar
 .app{max-width:960px;margin:0 auto;padding-block:14px 28px;display:flex;flex-direction:column;gap:10px}
 header{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 h1{font-size:18px;margin:0;letter-spacing:.04em}
+  .devtag{font-family:var(--pix);font-size:10px;letter-spacing:.08em;color:#14130c;background:var(--alert);padding:2px 6px}
 h1 small{font-family:var(--pix);font-size:10px;color:var(--muted);margin-left:6px;letter-spacing:.12em}
 .view{display:flex;flex-direction:column;gap:10px}
 .btn{font:inherit;font-size:13px;color:var(--fg);background:var(--panel);border:2px solid var(--line);padding:8px 14px;cursor:pointer;touch-action:manipulation}
@@ -164,7 +165,7 @@ body.pc .keys{display:block}
 
 <div id="tip" class="tip" role="tooltip" hidden></div>
 <div class="app">
-  <header><h1>참호전선 <small>TRENCH LINE</small></h1></header>
+  <header><h1>참호전선 <small>TRENCH LINE</small></h1><span id="devTag" class="devtag" hidden>테스트 서버</span></header>
 
   <section class="view" id="vTitle">
     <div class="title">
@@ -1364,6 +1365,7 @@ function frame(now){
 /* ---------- test hook (tests/ 시뮬레이션 전용, 게임 로직은 쓰지 않음) ---------- */
 window.__TL={get S(){return S},get RUN(){return RUN},set RUN(v){RUN=v},get CFG(){return CFG},U,PERKS,RELICS,
   genMap,hashSeed,startBattle,step,spawn,setStance,callBarrage,callSupport,supReady,SUP,gameOver,newRun,getMeta,mkRun:(over)=>({seed:'SIM',map:genMap(1),path:[],hq:250,hqMax:250,supply:20,units:['rifle','assault','mg','at','sniper','mortar','tank'],perks:{},relics:[],support:['bar'],loadout:['bar'],kills:0,battles:0,recruits:0,elites:0,...(over||{})})};
+if(/-dev\.|localhost|127\.0\.0\.1/.test(location.hostname))$('#devTag').hidden=false;
 showTitle();
 cloudInit();
 requestAnimationFrame(frame);

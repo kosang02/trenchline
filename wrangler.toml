@@ -9,3 +9,10 @@ binding = "ASSETS"
 [[kv_namespaces]]
 binding = "SAVES"
 id = "db6f5461368446deaaf351e4296949e0"
+
+# 테스트 서버: dev 브랜치 → https://trenchline-dev.kosang0234.workers.dev
+# 같은 KV를 쓰되 키 앞에 "dev:"를 붙여 실제 유저 세이브와 섞이지 않게 한다.
+[env.dev]
+name = "trenchline-dev"
+vars = { PREFIX = "dev:" }
+kv_namespaces = [{ binding = "SAVES", id = "db6f5461368446deaaf351e4296949e0" }]

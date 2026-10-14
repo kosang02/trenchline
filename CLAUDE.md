@@ -9,7 +9,7 @@
   - 로직이 필요한 제안은 `NOTES.md`의 "팀장 확인 필요"에 적는다.
 
 ## 작업 순서 (충돌 방지)
-1. 시작 전 반드시 `git pull`.
+1. 시작 전 반드시 `git checkout dev && git pull`.
 2. 한 번에 한 세션만 `public/index.html`을 고친다. 사용자가 누구 차례인지 정한다.
 3. 작고 의미 있는 단위로 커밋하고 바로 `git push`. 커밋 메시지는 한국어로, 무엇을 왜 바꿨는지.
 4. 푸시 전 검사: `node --check`로 스크립트 문법 확인(아래 명령), 가능하면 `python3 tests/smoke.py`.
@@ -20,9 +20,11 @@
 sed -n '/<script>/,/<\/script>/p' public/index.html | sed '1d;$d' > /tmp/g.js && node --check /tmp/g.js
 ```
 
-## 배포
-`main`에 푸시하면 GitHub Actions(`.github/workflows/deploy.yml`)가 문법 검사 후 Cloudflare에 자동 배포한다. 저장소 Secret `CLOUDFLARE_API_TOKEN`이 필요하다. 배포 결과는 GitHub의 Actions 탭에서 확인. 주소: https://trenchline.kosang0234.workers.dev
-수동 배포는 `npx wrangler deploy` (API 토큰 필요, 토큰은 절대 커밋하지 않는다).
+## 배포 (테스트 서버 → 실제 서버)
+- **모든 작업은 `dev` 브랜치에 푸시한다.** dev에 푸시하면 테스트 서버 https://trenchline-dev.kosang0234.workers.dev 에 자동 배포된다(화면에 "테스트 서버" 표시, 세이브는 `dev:` 접두어로 분리).
+- **`main`은 실제 유저가 쓰는 서버다**(https://trenchline.kosang0234.workers.dev). 사용자가 테스트 서버에서 확인하고 "배포해"라고 할 때만 `dev`를 `main`에 합쳐 푸시한다.
+- GitHub Actions(`.github/workflows/deploy.yml`)가 문법 검사 후 배포한다. 저장소 Secret `CLOUDFLARE_API_TOKEN` 사용. 토큰은 절대 커밋하지 않는다.
+- 세이브 호환성은 실제 유저가 있으므로 더 엄격히 지킨다. 필드 이름 변경·삭제 금지, 새 필드는 기본값.
 
 ## 파일 구조
 - `public/index.html` — 게임 전체(HTML+CSS+JS 한 파일). 이게 유일한 원본.

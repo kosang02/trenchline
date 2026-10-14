@@ -17,9 +17,9 @@ function newCode() {
   return s;
 }
 
-async function keyFor(code) {
+async function keyFor(code, env) {
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('trenchline:' + code));
-  return 'save:' + [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
+  return (env.PREFIX || '') + 'save:' + [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
 export default {
@@ -33,7 +33,7 @@ export default {
     if (path === '/api/account' && request.method === 'POST') {
       for (let i = 0; i < 3; i++) {
         const code = newCode();
-        const key = await keyFor(code);
+        const key = await keyFor(code, env);
         if (await env.SAVES.get(key)) continue;
         const now = Date.now();
         await env.SAVES.put(key, JSON.stringify({ savedAt: 0, createdAt: now, data: null }));
@@ -46,7 +46,7 @@ export default {
     if (m) {
       const code = decodeURIComponent(m[1]).toUpperCase();
       if (!CODE_RE.test(code)) return json({ error: '잘못된 코드 형식' }, 400);
-      const key = await keyFor(code);
+      const key = await keyFor(code, env);
       const cur = await env.SAVES.get(key, 'json');
       if (!cur) return json({ error: '계정 없음' }, 404);
 
