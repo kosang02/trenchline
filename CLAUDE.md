@@ -21,8 +21,8 @@ sed -n '/<script>/,/<\/script>/p' public/index.html | sed '1d;$d' > /tmp/g.js &&
 ```
 
 ## 배포 (테스트 서버 → 실제 서버)
-- **모든 작업은 `dev` 브랜치에 푸시한다.** dev에 푸시하면 테스트 서버 https://trenchline-dev.kosang0234.workers.dev 에 자동 배포된다(화면에 "테스트 서버" 표시, 세이브는 `dev:` 접두어로 분리).
-- **`main`은 실제 유저가 쓰는 서버다**(https://trenchline.kosang0234.workers.dev). 사용자가 테스트 서버에서 확인하고 "배포해"라고 할 때만 `dev`를 `main`에 합쳐 푸시한다.
+- **모든 작업은 `dev` 브랜치에 푸시한다.** dev에 푸시하면 테스트 서버 https://dev.playtrenchline.com 에 자동 배포된다(화면에 "테스트 서버" 표시, 세이브는 `dev:` 접두어로 분리).
+- **`main`은 실제 유저가 쓰는 서버다**(https://playtrenchline.com, 옛 주소 trenchline.kosang0234.workers.dev도 유지). 사용자가 테스트 서버에서 확인하고 "배포해"라고 할 때만 `dev`를 `main`에 합쳐 푸시한다.
 - GitHub Actions(`.github/workflows/deploy.yml`)가 문법 검사 후 배포한다. 저장소 Secret `CLOUDFLARE_API_TOKEN` 사용. 토큰은 절대 커밋하지 않는다.
 - 세이브 호환성은 실제 유저가 있으므로 더 엄격히 지킨다. 필드 이름 변경·삭제 금지, 새 필드는 기본값.
 
