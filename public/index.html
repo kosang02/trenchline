@@ -822,7 +822,7 @@ function newGame(cfg){
     stance:{1:'hold','-1':'hold'},cd:{1:{},'-1':{}},units:[],corpses:[],proj:[],tracers:[],bullets:[],rings:[],fires:[],smokes:[],mines:[],flares:[],glows:[],ash:[],nextFlare:R(6,14),nextGlow:1,warn:0,parts:[],flashes:[],barr:[],texts:[],
     trench:trs,terrain:TER,
     kills:0,lost:0,payT:{1:0,'-1':0},lastPay:0,payFlash:0,cam:0,follow:true,aim:false,shake:0,ai:{t:0,next:null},
-    eTypes:cfg.boss?ORDER:['rifle','assault','mg',...(cfg.f>=2?['at','mortar']:[]),...(cfg.f>=3?['tank','sniper']:[])]};
+    eTypes:cfg.boss?ORDER:['rifle','assault','mg',...(cfg.f>=2?['at','mortar']:(RUN.units.includes('tank')?['at']:[])),...(cfg.f>=3?['tank','sniper']:[])]};
   setStance('hold');
   for(let i=0;i<2*lv('vanguard')+P.recruits;i++)spawn(1,'rifle',true);P.recruits=0;
   for(let i=0;i<5*lv('mines');i++){const T=[...S.trench].sort((a,b)=>a.x-b.x)[1];S.mines.push({x:T.x+R(22,70),y:R(FY0+4,FY1-4)})}
