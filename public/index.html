@@ -60,6 +60,12 @@ h1 small{font-family:var(--pix);font-size:10px;color:var(--muted);margin-left:6p
 .tip p.lore{color:var(--muted);font-size:12px}
 .chip.u{border-color:var(--friend-dim)}
 .chip.r{border-color:#8a6f3a;color:#e8c98a}
+.clears{display:flex;flex-direction:column;gap:6px;margin-top:6px;font-size:13px}
+.clears table{border-collapse:collapse;font-variant-numeric:tabular-nums}
+.clears th,.clears td{border:1px solid var(--line);padding:3px 8px;text-align:center;font-weight:400;color:var(--muted)}
+.clears td.on{color:#e8c98a}
+.clears td.lock{opacity:.4}
+.clears p{margin:0;font-size:12px;color:var(--muted)}
 .relic-list{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
 .relic-list li{font-size:13px;color:var(--muted);line-height:1.45}
 .relic-list b{color:#e8c98a;font-weight:600}
@@ -307,7 +313,25 @@ const META_UP={
 };
 
 /* ---------- storage ---------- */
-const META_DEF={merit:0,earned:0,up:{},found:[],heir:null,runs:0,best:0,wins:0};
+const META_DEF={merit:0,earned:0,up:{},found:[],heir:null,runs:0,best:0,wins:0,rank:1,clears:{}};
+// 지휘관 출신: 작전 시작 때 고른다. 장점 하나와 대가. 시작 혜택은 작전 내내 유지된다.
+const ORIGINS={
+  inf:  {name:'보병 출신',line:'소총 중대를 이끌던 중위',pro:'선발대·고참병 특성으로 시작',con:'포격 대신 연막탄 · 사령부 -40',perks:{vanguard:1,veteran:1},support:['smoke'],hq:-40,supply:0,unlock:()=>true,lock:''},
+  art:  {name:'포병 출신',line:'포병 관측장교',pro:'야포 사격 카드 추가',con:'시작 보급 0 · 사령부 -40',support:['bar','howitzer'],hq:-40,supply:-20,unlock:M=>M.best>=3,lock:'3번째 전선 도달'},
+  arm:  {name:'기갑 출신',line:'시제 전차 시험대대',pro:'전차를 처음부터 편성',con:'포격 대신 연막탄 · 사령부 -20',units:['tank'],support:['smoke'],hq:-20,supply:0,unlock:M=>M.earned>=200,lock:'누적 공적 200'},
+  intel:{name:'정보 출신',line:'참모본부 정보과',pro:'노획 지도 유물(적이 CP 0으로 시작)',con:'포격 대신 구급 지원 · 사령부 -40 · 시작 보급 0',relics:['map'],support:['aid'],hq:-40,supply:-20,unlock:M=>M.found.length>=6,lock:'유물 도감 6종'},
+};
+const ORIGIN_ORDER=['inf','art','arm','intel'];
+// 작전 등급: 클리어하면 다음 등급이 열린다. 규칙은 누적된다.
+const RANKS=[null,
+  {name:'회랑 정찰',rule:'기본 규칙'},
+  {name:'철갑의 계절',rule:'적 전차가 3번째 전선부터, 전투 30초부터 나온다'},
+  {name:'끊어진 보급선',rule:'아군 보급 주기 ×1.15'},
+  {name:'증원 도착',rule:'정예 전투에 적 기관총·소총수 추가 배치'},
+  {name:'포병 총동원',rule:'적이 지원 카드를 두 단계 일찍 쓴다'},
+  {name:'벨스타 결전',rule:'적 사령부 600, 내구도 절반 이하에서 총동원(적 지원 대기 절반)'},
+];
+const rk=()=>RUN&&RUN.rank||1;
 const SYNC_KEYS=new Set(['trenchline.run','trenchline.meta']);
 const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},
   set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}if(SYNC_KEYS.has(k))cloudMark()},
@@ -470,17 +494,38 @@ function show(v){if(typeof hideTip==='function')hideTip();for(const id of ['vTit
 let RUN=null;
 const lv=k=>RUN&&RUN.perks[k]||0;
 const has=k=>!!(RUN&&RUN.relics&&RUN.relics.includes(k));
-function getMeta(){const m=store.get('trenchline.meta')||{};const old=store.get('trenchline.best');const M={...META_DEF,...m,up:{...(m.up||{})}};if(old&&!m.best){M.best=old.floor||0;M.wins=old.wins||0}return M}
+function getMeta(){const m=store.get('trenchline.meta')||{};const old=store.get('trenchline.best');const M={...META_DEF,...m,up:{...(m.up||{})},clears:{...(m.clears||{})}};if(old&&!m.best){M.best=old.floor||0;M.wins=old.wins||0}return M}
 function setMeta(M){store.set('trenchline.meta',M)}
 const mlv=k=>getMeta().up[k]||0;
 function legacy(){const n=getMeta().found.length;return {n,inc:n*.01,hq:n*2}}
 function gainRelic(k){if(!RUN.relics.includes(k))RUN.relics.push(k);const M=getMeta();if(!M.found.includes(k)){M.found.push(k);setMeta(M);return true}return false}
 function relicPool(){return shuffle(Object.keys(RELICS).filter(k=>!RUN.relics.includes(k)))}
-function newRun(){
+function startSetup(){
+  const M=getMeta(),last=store.get('trenchline.lastSetup')||{};
+  panel('지휘관 부임','새 지휘관의 출신을 고르세요. 출신의 장점은 작전 내내 유지됩니다.',ORIGIN_ORDER.map(k=>{const o=ORIGINS[k],ok=o.unlock(M);
+    return {tag:ok?(last.origin===k?'지난번 선택':'출신'):'잠김 · '+o.lock,name:o.name,desc:ok?`${o.line}. 장점: ${o.pro}. 대가: ${o.con}.`:`해금 조건: ${o.lock}.`,disabled:!ok,
+      go:()=>{if(M.rank>1)pickRank(k);else newRun(k,1)}}}),{label:'돌아가기',go:showTitle});
+}
+function pickRank(origin){
+  const M=getMeta(),last=store.get('trenchline.lastSetup')||{};
+  const ch=[];for(let i=1;i<=M.rank;i++)ch.push({tag:`등급 ${i}`+(M.clears[origin+':'+i]?' · 클리어':'')+(last.rank===i?' · 지난번':''),name:RANKS[i].name,
+    desc:(i===1?'기본 규칙.':RANKS.slice(2,i+1).map(x=>x.rule).join('. ')+'.')+(i>1?` 공적 +${(i-1)*10}%.`:''),go:()=>newRun(origin,i)});
+  panel('작전 등급','등급이 높을수록 규칙이 하나씩 더해집니다. 클리어하면 다음 등급이 열립니다.',ch.reverse(),{label:'돌아가기',go:startSetup});
+}
+function newRun(origin,rank){
+  origin=ORIGINS[origin]?origin:'inf';rank=Math.max(1,Math.min(6,rank||1));
+  try{store.set('trenchline.lastSetup',{origin,rank})}catch(e){}
   const M=getMeta(),L=legacy(),hq=250+20*(M.up.hq||0)+L.hq;
   const sIn=($('#seedIn').value||'').trim(),seedStr=sIn||Math.floor(Math.random()*1e8).toString(36).toUpperCase();
   RUN={seed:seedStr,map:genMap(hashSeed(seedStr)),path:[],hq,hqMax:hq,supply:20+25*(M.up.supply||0),units:['rifle','assault','mg','at'],perks:{},relics:[],support:['bar'],loadout:['bar'],kills:0,battles:0,recruits:0,elites:0};
-  if(M.up.mortarDoc)RUN.units.push('mortar');if(M.up.sniperDoc)RUN.units.push('sniper');
+  RUN.origin=origin;RUN.rank=rank;
+  {const o=ORIGINS[origin];
+   for(const k in (o.perks||{}))RUN.perks[k]=Math.max(RUN.perks[k]||0,o.perks[k]);
+   for(const u of (o.units||[]))if(!RUN.units.includes(u))RUN.units.push(u);
+   if(o.support){RUN.support=[...o.support];RUN.loadout=o.support.slice(0,2+(M.up.slots||0))}
+   for(const k of (o.relics||[]))if(!RUN.relics.includes(k))RUN.relics.push(k);
+   RUN.hq=RUN.hqMax=Math.max(100,RUN.hqMax+(o.hq||0));RUN.supply=Math.max(0,RUN.supply+(o.supply||0))}
+  if(M.up.mortarDoc&&!RUN.units.includes('mortar'))RUN.units.push('mortar');if(M.up.sniperDoc&&!RUN.units.includes('sniper'))RUN.units.push('sniper');
   if(M.up.chest)RUN.relics.push(relicPool()[0]);
   if(M.heir&&RELICS[M.heir]&&!RUN.relics.includes(M.heir))RUN.relics.push(M.heir);
   M.heir=null;M.runs++;setMeta(M);$('#seedIn').value='';
@@ -518,7 +563,7 @@ function reachable(){const c=curNode();if(!c)return RUN.map[0].map(n=>n.id);if(c
 function statusHTML(){
   if(!RUN){const M=getMeta();return `<span>보유 공적<b class="merit">${M.merit}</b></span><span>유물 도감<b>${M.found.length}/${Object.keys(RELICS).length}</b></span>`}
   const c=curNode();
-  return `<span>시드<b>${RUN.seed||'-'}</b></span><span>사령부<b>${RUN.hq}/${RUN.hqMax}</b></span><span>보급<b>${RUN.supply}</b></span><span>전선<b>${c?c.f+1:0}/${FLOORS}</b></span><span>사살<b>${RUN.kills}</b></span>`;
+  return `<span>${ORIGINS[RUN.origin||'inf'].name.replace(' 출신','')}<b>${rk()}등급</b></span><span>시드<b>${RUN.seed||'-'}</b></span><span>사령부<b>${RUN.hq}/${RUN.hqMax}</b></span><span>보급<b>${RUN.supply}</b></span><span>전선<b>${c?c.f+1:0}/${FLOORS}</b></span><span>사살<b>${RUN.kills}</b></span>`;
 }
 function chipsHTML(){
   let s=RUN.units.map(u=>`<button type="button" class="chip u" data-k="unit:${u}">${U[u].name}</button>`).join('');
@@ -652,10 +697,12 @@ function showEvent(n){
 }
 function gameOver(win){
   const c=curNode(),floor=win?FLOORS:(CFG?CFG.f+1:c?c.f+1:0);
-  const M=getMeta(),merit=5+floor*12+(RUN.elites||0)*15+Math.floor(RUN.kills/8)+(win?100:0);
+  const M=getMeta(),R=rk(),og=RUN.origin||'inf',merit=Math.round((5+floor*12+(RUN.elites||0)*15+Math.floor(RUN.kills/8)+(win?100:0))*(1+.1*(R-1)));
+  let unlocked='';
+  if(win){M.clears[og+':'+R]=true;if(R>=M.rank&&R<6){M.rank=R+1;unlocked=` 작전 등급 ${R+1}(${RANKS[R+1].name})이 열렸습니다.`}}
   M.merit+=merit;M.earned+=merit;if(floor>M.best)M.best=floor;if(win)M.wins++;setMeta(M);store.del('trenchline.run');
   const relics=[...(RUN.relics||[])],stats=`전투 ${RUN.battles}회 · 적 사살 ${RUN.kills} · 공적 +${merit} (보유 ${M.merit})`;
-  const text=(win?'적 사령부를 함락했습니다. ':`${floor}번째 전선에서 사령부가 무너졌습니다. 최고 기록은 ${M.best}번째 전선입니다. `)+stats+'.';
+  const text=(win?`${ORIGINS[og].name} ${R}등급으로 적 사령부를 함락했습니다.${unlocked} `:`${floor}번째 전선에서 사령부가 무너졌습니다. 최고 기록은 ${M.best}번째 전선입니다. `)+stats+'.';
   RUN=null;
   if(relics.length){
     panel(win?'작전 완수':'작전 실패',text+' 이번 작전의 유물 하나를 다음 작전에 가져갈 수 있습니다.',
@@ -667,17 +714,21 @@ function showMeta(){
   const M=getMeta(),L=legacy();
   const ch=Object.entries(META_UP).map(([k,u])=>{const l=M.up[k]||0,max=l>=u.max,c=u.cost[l];
     return {tag:`LV ${l}/${u.max}`,name:u.name,desc:u.desc,price:max?null:c,disabled:max||M.merit<c,go:()=>{const m=getMeta();if(m.merit<c)return;m.merit-=c;m.up[k]=l+1;setMeta(m);showMeta()}}});
-  panel('사령부 보급창',`공적으로 모든 작전에 남는 강화를 삽니다. 보유 공적 ${M.merit}. 도감 유물 ${L.n}/${Object.keys(RELICS).length}개 · 영구 보너스 CP 수입 +${Math.round(L.inc*100)}%, 사령부 +${L.hq}.${M.heir?` 다음 작전 계승 유물: ${RELICS[M.heir].name}.`:''}`,ch.map(c=>({...c,price:c.price})),{label:'새 작전 시작',go:newRun});
+  panel('사령부 보급창',`공적으로 모든 작전에 남는 강화를 삽니다. 보유 공적 ${M.merit}. 도감 유물 ${L.n}/${Object.keys(RELICS).length}개 · 영구 보너스 CP 수입 +${Math.round(L.inc*100)}%, 사령부 +${L.hq}.${M.heir?` 다음 작전 계승 유물: ${RELICS[M.heir].name}.`:''}`,ch.map(c=>({...c,price:c.price})),{label:'새 작전 시작',go:startSetup});
   const box=$('#pChoices');box.querySelectorAll('.price').forEach(e=>e.textContent=e.textContent.replace('보급','공적'));
   const ul=document.createElement('ul');ul.className='relic-list';ul.style.gridColumn='1/-1';
   ul.innerHTML='<li style="margin-top:6px"><b style="color:var(--fg)">유물 도감</b></li>'+Object.entries(RELICS).map(([k,r])=>M.found.includes(k)?`<li>${iconImg(k,'ico sm')}<b>${r.name}</b> · ${r.desc}</li>`:'<li class="no"><b>◇ ???</b> · 아직 발견하지 못함</li>').join('');
   box.append(ul);
+  const g=document.createElement('div');g.className='clears';g.style.gridColumn='1/-1';
+  let h='<b>지휘관 명부</b><table><tr><th></th>'+[1,2,3,4,5,6].map(i=>`<th>${i}</th>`).join('')+'</tr>';
+  for(const k of ORIGIN_ORDER){h+=`<tr><th>${ORIGINS[k].name.replace(' 출신','')}</th>`+[1,2,3,4,5,6].map(i=>`<td class="${M.clears[k+':'+i]?'on':i>M.rank?'lock':''}">${M.clears[k+':'+i]?'★':i>M.rank?'·':'○'}</td>`).join('')+'</tr>'}
+  g.innerHTML=h+'</table><p>★ 클리어 · ○ 도전 가능 · · 잠김(등급 미개방)</p>';box.append(g);
 }
 function showTitle(){
   show('vTitle');renderAccount();const sv=store.get('trenchline.run');$('#bCont').hidden=!sv;
-  const M=getMeta();$('#best').innerHTML=M.runs?`최고 기록 ${M.best}번째 전선 · 작전 완수 ${M.wins}회 · 보유 공적 <span class="merit">${M.merit}</span> · 유물 도감 ${M.found.length}/${Object.keys(RELICS).length}`:'';
+  const M=getMeta();$('#best').innerHTML=M.runs?`최고 기록 ${M.best}번째 전선 · 작전 완수 ${M.wins}회 · 열린 등급 ${M.rank} · 명부 ${Object.keys(M.clears).length}/24 · 보유 공적 <span class="merit">${M.merit}</span> · 유물 도감 ${M.found.length}/${Object.keys(RELICS).length}`:'';
 }
-$('#bNew').onclick=newRun;
+$('#bNew').onclick=startSetup;
 $('#bMeta').onclick=showMeta;
 $('#bMode').onclick=()=>{MODE=MODE==='pc'?'mobile':'pc';store.set('trenchline.mode',MODE);applyMode()};
 $('#bCont').onclick=()=>{RUN=store.get('trenchline.run');if(RUN){RUN.relics=RUN.relics||[];showMap()}};
@@ -822,12 +873,12 @@ function newGame(cfg){
     stance:{1:'hold','-1':'hold'},cd:{1:{},'-1':{}},units:[],corpses:[],proj:[],tracers:[],bullets:[],rings:[],fires:[],smokes:[],mines:[],flares:[],glows:[],ash:[],nextFlare:R(6,14),nextGlow:1,warn:0,parts:[],flashes:[],barr:[],texts:[],
     trench:trs,terrain:TER,
     kills:0,lost:0,payT:{1:0,'-1':0},lastPay:0,payFlash:0,cam:0,follow:true,aim:false,shake:0,ai:{t:0,next:null},
-    eTypes:cfg.boss?ORDER:['rifle','assault','mg',...(cfg.f>=2?['at','mortar']:(RUN.units.includes('tank')?['at']:[])),...(cfg.f>=3?['tank','sniper']:[])]};
+    eTypes:cfg.boss?ORDER:['rifle','assault','mg',...(cfg.f>=2?['at','mortar']:(RUN.units.includes('tank')?['at']:[])),...(cfg.f>=3?['tank','sniper']:(rk()>=2&&cfg.f>=2?['tank']:[]))]};
   setStance('hold');
   for(let i=0;i<2*lv('vanguard')+P.recruits;i++)spawn(1,'rifle',true);P.recruits=0;
   for(let i=0;i<5*lv('mines');i++){const T=[...S.trench].sort((a,b)=>a.x-b.x)[1];S.mines.push({x:T.x+R(22,70),y:R(FY0+4,FY1-4)})}
   const half=a=>has('dossier')?a.filter((_,i)=>i%2===0):a;
-  if(cfg.elite){half(['mg','rifle','rifle','rifle',cfg.f>=5?'tank':'assault','mg']).forEach(t=>spawn(-1,t,true))}
+  if(cfg.elite){half(['mg','rifle','rifle','rifle',cfg.f>=5?'tank':'assault','mg',...(rk()>=4?['mg','rifle']:[])]).forEach(t=>spawn(-1,t,true))}
   if(cfg.boss){half(['tank','mg','mg','rifle','rifle','rifle','mortar','mg','rifle']).forEach(t=>spawn(-1,t,true))}
   buildCards();
 }
@@ -865,7 +916,7 @@ function sprOf(u){
 }
 // 보급 주기: 4초마다 고정 CP. 특성·유물·영구 강화로 양과 주기를 늘린다
 const PAY_INT=4,PAY_BASE=20;
-function payInterval(s){return s===1?PAY_INT*(1-.12*lv('logistics'))*(has('railway')?.85:1):PAY_INT}
+function payInterval(s){return s===1?PAY_INT*(1-.12*lv('logistics'))*(has('railway')?.85:1)*(rk()>=3?1.15:1):PAY_INT}
 // 증강: 60초마다 양쪽 보급 +20%. 교착을 깨고 전투가 끝을 향해 가게 한다.
 const surge=()=>1+.2*Math.floor(S.t/60);
 function payAmount(s){if(s!==1)return PAY_BASE*S.inc[-1]*surge();return Math.round((PAY_BASE+3*mlv('payroll'))*S.inc[1]*(has('gramophone')&&S.t<30?2:1)*surge())}
@@ -941,7 +992,7 @@ function aiStep(dt){
   const rushed=pu.some(u=>(HQ[-1]-u.x)<170);
   if(rushed&&A.next&&S.ST[-1][A.next].cost>35)A.next=null;
   if(!A.next){
-    const w={rifle:4,assault:1.5+pTank*1.5+(pTr>3?2:0),mg:1.2+(pInf>5?2.2:0),at:.4+pTank*4,mortar:.8+(pTr>3?2:0)+(pInf>8?1:0),sniper:.5+(cnt('mg')+cnt('mortar')+cnt('at'))*.5,tank:S.t>45?.5+(pInf>7?1:0)+(CFG.boss?1:0):0};
+    const w={rifle:4,assault:1.5+pTank*1.5+(pTr>3?2:0),mg:1.2+(pInf>5?2.2:0),at:.4+pTank*4,mortar:.8+(pTr>3?2:0)+(pInf>8?1:0),sniper:.5+(cnt('mg')+cnt('mortar')+cnt('at'))*.5,tank:S.t>(rk()>=2?30:45)?.5+(pInf>7?1:0)+(CFG.boss?1:0):0};
     if(rushed){w.mg+=3;w.rifle+=2;w.tank=0;w.mortar=0;w.sniper=0}
     let sum=0;for(const k of S.eTypes)sum+=w[k];let r=Math.random()*sum;
     for(const k of S.eTypes){r-=w[k];if(r<=0){A.next=k;break}}
@@ -951,7 +1002,8 @@ function aiStep(dt){
   S.stance[-1]=es>ps*1.15+20?'advance':es<ps*.55?'fall':'hold';
   // 적 지원 카드: 층이 깊을수록 종류가 늘어난다. 한 번 쓰면 6초는 쉰다.
   S.ai.supT=(S.ai.supT||0)-.6;if(S.ai.supT>0)return;
-  const F=CFG.f+(CFG.elite?1:0)+(CFG.boss?3:0),use=(k,x,y)=>{callSupport(-1,k,x,y);S.ai.supT=6};
+  if(CFG.boss&&rk()>=6&&!S.allout&&S.hq[-1]<=S.hqMax[-1]*.5){S.allout=true;floatText(HQ[-1],FY0-20,'ALL-OUT','200,85,61');S.shake=4}
+  const F=CFG.f+(CFG.elite?1:0)+(CFG.boss?3:0)+(rk()>=5?2:0),use=(k,x,y)=>{callSupport(-1,k,x,y);S.ai.supT=S.allout?3:6};
   if(F>=1&&supReady(-1,'bar')){
     let bx=null,by=FMID,bn=0;for(const u of pu){const n=pu.filter(v=>Math.hypot(v.x-u.x,v.y-u.y)<26).length;if(n>bn){bn=n;bx=u.x;by=u.y}}
     if(bn>=4)return use('bar',bx,by);
@@ -968,7 +1020,7 @@ function aiStep(dt){
     const m=pu.find(u=>u.type==='mg'||u.type==='sniper');if(m)return use('smoke',m.x,m.y);
   }
 }
-function supCd(side,k){const b=SUP[k].cd;if(side===1)return b*(k==='bar'?1-.25*lv('barrage'):1)*(has('watch')?.7:1);return b*(CFG&&CFG.mod==='arty'?.5:1)}
+function supCd(side,k){const b=SUP[k].cd;if(side===1)return b*(k==='bar'?1-.25*lv('barrage'):1)*(has('watch')?.7:1);return b*(CFG&&CFG.mod==='arty'?.5:1)*(S&&S.allout?.5:1)}
 function supReady(side,k){return S.pts[side]>=SUP[k].cost&&!(S.cd[side][k]>0)}
 function callSupport(side,k,x,y){
   const d=SUP[k];S.pts[side]-=d.cost;S.cd[side][k]=supCd(side,k);y=clampY(y);
@@ -1216,14 +1268,14 @@ function bindLoadout(){ov.querySelectorAll('[data-lo]').forEach(b=>b.onclick=()=
   ov.querySelectorAll('[data-lo]').forEach(x=>x.setAttribute('aria-pressed',lo.includes(x.dataset.lo)));const p=ov.querySelector('.lo').previousElementSibling;if(p)p.textContent=`출전 지원 카드 ${lo.length}/${supSlots()}`;buildCards();ui();saveRun()})}
 function startBattle(n){
   const f=n.f,boss=n.type==='boss',elite=n.type==='elite';
-  CFG={node:n,f,boss,elite,mod:n.mod,diff:(.82+f*.055)*(elite?1.1:1)*(boss?1.15:1),ehq:boss?520:200+f*18};
+  CFG={node:n,f,boss,elite,mod:n.mod,diff:(.82+f*.055)*(elite?1.1:1)*(boss?1.15:1),ehq:boss?(rk()>=6?600:520):200+f*18};
   newGame(CFG);show('vBattle');S.cam=0;
   $('#bName').textContent=(boss?'적 사령부 공략':`${f+1}번째 전선 · ${elite?'정예 부대':'일반 전투'}`)+' · '+BIOMES[CFG.terrain.biome].name;
   const m=$('#bMod');m.hidden=!n.mod;if(n.mod){m.textContent=MODS[n.mod].name;m.title=MODS[n.mod].desc}
   $('#bPause').textContent='일시정지';$('#bSpeed').textContent='×1';
   render();ui();
   setTimeout(bindLoadout,0);
-  overlay(`<h2>${$('#bName').textContent}</h2><p>${boss?'적 사령부는 내구도가 높고 전차와 기관총이 미리 배치돼 있습니다. ':elite?'적이 진지를 미리 갖추고 있습니다. ':''}${n.mod?MODS[n.mod].name+': '+MODS[n.mod].desc+'. ':''}지형: ${[...new Set(CFG.terrain.feats.map(o=>FEAT[o.type].name))].join(', ')||'개활지'}. 적 사령부 내구도 ${CFG.ehq}, 아군 사령부 ${RUN.hq}/${RUN.hqMax}.</p>${loadoutPicker()}`,'작전 개시',()=>{ov.hidden=true;S.paused=false;S.started=true;audioInit();soundLabel()});
+  overlay(`<h2>${$('#bName').textContent}</h2><p>${boss?'적 사령부는 내구도가 높고 전차와 기관총이 미리 배치돼 있습니다. ':elite?'적이 진지를 미리 갖추고 있습니다. ':''}${n.mod?MODS[n.mod].name+': '+MODS[n.mod].desc+'. ':''}지형: ${[...new Set(CFG.terrain.feats.map(o=>FEAT[o.type].name))].join(', ')||'개활지'}. ${rk()>1?`등급 ${rk()} ${RANKS[rk()].name}. `:''}적 사령부 내구도 ${CFG.ehq}, 아군 사령부 ${RUN.hq}/${RUN.hqMax}.</p>${loadoutPicker()}`,'작전 개시',()=>{ov.hidden=true;S.paused=false;S.started=true;audioInit();soundLabel()});
 }
 function endBattle(win){
   if(S.over)return;S.over=true;RUN.kills+=S.kills;RUN.battles++;
@@ -1282,7 +1334,7 @@ function frame(now){
 }
 /* ---------- test hook (tests/ 시뮬레이션 전용, 게임 로직은 쓰지 않음) ---------- */
 window.__TL={get S(){return S},get RUN(){return RUN},set RUN(v){RUN=v},get CFG(){return CFG},U,PERKS,RELICS,
-  genMap,hashSeed,startBattle,step,spawn,setStance,callBarrage,callSupport,supReady,SUP,mkRun:(over)=>({seed:'SIM',map:genMap(1),path:[],hq:250,hqMax:250,supply:20,units:['rifle','assault','mg','at','sniper','mortar','tank'],perks:{},relics:[],support:['bar'],loadout:['bar'],kills:0,battles:0,recruits:0,elites:0,...(over||{})})};
+  genMap,hashSeed,startBattle,step,spawn,setStance,callBarrage,callSupport,supReady,SUP,gameOver,newRun,getMeta,mkRun:(over)=>({seed:'SIM',map:genMap(1),path:[],hq:250,hqMax:250,supply:20,units:['rifle','assault','mg','at','sniper','mortar','tank'],perks:{},relics:[],support:['bar'],loadout:['bar'],kills:0,battles:0,recruits:0,elites:0,...(over||{})})};
 showTitle();
 cloudInit();
 requestAnimationFrame(frame);

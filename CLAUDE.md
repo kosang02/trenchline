@@ -3,9 +3,10 @@
 도트 그래픽 참호 줄다리기 RTS + 로그라이크. 사용자: 고상혁(kosang02). 이 문서는 이 저장소에서 일하는 모든 Claude 세션이 따른다.
 
 ## 역할
-- **팀장 (Opus 세션)**: 시스템 설계, 밸런스 방향, 구조 변경, 다른 세션 작업 검토. 큰 변경은 팀장이 먼저 방향을 정한다.
-- **팀원 (Sonnet 세션)**: 버그 수정, 수치 조정, 도트 스프라이트·UI 손질, 배포 확인.
-- 팀원이 구조를 바꿔야 할 것 같으면 직접 바꾸지 말고 `NOTES.md`의 "팀장 확인 필요"에 적는다.
+- **팀장 (Opus 세션)**: 모든 코드 작업(시스템, 구조, 기능, 버그, 스프라이트), 배포, 다른 세션 작업 검토와 최종 결정.
+- **팀원 (Sonnet 세션)**: 기획과 밸런스 설계, 세계관·문구, 측정 결과 분석. 결과물은 `docs/`의 문서와 `NOTES.md`로 낸다.
+  - 팀원은 `public/index.html`의 **데이터 값과 문구만** 직접 고칠 수 있다(`U`·`PERKS`·`RELICS`·`SUP`·`EVENTS`·`ORIGINS`·`RANKS`의 숫자와 텍스트). 함수나 로직은 고치지 않는다.
+  - 로직이 필요한 제안은 `NOTES.md`의 "팀장 확인 필요"에 적는다.
 
 ## 작업 순서 (충돌 방지)
 1. 시작 전 반드시 `git pull`.
@@ -39,6 +40,7 @@ sed -n '/<script>/,/<\/script>/p' public/index.html | sed '1d;$d' > /tmp/g.js &&
 | 특성·유물 효과 적용 | `buildStats()`(스탯), `newGame()`(전투 시작값), `hit()`/`hitChance()`(전투 중) |
 | 보급(CP) | `PAY_INT`, `PAY_BASE`, `payInterval()`, `payAmount()`, 증강 `surge()`(60초마다 +20%) |
 | 지원 카드 | `SUP`(수치), `SUP_ORDER`, `SUP_ICON`, `callSupport()`(효과), `supCd()`, 적 사용은 `aiStep()` 끝부분. 보유 `RUN.support`, 출전 `RUN.loadout`(슬롯 `supSlots()`) |
+| 출신·등급 | `ORIGINS`, `RANKS`, `rk()`(현재 등급), `startSetup()`→`pickRank()`→`newRun(origin,rank)`. 기록 `META.rank`(열린 등급), `META.clears`("출신:등급") |
 | 적 난이도 | `startBattle()`의 `CFG.diff`(보급 배율), `buildStats()`의 적 분기 |
 | 적 AI | `aiStep()` |
 | 사건 | `EVENTS` |
