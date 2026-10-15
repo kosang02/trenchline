@@ -147,6 +147,8 @@ h1 small{font-family:var(--pix);font-size:10px;color:var(--muted);margin-left:6p
 body.pc .app{max-width:1280px}
 body.pc .card{padding:8px 4px 6px}
 body.pc .card canvas{height:38px}
+.card .cnt{position:absolute;top:3px;right:4px;font-family:var(--pix);font-size:10px;font-style:normal;color:var(--fg);opacity:.85}
+.card .cnt:empty{display:none}
 .card kbd{display:none;position:absolute;top:3px;left:4px;font-family:var(--pix);font-size:9px;color:var(--muted)}
 body.pc .card kbd{display:block}
 .keys{display:none;font-size:12px;color:var(--muted);margin:0;line-height:1.7}
@@ -619,7 +621,7 @@ const I18N_EN={
   "수송차":"Transport",
   "짧은 사거리에서 불을 뿜습니다. 불은 참호와 엄폐를 무시하고 4초 동안 탑니다. 참호를 비울 때 씁니다.":"Sprays fire at short range. Flames ignore trenches and cover and burn for 4 s. Use it to clear trenches.",
   "무기가 없습니다. 최전방 바로 뒤를 따라가며 반경 안 아군 보병을 초당 3씩 치료합니다.":"Unarmed. Follows just behind the front line and heals nearby infantry 3 HP per second.",
-  "무기가 없습니다. 살아 있는 동안 포격·야포·기총소사 재사용 대기 -25%. 반경 70 안에서는 박격포·포격 탄착이 절반으로 모이고, 야포는 근처 적을 따라가며, 박격포 사거리 +25%. 여러 명이어도 겹치지 않습니다.":"Unarmed. While alive, Barrage, Howitzer and Strafing Run cooldowns -25%. Within 70: mortar and barrage spread halved, howitzer shells track nearby enemies, mortar range +25%. Multiple spotters do not stack.",
+  "무기가 없습니다. 살아 있는 동안 포격·야포·기총소사 재사용 대기 -25%. 반경 70 안에서는 박격포·포격 탄착이 절반으로 모이고, 야포는 근처 적을 따라가며, 박격포 사거리 +25%. 여러 명이어도 겹치지 않습니다. 몸을 드러내고 있어 참호·엄폐 보호를 못 받고 잘 맞습니다.":"Unarmed. While alive, Barrage, Howitzer and Strafing Run cooldowns -25%. Within 70: mortar and barrage spread halved, howitzer shells track nearby enemies, mortar range +25%. Multiple spotters do not stack. Exposed: gets no trench or cover protection and is easy to hit.",
   "보병 5명(소총수·돌격조·대전차병·위생병)을 태워 최전방 참호까지 실어 나릅니다. 카드를 누르면 차가 나오고, 그다음 산 병력이 탑승합니다. 다시 누르면 바로 출발합니다. 파괴되면 탑승병 절반이 살아남습니다.":"Carries 5 infantry (Rifleman, Assault Team, Anti-Tank, Medic) to the front trench. Tap the card to bring up a truck; troops you deploy next climb aboard. Tap again to leave early. If destroyed, half the passengers survive.",
   "차량 중대":"Motor Pool",
   "수송차를 동시에 3대까지 운용":"Run up to 3 transports at once"
@@ -653,7 +655,7 @@ const U={
   flame:  {name:_t('화염방사병'),cost:30,hp:30,dmg:14,range:30,rof:1,  spd:13,cd:8, kind:'flame',burn:4,fr:12,armorMul:.3},
   // 위생병·관측병: 무기 없음(aux). 아군 최전방 바로 뒤를 따라간다.
   corpsman:{name:_t('위생병'), cost:30, hp:10, dmg:0, range:0, rof:9,  spd:11,cd:8,  kind:'aux',aux:true,heal:3,hr:22},
-  observer:{name:_t('관측병'), cost:20, hp:8,  dmg:0, range:0, rof:9,  spd:11,cd:10, kind:'aux',aux:true,sr:70,spot:.5,spotRange:1.25,spotCd:.75},
+  observer:{name:_t('관측병'), cost:45, hp:4,  dmg:0, range:0, rof:9,  spd:11,cd:30, kind:'aux',aux:true,exposed:true,sr:70,spot:.5,spotRange:1.25,spotCd:.75},
   // 수송차: 사령부에서 보병 cap명을 태우고 아군 최전방 참호에 내려준 뒤 돌아온다. 무장 없음.
   apc:    {name:_t('수송차'),  cost:30, hp:60, dmg:0, range:0, rof:9,  spd:26,cd:25, kind:'apc',armor:true,cap:5},
 };
@@ -670,7 +672,7 @@ const SUP={
 };
 const SUP_ORDER=['bar','smoke','mines','aid','howitzer','strafe'];
 const ORDER=['rifle','assault','mg','at','flame','sniper','mortar','tank','corpsman','observer','apc'];
-const UNIT_DESC={flame:_t('짧은 사거리에서 불을 뿜습니다. 불은 참호와 엄폐를 무시하고 4초 동안 탑니다. 참호를 비울 때 씁니다.'),corpsman:_t('무기가 없습니다. 최전방 바로 뒤를 따라가며 반경 안 아군 보병을 초당 3씩 치료합니다.'),observer:_t('무기가 없습니다. 살아 있는 동안 포격·야포·기총소사 재사용 대기 -25%. 반경 70 안에서는 박격포·포격 탄착이 절반으로 모이고, 야포는 근처 적을 따라가며, 박격포 사거리 +25%. 여러 명이어도 겹치지 않습니다.'),apc:_t('보병 5명(소총수·돌격조·대전차병·위생병)을 태워 최전방 참호까지 실어 나릅니다. 카드를 누르면 차가 나오고, 그다음 산 병력이 탑승합니다. 다시 누르면 바로 출발합니다. 파괴되면 탑승병 절반이 살아남습니다.'),sniper:_t('사거리가 아주 길고 한 발이면 쓰러뜨립니다. 기관총·박격포·대전차병·저격수를 먼저 노립니다. 연사가 느립니다.'),mortar:_t('곡사로 범위 피해를 줍니다. 멀리 쏠수록 탄착이 크게 흩어지고, 가까운 적은 못 쏩니다. 저격수에게 약합니다.'),tank:_t('튼튼하고 범위 포격을 합니다. 대전차병과 수류탄에 약합니다.')};
+const UNIT_DESC={flame:_t('짧은 사거리에서 불을 뿜습니다. 불은 참호와 엄폐를 무시하고 4초 동안 탑니다. 참호를 비울 때 씁니다.'),corpsman:_t('무기가 없습니다. 최전방 바로 뒤를 따라가며 반경 안 아군 보병을 초당 3씩 치료합니다.'),observer:_t('무기가 없습니다. 살아 있는 동안 포격·야포·기총소사 재사용 대기 -25%. 반경 70 안에서는 박격포·포격 탄착이 절반으로 모이고, 야포는 근처 적을 따라가며, 박격포 사거리 +25%. 여러 명이어도 겹치지 않습니다. 몸을 드러내고 있어 참호·엄폐 보호를 못 받고 잘 맞습니다.'),apc:_t('보병 5명(소총수·돌격조·대전차병·위생병)을 태워 최전방 참호까지 실어 나릅니다. 카드를 누르면 차가 나오고, 그다음 산 병력이 탑승합니다. 다시 누르면 바로 출발합니다. 파괴되면 탑승병 절반이 살아남습니다.'),sniper:_t('사거리가 아주 길고 한 발이면 쓰러뜨립니다. 기관총·박격포·대전차병·저격수를 먼저 노립니다. 연사가 느립니다.'),mortar:_t('곡사로 범위 피해를 줍니다. 멀리 쏠수록 탄착이 크게 흩어지고, 가까운 적은 못 쏩니다. 저격수에게 약합니다.'),tank:_t('튼튼하고 범위 포격을 합니다. 대전차병과 수류탄에 약합니다.')};
 const PERKS={
   rifleDmg:{name:_t('정밀 사격'),desc:_t('소총수 명중률 +30%'),max:2},
   mgSetup:{name:_t('신속 거치'),desc:_t('기관총 사격 준비 시간 절반'),max:1},
@@ -1457,7 +1459,8 @@ function hitChance(base,dist,range,t,decay,shooter){
   if(shooter&&shooter.side===1&&has('banner'))a*=1+.04*owned(1);
   if(shooter)for(const m of S.smokes)if(m.side!==shooter.side&&Math.hypot(shooter.x-m.x,(shooter.y-m.y)*1.3)<m.r)a*=.5;
   if(t.moving)a*=.85;
-  if(t.inTrench)a*=.6*S.trenchMul[t.side];else if(t.cover)a*=t.cover;
+  if(ts&&ts.exposed)a*=1.4;
+  else if(t.inTrench)a*=.6*S.trenchMul[t.side];else if(t.cover)a*=t.cover;
   if(shooter&&shooter.accMul)a*=shooter.accMul;
   return a;
 }
@@ -1471,7 +1474,7 @@ function impact(p){
   for(const e of S.units){if(e.side===p.side)continue;
     const dd=Math.hypot(e.x-p.x1,e.y-p.y1);if(dd>p.splash)continue;
     let dmg=(isArmor(e)?(p.armorDmg??p.dmg):p.dmg)*(1-dd/p.splash*.5);
-    if(!p.grenade){if(e.inTrench)dmg*=.55*S.trenchMul[e.side];else if(e.scov)dmg*=e.scov}hit(e,dmg)}
+    if(!p.grenade&&!U[e.type].exposed){if(e.inTrench)dmg*=.55*S.trenchMul[e.side];else if(e.scov)dmg*=e.scov}hit(e,dmg)}
   if(Math.abs(HQ[-p.side]-p.x1)<16)hit({hq:-p.side},p.dmg*.8);
   if(p.fire)S.fires.push({x:p.x1,y:p.y1,r:11,life:4,side:p.side});
 }
@@ -1757,7 +1760,7 @@ function buildCards(){
     const img=sup?supImg(k):SPR[1][k].s;const c=document.createElement('canvas');c.width=img.width;c.height=img.height;c.getContext('2d').drawImage(img,0,0);
     c.style.height=(sup?22:k==='tank'||k==='apc'?28:32)+'px';
     const key=sup?KEYS_SUP[sl.children.length]:KEYS_UNIT[el.children.length];
-    b.append(c);b.insertAdjacentHTML('beforeend',`<kbd>${(key||'').toUpperCase()}</kbd><b>${d.name}</b><em>${d.cost}</em>`);
+    b.append(c);b.insertAdjacentHTML('beforeend',`<kbd>${(key||'').toUpperCase()}</kbd>${sup?'':'<i class="cnt"></i>'}<b>${d.name}</b><em>${d.cost}</em>`);
     b.onclick=()=>{if(!S||S.over||S.paused)return;
       if(sup){if(S.aim===k){S.aim=false;aimX=null;return}if(supReady(1,k)){S.aim=k}return}
       if(k==='apc'){apcCard();return}
@@ -1775,6 +1778,8 @@ $('#bSound').onclick=()=>{AU.on=!AU.on;store.set('trenchline.sound',AU.on);if(AU
 soundLabel();
 $('#bPause').onclick=e=>{if(!S||S.over||!S.started)return;S.paused=!S.paused;e.target.textContent=S.paused?_t('계속'):_t('일시정지')};
 function ui(){
+  {const n={};for(const u of S.units){if(u.side!==1)continue;n[u.type]=(n[u.type]||0)+1;if(u.cargo)for(const c of u.cargo)n[c.type]=(n[c.type]||0)+1}
+   for(const k in cards){const el=cards[k].querySelector('.cnt');if(el)el.textContent=n[k]||''}}
   $('#cp').textContent=Math.floor(S.pts[1]);$('#cp').classList.toggle('pay',S.payFlash>0);$('#payAmt').textContent=_t("+{0} / {1}초",payAmount(1),payInterval(1).toFixed(1));$('#payBar').style.width=Math.min(100,S.payT[1]/payInterval(1)*100)+'%';
   $('#hpP').style.width=Math.max(0,S.hq[1]/S.hqMax[1]*100)+'%';$('#hpE').style.width=Math.max(0,S.hq[-1]/S.hqMax[-1]*100)+'%';
   for(const k in cards){const sup=!!SUP[k]&&!U[k],d=sup?{cost:SUP[k].cost,cd:supCd(1,k)}:S.ST[1][k],cd=S.cd[1][k]||0;
