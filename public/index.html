@@ -697,7 +697,7 @@ const I18N_EN={
   "전차 체력 ×1.8, 전차 곁(20) 아군 보병이 받는 피해 -25%. 대가: 전차 비용 +40%":"Tank HP ×1.8; allied infantry within 20 of a tank take -25% damage. Cost: tank cost +40%",
   "시험대대의 첫 깃발":"The first flag of the trial battalion",
   "참호 사령관의 인장":"Trench Commander's Seal",
-  "참호 안 아군이 맞을 확률 -35%. 대가: 전진 명령 때 이동 속도 -40%":"Allies in trenches are hit 35% less often. Cost: movement speed -40% under Advance orders",
+  "참호 안 아군이 맞을 확률 -35%. 대가: 전진 명령 때 이동 속도 -25%":"Allies in trenches are hit 35% less often. Cost: movement speed -25% under Advance orders",
   "한 번 판 참호는 내주지 않는다":"A trench dug once is never given up",
   "도박꾼의 장부":"Gambler's Ledger",
   "보상 선택지 +2, 단 보상 내용이 가려져 나옴. 대가: 보상 건너뛰기 보급 없음":"Reward choices +2, but rewards come hidden. Cost: no Supply for skipping rewards",
@@ -967,7 +967,7 @@ const RELICS={
   horde:{name:_t('인해전술 깃발'),desc:_t('소총수 비용 -35%, 아군 15명 이상이면 소총수 명중 +25%. 대가: 소총수 체력 -30%'),lore:_t('깃발 아래 모인 수가 곧 화력이다'),rar:'key'},
   baton:{name:_t('탄막 지휘봉'),desc:_t('포격·야포가 적 3명 이상을 맞히면 그 카드 대기 -5초(최소 10초). 대가: 지원 카드 비용 +30%'),lore:_t('지휘봉 끝이 포연에 검게 그을렸다'),rar:'key'},
   ironreg:{name:_t('철의 연대기'),desc:_t('전차 체력 ×1.8, 전차 곁(20) 아군 보병이 받는 피해 -25%. 대가: 전차 비용 +40%'),lore:_t('시험대대의 첫 깃발'),rar:'key'},
-  seal:{name:_t('참호 사령관의 인장'),desc:_t('참호 안 아군이 맞을 확률 -35%. 대가: 전진 명령 때 이동 속도 -40%'),lore:_t('한 번 판 참호는 내주지 않는다'),rar:'key'},
+  seal:{name:_t('참호 사령관의 인장'),desc:_t('참호 안 아군이 맞을 확률 -35%. 대가: 전진 명령 때 이동 속도 -25%'),lore:_t('한 번 판 참호는 내주지 않는다'),rar:'key'},
   ledger:{name:_t('도박꾼의 장부'),desc:_t('보상 선택지 +2, 단 보상 내용이 가려져 나옴. 대가: 보상 건너뛰기 보급 없음'),lore:_t('어느 쪽에 걸었는지는 적혀 있지 않다'),rar:'key'},
   heroes:{name:_t('영웅 연대'),desc:_t('생환병 최대 +2명, 계급 효과 ×1.5. 대가: 생환병이 쓰러지면 사령부 -10'),lore:_t('이름이 불리는 부대는 물러서지 않는다'),rar:'key'},
   undying:{name:_t('불사 연대'),desc:_t('사령부가 처음 무너지면 내구도 50으로 버티고 모든 아군 연사 +50% 10초. 한 번 쓰면 사라짐'),lore:_t('명부에서 지워지지 않는 연대'),rar:'key'},
@@ -1041,8 +1041,8 @@ function nodeCfg(n){
   if(FL()===10)return {ef:n.f,act:0,a:n.f,actBoss:false,diff:(.82+n.f*.055)*(elite?1.1:1)*(boss?1.15:1),ehq:boss?(rk()>=6?600:520):200+n.f*18};
   const act=Math.min(2,n.f/ACT|0),a=n.f%ACT,last=act===2;
   const base=act===0?.82+a*.055:1.21+(act-1)*.36+(a+1)*.04;
-  return {ef:n.f*9/(FL()-1),act,a,actBoss:boss&&!last,diff:base*(elite?1.1:1)*(boss?[1.25,1.4,1.6][act]:1),
-    ehq:boss?(last?(rk()>=6?700:600):[480,600][act]):[200,300,400][act]+a*18};
+  return {ef:n.f*9/(FL()-1),act,a,actBoss:boss&&!last,diff:base*(elite?1.1:1)*(boss?[1.0,1.15,2.0][act]:1),
+    ehq:boss?(last?(rk()>=6?850:750):[480,600][act]):[200,300,400][act]+a*18};
 }
 const SYNC_KEYS=new Set(['trenchline.run','trenchline.meta']);
 const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},
@@ -2021,7 +2021,7 @@ function step(dt){
         want+=d.armor?-s*14:u.slot}
     }
     u.moving=false;
-    if(want!=null){const dx=want-u.x;if(Math.abs(dx)>1){const sp=d.spd*(u.slow||1)*(dx*s<0?.8:1)*(s===1&&S.stance[1]==='advance'?(has('whistle')?1.25:1)*(has('seal')?.6:1):1);u.x+=Math.sign(dx)*Math.min(Math.abs(dx),sp*dt);u.moving=true}}
+    if(want!=null){const dx=want-u.x;if(Math.abs(dx)>1){const sp=d.spd*(u.slow||1)*(dx*s<0?.8:1)*(s===1&&S.stance[1]==='advance'?(has('whistle')?1.25:1)*(has('seal')?.75:1):1);u.x+=Math.sign(dx)*Math.min(Math.abs(dx),sp*dt);u.moving=true}}
     if(u.moving&&d.setup)u.setupT=Math.max(0,u.setupT-dt*3);
     u.inTrench=!d.armor&&S.trench.some(T=>Math.abs(T.x-u.x)<=8&&inTrenchSpan(T,u.y));
     {const o=featAt(u.x,u.y),F=o&&FEAT[o.type];u.feat=o?o.type:null;
