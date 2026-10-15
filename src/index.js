@@ -47,7 +47,9 @@ export default {
       const code = decodeURIComponent(m[1]).toUpperCase();
       if (!CODE_RE.test(code)) return json({ error: '잘못된 코드 형식' }, 400);
       const key = await keyFor(code, env);
-      const cur = await env.SAVES.get(key, 'json');
+      let cur = await env.SAVES.get(key, 'json');
+      // 개발자 슈퍼계정(GOAT-GOAT-GOAT): 처음 쓰면 빈 계정을 만든다. 서버 쪽 특권은 없다(DEV 도구는 클라이언트).
+      if (!cur && code === 'G0ATG0ATG0AT') { cur = { savedAt: 0, createdAt: Date.now(), data: null }; await env.SAVES.put(key, JSON.stringify(cur)); }
       if (!cur) return json({ error: '계정 없음' }, 404);
 
       if (request.method === 'GET') return json({ savedAt: cur.savedAt || 0, data: cur.data });

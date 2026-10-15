@@ -126,6 +126,8 @@ h1 small{font-family:var(--pix);font-size:10px;color:var(--muted);margin-left:6p
 .ov p{margin:0;color:var(--muted);font-size:13px;max-width:46ch;line-height:1.55}
 .evb{position:absolute;left:8px;right:8px;top:8px;background:rgba(14,12,8,.82);border:1px solid var(--alert);color:var(--fg);font-size:12px;padding:6px 8px;pointer-events:none}
 .lsch{display:grid;gap:6px;width:min(100%,420px)}.lsch .btn{display:flex;flex-direction:column;gap:1px;text-align:left;padding:6px 10px}.lsch span{font-size:12px;color:var(--muted)}
+.devbtn{position:fixed;right:10px;bottom:10px;z-index:60;font-family:var(--pix);font-size:10px;background:#7a2a1e;color:#fff;border:2px solid #17140e;padding:6px 8px;cursor:pointer}
+.devpanel{position:fixed;right:10px;bottom:46px;z-index:60;display:grid;gap:6px;background:var(--panel);border:2px solid #7a2a1e;padding:10px;max-width:260px}.devpanel b{font-family:var(--pix);font-size:10px}
 .toast{position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:50;background:var(--panel);border:2px solid var(--alert);padding:8px 14px;font-size:13px;max-width:calc(100% - 32px)}
 .chip.v{border-color:#7a6a3a}
 .bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
@@ -841,7 +843,18 @@ const I18N_EN={
   "{0}번째 전선 · {1}막 결전":"Front {0} · Act {1} Showdown",
   "적 지휘관: {0}({1}). {2} ":"Enemy commander: {0} ({1}). {2} ",
   "<h2>{0}막 돌파</h2><p>적 사살 {1} · 아군 손실 {2} · 보급 +{3}. 적 지휘관을 물리치고 전리품을 얻었습니다.</p>":"<h2>Act {0} Breached</h2><p>Kills {1} · Losses {2} · Supply +{3}. You defeated the enemy commander and took the spoils.</p>",
-  "전리품 고르기":"Pick Spoils"
+  "전리품 고르기":"Pick Spoils",
+  "CP +500":"CP +500",
+  "즉시 승리":"Win now",
+  "사령부 회복":"Heal HQ",
+  "재배치 대기 초기화":"Reset cooldowns",
+  "배속 ×8":"Speed ×8",
+  "모든 병과·카드":"All units & cards",
+  "유물 전부":"All relics",
+  "보급 +500":"Supply +500",
+  "다음 막 보스 앞으로":"Skip to act boss",
+  "모두 해금(공적·등급·출신·도감·강화)":"Unlock everything (merit, ranks, origins, codex, upgrades)",
+  "모두 해금했습니다.":"Everything unlocked."
 };
 const LANG=(()=>{try{const v=localStorage.getItem('trenchline.lang');if(v==='ko'||v==='en')return v}catch(e){}return /^ko\b/i.test(navigator.language||'')?'ko':'en'})();
 function _t(k,...a){const s=LANG==='en'&&I18N_EN[k]?I18N_EN[k]:k;return a.length?s.replace(/\{(\d+)\}/g,(m,i)=>a[+i]):s}
@@ -1085,7 +1098,7 @@ async function cloudInit(){
   try{const j=await api('/ping');CLOUD.on=j.ok===true}catch(e){CLOUD.on=false}
   if(CLOUD.on&&CLOUD.code)await cloudPull();else renderAccount();
 }
-function setCode(c){CLOUD.code=c;try{if(c)localStorage.setItem('trenchline.code',JSON.stringify(c));else localStorage.removeItem('trenchline.code')}catch(e){}}
+function setCode(c){CLOUD.code=c;setTimeout(devUI,0);try{if(c)localStorage.setItem('trenchline.code',JSON.stringify(c));else localStorage.removeItem('trenchline.code')}catch(e){}}
 function renderAccount(){
   const el=document.getElementById('account');if(!el)return;el.hidden=!CLOUD.on;if(!CLOUD.on)return;
   const t=CLOUD.last?new Date(CLOUD.last).toLocaleTimeString(LANG==='en'?'en-US':'ko-KR',{hour:'2-digit',minute:'2-digit'}):'';
@@ -1099,6 +1112,36 @@ function renderAccount(){
   on('accCopy',()=>{const txt=fmtCode(CLOUD.code);try{navigator.clipboard.writeText(txt).then(()=>{CLOUD.msg=_t('코드를 복사했습니다.');renderAccount()},()=>selectCode())}catch(e){selectCode()}});
   on('accSync',()=>cloudPush());
   on('accOut',()=>{if(CLOUD.timer)cloudPush();setCode(null);CLOUD.msg=_t('로그아웃했습니다. 이 기기의 진행 상황은 남아 있습니다.');renderAccount()});
+}
+// 개발자 슈퍼계정: 코드 GOAT-GOAT-GOAT(정규화 G0ATG0ATG0AT)로 로그인하면 DEV 버튼이 뜬다.
+const DEV_CODE='G0ATG0ATG0AT',isDev=()=>CLOUD.code===DEV_CODE;
+function devUI(){
+  let b=$('#devBtn');
+  if(!isDev()){if(b)b.remove();const p=$('#devPanel');if(p)p.remove();return}
+  if(b)return;
+  b=document.createElement('button');b.id='devBtn';b.className='devbtn';b.textContent='DEV';document.body.append(b);
+  b.onclick=()=>{let p=$('#devPanel');if(p){p.remove();return}p=document.createElement('div');p.id='devPanel';p.className='devpanel';document.body.append(p);devFill(p)};
+}
+function devFill(p){
+  const acts=[];const add=(t,f)=>acts.push([t,f]);
+  const inBattle=S&&!$('#vBattle').hidden&&!S.over;
+  if(inBattle){
+    add(_t('CP +500'),()=>{S.pts[1]+=500});
+    add(_t('즉시 승리'),()=>{S.hq[-1]=0});
+    add(_t('사령부 회복'),()=>{S.hq[1]=S.hqMax[1]});
+    add(_t('재배치 대기 초기화'),()=>{for(const k in S.cd[1])S.cd[1][k]=0});
+    add(_t('배속 ×8'),()=>{S.speed=8;$('#bSpeed').textContent='×8'});
+  }else if(RUN){
+    add(_t('모든 병과·카드'),()=>{RUN.units=[...ORDER];RUN.support=[...SUP_ORDER];RUN.loadout=SUP_ORDER.slice(0,supSlots());saveRun();showMap()});
+    add(_t('유물 전부'),()=>{for(const k in RELICS)gainRelic(k);saveRun();showMap()});
+    add(_t('보급 +500'),()=>{RUN.supply+=500;saveRun();showMap()});
+    add(_t('다음 막 보스 앞으로'),()=>{const c=curNode(),f=c?c.f+1:0,stop=FL()===10?FL()-2:Math.min(FL()-2,Math.floor(f/ACT)*ACT+ACT-2);RUN.path=RUN.path||[];
+      for(let g=c?c.f+1:0;g<=stop;g++)RUN.path.push(RUN.map[g][0].id);saveRun();showMap()});
+  }
+  add(_t('모두 해금(공적·등급·출신·도감·강화)'),()=>{const M=getMeta();M.merit=99999;M.earned=99999;M.rank=6;M.best=Math.max(M.best,24);M.found=Object.keys(RELICS);
+    for(const k in META_UP)M.up[k]=META_UP[k].max;setMeta(M);if(!$('#vTitle').hidden)showTitle();toast(_t('모두 해금했습니다.'))});
+  p.innerHTML=`<b>DEV · ${fmtCode(DEV_CODE)}</b>`;
+  for(const [t,f] of acts){const x=document.createElement('button');x.className='btn';x.textContent=t;x.onclick=()=>{f();p.remove()};p.append(x)}
 }
 function selectCode(){const c=document.getElementById('accCode');if(!c)return;const g=document.createRange();g.selectNodeContents(c);const s=getSelection();s.removeAllRanges();s.addRange(g);CLOUD.msg=_t('코드를 길게 눌러 복사하세요.')}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&CLOUD.timer)cloudPush(true)});
@@ -2375,7 +2418,7 @@ $('#bLang').textContent=LANG==='en'?'한국어':'English';$('#bLang').lang=LANG=
 if($('#ver').textContent.startsWith('__'))$('#ver').textContent='local';
 $('#bLang').onclick=()=>setLang(LANG==='en'?'ko':'en');
 translateDOM();
-showTitle();
+showTitle();devUI();
 cloudInit();
 requestAnimationFrame(frame);
 })();
