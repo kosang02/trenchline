@@ -617,9 +617,9 @@ const I18N_EN={
   "위생병":"Medic",
   "관측병":"Spotter",
   "수송차":"Transport",
-  "짧은 사거리에서 불을 뿜습니다. 불은 참호와 엄폐를 무시하고 3초 동안 탑니다. 참호를 비울 때 씁니다.":"Sprays fire at short range. Flames ignore trenches and cover and burn for 3 s. Use it to clear trenches.",
+  "짧은 사거리에서 불을 뿜습니다. 불은 참호와 엄폐를 무시하고 4초 동안 탑니다. 참호를 비울 때 씁니다.":"Sprays fire at short range. Flames ignore trenches and cover and burn for 4 s. Use it to clear trenches.",
   "무기가 없습니다. 최전방 바로 뒤를 따라가며 반경 안 아군 보병을 초당 3씩 치료합니다.":"Unarmed. Follows just behind the front line and heals nearby infantry 3 HP per second.",
-  "무기가 없습니다. 반경 70 안의 아군 박격포·포격 탄착을 35% 모으고, 곁의 박격포 사거리를 20% 늘립니다.":"Unarmed. Tightens friendly mortar and barrage spread by 35% within 70, and extends nearby mortar range by 20%.",
+  "무기가 없습니다. 살아 있는 동안 포격·야포·기총소사 재사용 대기 -25%. 반경 70 안에서는 박격포·포격 탄착이 절반으로 모이고, 야포는 근처 적을 따라가며, 박격포 사거리 +25%. 여러 명이어도 겹치지 않습니다.":"Unarmed. While alive, Barrage, Howitzer and Strafing Run cooldowns -25%. Within 70: mortar and barrage spread halved, howitzer shells track nearby enemies, mortar range +25%. Multiple spotters do not stack.",
   "보병 5명(소총수·돌격조·대전차병·위생병)을 태워 최전방 참호까지 실어 나릅니다. 카드를 누르면 차가 나오고, 그다음 산 병력이 탑승합니다. 다시 누르면 바로 출발합니다. 파괴되면 탑승병 절반이 살아남습니다.":"Carries 5 infantry (Rifleman, Assault Team, Anti-Tank, Medic) to the front trench. Tap the card to bring up a truck; troops you deploy next climb aboard. Tap again to leave early. If destroyed, half the passengers survive.",
   "차량 중대":"Motor Pool",
   "수송차를 동시에 3대까지 운용":"Run up to 3 transports at once"
@@ -650,10 +650,10 @@ const U={
   mortar: {name:_t('박격포'),  cost:50, hp:20, dmg:12,range:72,min:28,rof:4.4,spd:7,cd:12,kind:'shell',splash:10,flight:1.1,arc:42,scatter:6,spread:.32},
   tank:   {name:_t('전차'),    cost:110,hp:130,dmg:16,range:52,rof:3.2,spd:6, cd:35, kind:'shell',splash:6,flight:.22,arc:0,scatter:3,armor:true},
   // 화염방사병: 맞힌 자리에 불을 붙인다(초당 dmg, burn초, 반경 fr). 불은 참호·엄폐를 무시. 장갑에는 armorMul.
-  flame:  {name:_t('화염방사병'),cost:30,hp:30,dmg:14,range:28,rof:1,  spd:10,cd:8, kind:'flame',burn:3,fr:12,armorMul:.3},
+  flame:  {name:_t('화염방사병'),cost:30,hp:30,dmg:14,range:30,rof:1,  spd:13,cd:8, kind:'flame',burn:4,fr:12,armorMul:.3},
   // 위생병·관측병: 무기 없음(aux). 아군 최전방 바로 뒤를 따라간다.
   corpsman:{name:_t('위생병'), cost:30, hp:10, dmg:0, range:0, rof:9,  spd:11,cd:8,  kind:'aux',aux:true,heal:3,hr:22},
-  observer:{name:_t('관측병'), cost:20, hp:8,  dmg:0, range:0, rof:9,  spd:11,cd:10, kind:'aux',aux:true,sr:70},
+  observer:{name:_t('관측병'), cost:20, hp:8,  dmg:0, range:0, rof:9,  spd:11,cd:10, kind:'aux',aux:true,sr:70,spot:.5,spotRange:1.25,spotCd:.75},
   // 수송차: 사령부에서 보병 cap명을 태우고 아군 최전방 참호에 내려준 뒤 돌아온다. 무장 없음.
   apc:    {name:_t('수송차'),  cost:30, hp:60, dmg:0, range:0, rof:9,  spd:26,cd:25, kind:'apc',armor:true,cap:5},
 };
@@ -670,7 +670,7 @@ const SUP={
 };
 const SUP_ORDER=['bar','smoke','mines','aid','howitzer','strafe'];
 const ORDER=['rifle','assault','mg','at','flame','sniper','mortar','tank','corpsman','observer','apc'];
-const UNIT_DESC={flame:_t('짧은 사거리에서 불을 뿜습니다. 불은 참호와 엄폐를 무시하고 3초 동안 탑니다. 참호를 비울 때 씁니다.'),corpsman:_t('무기가 없습니다. 최전방 바로 뒤를 따라가며 반경 안 아군 보병을 초당 3씩 치료합니다.'),observer:_t('무기가 없습니다. 반경 70 안의 아군 박격포·포격 탄착을 35% 모으고, 곁의 박격포 사거리를 20% 늘립니다.'),apc:_t('보병 5명(소총수·돌격조·대전차병·위생병)을 태워 최전방 참호까지 실어 나릅니다. 카드를 누르면 차가 나오고, 그다음 산 병력이 탑승합니다. 다시 누르면 바로 출발합니다. 파괴되면 탑승병 절반이 살아남습니다.'),sniper:_t('사거리가 아주 길고 한 발이면 쓰러뜨립니다. 기관총·박격포·대전차병·저격수를 먼저 노립니다. 연사가 느립니다.'),mortar:_t('곡사로 범위 피해를 줍니다. 멀리 쏠수록 탄착이 크게 흩어지고, 가까운 적은 못 쏩니다. 저격수에게 약합니다.'),tank:_t('튼튼하고 범위 포격을 합니다. 대전차병과 수류탄에 약합니다.')};
+const UNIT_DESC={flame:_t('짧은 사거리에서 불을 뿜습니다. 불은 참호와 엄폐를 무시하고 4초 동안 탑니다. 참호를 비울 때 씁니다.'),corpsman:_t('무기가 없습니다. 최전방 바로 뒤를 따라가며 반경 안 아군 보병을 초당 3씩 치료합니다.'),observer:_t('무기가 없습니다. 살아 있는 동안 포격·야포·기총소사 재사용 대기 -25%. 반경 70 안에서는 박격포·포격 탄착이 절반으로 모이고, 야포는 근처 적을 따라가며, 박격포 사거리 +25%. 여러 명이어도 겹치지 않습니다.'),apc:_t('보병 5명(소총수·돌격조·대전차병·위생병)을 태워 최전방 참호까지 실어 나릅니다. 카드를 누르면 차가 나오고, 그다음 산 병력이 탑승합니다. 다시 누르면 바로 출발합니다. 파괴되면 탑승병 절반이 살아남습니다.'),sniper:_t('사거리가 아주 길고 한 발이면 쓰러뜨립니다. 기관총·박격포·대전차병·저격수를 먼저 노립니다. 연사가 느립니다.'),mortar:_t('곡사로 범위 피해를 줍니다. 멀리 쏠수록 탄착이 크게 흩어지고, 가까운 적은 못 쏩니다. 저격수에게 약합니다.'),tank:_t('튼튼하고 범위 포격을 합니다. 대전차병과 수류탄에 약합니다.')};
 const PERKS={
   rifleDmg:{name:_t('정밀 사격'),desc:_t('소총수 명중률 +30%'),max:2},
   mgSetup:{name:_t('신속 거치'),desc:_t('기관총 사격 준비 시간 절반'),max:1},
@@ -1446,7 +1446,7 @@ function fire(u,t){
     if(f)f.life=Math.max(f.life,d.burn);else S.fires.push({x:fx,y:fy,r:d.fr,life:d.burn,side:s,dps:d.dmg,arm:d.armorMul,flame:true});
   }else{
     sfx(u.type==='tank'?'tank':'thump',u.x);if(u.type==='tank')for(let i=0;i<3;i++)S.parts.push({x:tip.x+s*2,y:tip.y,vx:s*R(6,14),vy:R(-6,-1),g:0,life:R(.5,.9),max:.9,c:'smoke',sz:R(2,4)});
-    const sc=(d.scatter+(d.spread||0)*dist)*(u.type==='mortar'&&spotted(s,t.x,t.y)?.65:1),ang=R(0,6.283),rr=Math.sqrt(Math.random())*sc;
+    const sc=(d.scatter+(d.spread||0)*dist)*(u.type==='mortar'&&spotted(s,t.x,t.y)?S.ST[s].observer.spot:1),ang=R(0,6.283),rr=Math.sqrt(Math.random())*sc;
     S.proj.push({x0:tip.x,y0:tip.y,x1:t.x+Math.cos(ang)*rr,y1:clampY(t.y+Math.sin(ang)*rr*.8),t:0,dur:d.flight*(u.type==='mortar'?(.7+dist/d.range*.5):1),arc:d.arc,side:s,dmg:d.dmg,splash:d.splash,big:u.type==='tank',fire:d.fire});
   }
 }
@@ -1525,7 +1525,7 @@ function aiStep(dt){
     const m=pu.find(u=>u.type==='mg'||u.type==='sniper');if(m)return use('smoke',m.x,m.y);
   }
 }
-function supCd(side,k){const b=SUP[k].cd;if(side===1)return b*(k==='bar'?1-.25*lv('barrage'):1)*(has('watch')?.7:1);return b*(CFG&&CFG.mod==='arty'?.5:1)*(S&&S.allout?.5:1)}
+function supCd(side,k){const b=SUP[k].cd*((k==='bar'||k==='howitzer'||k==='strafe')&&S&&S.units&&S.units.some(u=>u.side===side&&u.type==='observer')?U.observer.spotCd:1);if(side===1)return b*(k==='bar'?1-.25*lv('barrage'):1)*(has('watch')?.7:1);return b*(CFG&&CFG.mod==='arty'?.5:1)*(S&&S.allout?.5:1)}
 function supReady(side,k){return S.pts[side]>=SUP[k].cost&&!(S.cd[side][k]>0)}
 function callSupport(side,k,x,y){
   const d=SUP[k];S.pts[side]-=d.cost;S.cd[side][k]=supCd(side,k);y=clampY(y);
@@ -1576,7 +1576,7 @@ function step(dt){
     {const o=featAt(u.x,u.y),F=o&&FEAT[o.type];u.feat=o?o.type:null;
      if(d.armor){u.cover=1;u.scov=1;u.slow=F&&F.tankSlow?F.tankSlow:1;u.rangeMul=F&&F.range?F.range:1;u.accMul=1}
      else{u.cover=F?F.cover:1;u.scov=F?F.splash:1;u.slow=F?F.slow:1;u.rangeMul=F&&F.range?F.range:1;u.accMul=F&&F.acc?F.acc:1}
-     if(u.type==='mortar'&&spotted(s,u.x,u.y))u.rangeMul*=1.2}
+     if(u.type==='mortar'&&spotted(s,u.x,u.y))u.rangeMul*=S.ST[s].observer.spotRange}
     if(medic&&s===1&&u.inTrench)u.hp=Math.min(u.max,u.hp+2*dt);
   }
   // 위생병 치료: 여러 명이 겹쳐도 한 명분만
@@ -1606,7 +1606,7 @@ function step(dt){
     if(p.t>=p.dur){impact(p);p.done=true}}
   S.proj=S.proj.filter(p=>!p.done);
   for(const b of S.barr){b.t+=dt;if(b.t>=0&&!b.sm&&b.side===1&&lv('smoke')){b.sm=true;S.smokes.push({x:b.x,y:b.y,r:34,life:10,max:10,side:1})}while(b.t>=b.fired*.28&&b.t>=0&&b.fired<b.n){b.fired++;
-    const k=spotted(b.side,b.x,b.y)?.65:1,x=b.x+R(-26,26)*k;S.proj.push({x0:x+R(-20,20),y0:-10,x1:x,y1:clampY(b.y+R(-20,20)*k),t:0,dur:.35,arc:0,side:b.side,dmg:22,splash:12,barrage:true,falling:true})}}
+    const k=spotted(b.side,b.x,b.y)?S.ST[b.side].observer.spot:1,x=b.x+R(-26,26)*k;S.proj.push({x0:x+R(-20,20),y0:-10,x1:x,y1:clampY(b.y+R(-20,20)*k),t:0,dur:.35,arc:0,side:b.side,dmg:22,splash:12,barrage:true,falling:true})}}
   S.barr=S.barr.filter(b=>b.fired<b.n);
   for(const p of S.parts){p.life-=dt;p.vy+=p.g*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;if(p.c!=='smoke'&&p.gy&&p.y>p.gy){p.y=p.gy;p.vx*=.3;p.vy=0}}
   S.parts=S.parts.filter(p=>p.life>0);
@@ -1628,7 +1628,10 @@ function step(dt){
   S.heals=S.heals.filter(h=>h.life>0);
   for(const st of S.strikes){st.t+=dt;if(st.t<0)continue;
     if(st.k==='smoke'&&!st.done){st.done=true;S.smokes.push({x:st.x,y:st.y,r:SUP.smoke.r,life:10,max:10,side:st.side});sfx('pop',st.x,.6)}
-    if(st.k==='howitzer'&&!st.done){st.done=true;impact({x1:st.x,y1:st.y,side:st.side,dmg:80,armorDmg:80,splash:SUP.howitzer.r,big:true});S.shake=Math.max(S.shake,4)}
+    if(st.k==='howitzer'&&!st.done){st.done=true;
+      // 관측병이 보는 곳이면 떨어지는 순간 근처(24)에서 가장 비싼 적에게 맞춘다
+      if(spotted(st.side,st.x,st.y)){let bv=0;for(const e of S.units){if(e.side===st.side||Math.hypot(e.x-st.x,e.y-st.y)>24)continue;const v=S.ST[e.side][e.type].cost;if(v>bv){bv=v;st.x=e.x;st.y=e.y}}}
+      impact({x1:st.x,y1:st.y,side:st.side,dmg:80,armorDmg:80,splash:SUP.howitzer.r,big:true});S.shake=Math.max(S.shake,4)}
     if(st.k==='strafe'){
       while(st.pass<2&&st.t>=st.pass*1.2){st.pass++;S.planes.push({x:st.x,t:0,side:st.side});sfx('mg',st.x,1.4);
         for(const e of S.units)if(e.side!==st.side&&Math.abs(e.x-st.x)<SUP.strafe.r){hit(e,isArmor(e)?1:(e.inTrench?12*.55*S.trenchMul[e.side]:12))}
