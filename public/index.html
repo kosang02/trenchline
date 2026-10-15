@@ -162,12 +162,13 @@ body.pc .keys{display:block}
 .card::after{content:"";position:absolute;left:0;right:0;bottom:0;height:var(--cd,0%);background:rgba(0,0,0,.55);pointer-events:none}
 .card.poor{opacity:.45}
 .card.aim{border-color:var(--alert)}
+.ver{margin-left:auto;font-family:var(--pix);font-size:10px;color:var(--muted);white-space:nowrap}
 .hint{font-size:12px;color:var(--muted);margin:0;line-height:1.5}
 </style>
 
 <div id="tip" class="tip" role="tooltip" hidden></div>
 <div class="app">
-  <header><h1>참호전선 <small>TRENCH LINE</small></h1><span id="devTag" class="devtag" hidden>테스트 서버</span></header>
+  <header><h1>참호전선 <small>TRENCH LINE</small></h1><span id="devTag" class="devtag" hidden>테스트 서버</span><span id="ver" class="ver">__BUILD__</span></header>
 
   <section class="view" id="vTitle">
     <div class="title">
@@ -191,7 +192,6 @@ body.pc .keys{display:block}
     <div class="status" id="mapStatus"></div>
     <div class="chips" id="mapChips"></div>
     <div class="mapwrap" id="mapWrap"></div>
-    <p class="legend">주황 테두리가 진입할 수 있는 지점입니다. 정예: 강한 적, 보상 두 배 · 보급: 보급으로 구매 · 휴식: 사령부 보수 또는 훈련 · 유물: 유물 상자 · ?: 사건 · 사령부: 최종 목표</p>
   </section>
 
   <section class="view" id="vPanel" hidden>
@@ -225,8 +225,6 @@ body.pc .keys{display:block}
     </div>
     <div class="cards" id="cards"></div>
     <div class="cards sup" id="supCards"></div>
-    <p class="keys">단축키: <kbd>1</kbd>~<kbd>0</kbd> 병력 · <kbd>Z</kbd><kbd>X</kbd><kbd>C</kbd> 지원 카드 · <kbd>Q</kbd><kbd>W</kbd><kbd>E</kbd> 전진·사수·후퇴 · <kbd>A</kbd><kbd>D</kbd>/<kbd>←</kbd><kbd>→</kbd> 화면 이동(화면 가장자리에 마우스를 대도 이동) · <kbd>F</kbd> 전선 보기 · <kbd>Space</kbd> 일시정지 · <kbd>Tab</kbd> 배속 · <kbd>Esc</kbd> 포격 취소</p>
-    <p class="hint">보병은 한두 발에 쓰러지고 멀수록·움직일수록·참호 안일수록 덜 맞습니다. 기관총은 보병을, 대전차병은 전차를, 박격포와 지원 카드는 뭉친 적을 잡습니다. 지원 카드는 누른 뒤 전장을 탭. 붉은 표식은 적의 포격·공습 예고이니 피하세요. 60초마다 양쪽 보급이 20%씩 늘어납니다.</p>
   </section>
 </div>
 
@@ -239,16 +237,6 @@ const I18N_EN={
   "부대 지시":"Orders",
   "시드":"Seed",
   "시드 (비우면 무작위)":"Seed (blank = random)",
-  "보병은 한두 발에 쓰러지고 멀수록·움직일수록·참호 안일수록 덜 맞습니다. 기관총은 보병을, 대전차병은 전차를, 박격포와 지원 카드는 뭉친 적을 잡습니다. 지원 카드는 누른 뒤 전장을 탭. 붉은 표식은 적의 포격·공습 예고이니 피하세요. 60초마다 양쪽 보급이 20%씩 늘어납니다.":"Infantry drop in one or two hits, and are harder to hit at range, on the move, or in a trench. Machine guns shred infantry, anti-tank troops kill tanks, and mortars and support cards break up clustered enemies. Tap a support card, then tap the field. Red markers warn of incoming enemy barrages and air strikes: move clear. Every 60 s, supply income on both sides rises 20%.",
-  "포격 취소":"Cancel Barrage",
-  "배속 ·":"Speed ·",
-  "일시정지 ·":"Pause ·",
-  "전선 보기 ·":"View front ·",
-  "화면 이동(화면 가장자리에 마우스를 대도 이동) ·":"Pan (or push the cursor to the screen edge) ·",
-  "전진·사수·후퇴 ·":"Advance / Hold / Fall Back ·",
-  "병력 ·":"Troops ·",
-  "지원 카드 ·":"Support ·",
-  "단축키:":"Keys:",
   "소리":"Sound",
   "전선 보기":"View Front",
   "후퇴":"Fall Back",
@@ -256,7 +244,6 @@ const I18N_EN={
   "전진":"Advance",
   "적군":"Enemy",
   "아군":"Allied",
-  "주황 테두리가 진입할 수 있는 지점입니다. 정예: 강한 적, 보상 두 배 · 보급: 보급으로 구매 · 휴식: 사령부 보수 또는 훈련 · 유물: 유물 상자 · ?: 사건 · 사령부: 최종 목표":"Orange-bordered nodes are reachable. Elite: tougher enemy, double reward · Supply: shop, pay with Supply · Rest: repair HQ or train · Relic: relic chest · ?: event · HQ: final objective",
   "화면":"Display",
   "이어하기":"Continue",
   "새 작전":"New Operation",
@@ -1868,6 +1855,7 @@ window.__TL={get S(){return S},get RUN(){return RUN},set RUN(v){RUN=v},get CFG()
   genMap,hashSeed,startBattle,step,spawn,setStance,callBarrage,callSupport,supReady,SUP,gameOver,newRun,getMeta,mkRun:(over)=>({seed:'SIM',map:genMap(1),path:[],hq:250,hqMax:250,supply:20,units:['rifle','assault','mg','at','sniper','mortar','tank','flame','corpsman','observer','apc'],perks:{},relics:[],support:['bar'],loadout:['bar'],kills:0,battles:0,recruits:0,elites:0,...(over||{})})};
 if(/^dev\.|-dev\.|localhost|127\.0\.0\.1/.test(location.hostname))$('#devTag').hidden=false;
 $('#bLang').textContent=LANG==='en'?'한국어':'English';$('#bLang').lang=LANG==='en'?'ko':'en';
+if($('#ver').textContent.startsWith('__'))$('#ver').textContent='local';
 $('#bLang').onclick=()=>setLang(LANG==='en'?'ko':'en');
 translateDOM();
 showTitle();

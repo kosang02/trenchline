@@ -17,6 +17,8 @@ jobs:
           node-version: 22
       - name: 문법 검사
         run: sed -n '/<script>/,/<\/script>/p' public/index.html | sed '1d;$d' > /tmp/g.js && node --check /tmp/g.js
+      - name: 버전 표시
+        run: sed -i "s/__BUILD__/v$(TZ=Asia/Seoul date +%m.%d\ %H:%M) ${GITHUB_SHA::7}/" public/index.html
       - name: 배포
         run: npx --yes wrangler@4 deploy ${{ github.ref_name == 'dev' && '--env dev' || '' }}
         env:
