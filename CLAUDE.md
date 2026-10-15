@@ -31,7 +31,7 @@ sed -n '/<script>/,/<\/script>/p' public/index.html | sed '1d;$d' > /tmp/g.js &&
 - `src/index.js` — Worker: 정적 파일 + 세이브 API(`/api/ping`, `POST /api/account`, `GET|PUT /api/save/:code`). KV 바인딩 `SAVES`.
 - `wrangler.toml` — Worker 설정. KV id는 비밀이 아니다.
 - `tests/smoke.py` — 브라우저 스모크 테스트.
-- `tests/sim.py` — 전략별 자동 전투 승률(`QUICK=1 N=8 PATCH='{"mg":{"hp":30}}' python3 tests/sim.py smart2`). `tests/duel.py` — 같은 CP 병과 대결. `tests/sniper.py` — 참호 사수 중 적 저격수 압박(`K=3 N=24`). `tests/assault.py` — 참호 돌파(`UNITS=rifle,flame D=10 BUDGET=150`).
+- `tests/sim.py` — 전략별 자동 전투 승률(`QUICK=1 N=8 PATCH='{"mg":{"hp":30}}' python3 tests/sim.py smart2`). `tests/duel.py` — 같은 CP 병과 대결. `tests/sniper.py` — 참호 사수 중 적 저격수 압박(`K=3 N=24`). `tests/assault.py` — 참호 돌파(`UNITS=rifle,flame D=10 BUDGET=150`). 3막 보스: `RUNX='{"floors":24}' SIMF='7:boss,15:boss,23:boss' python3 tests/sim.py smart2`.
 - 게임 끝의 `window.__TL`은 테스트 전용 훅이다. 게임 로직에서 쓰지 않는다.
 
 ## index.html 지도 (섹션 주석 `/* ---------- 이름 ---------- */` 기준)
@@ -46,6 +46,12 @@ sed -n '/<script>/,/<\/script>/p' public/index.html | sed '1d;$d' > /tmp/g.js &&
 | 적 난이도 | `startBattle()`의 `CFG.diff`(보급 배율), `buildStats()`의 적 분기 |
 | 위생병·관측병 | `auxWant()`(위치), 치료는 `step()`의 healers, 관측은 `spotted()` |
 | 수송차 | `APC_RIDE`(탑승 병과), `spawn()`(탑승), `apcCard()`, `apcStep()`/`apcUnload()`, `apcMax()`, `popCount()` |
+| 작전 길이·막 | `FL()`(RUN.floors, 옛 세이브 10), `ACT`, `ACTS`, `genActMap()`, `nodeCfg()`(막별 diff·ehq, `ef`=0~9 환산 전선), 막 보스 승리 → `keystoneChoice()` |
+| 적 지휘관 | `CMDRS`, `cmdOf()`, 효과는 `aiStep()`의 `CFG.cmd` 분기 |
+| 유물 풀·희귀도 | `RELICS`의 `req`(병과·카드·특성 중 하나), `rar`(rare·key), `relicPool(src)`, `keystonePool()` |
+| 생환병 | `VET_NAMES`, `VET_RANKS`, `vetsAfter()`, `vetDied()`, `RUN.vets`, `META.fallen` |
+| 마지막 방어선·돌발 사건 | `lastStand()`/`applyLS()`, `fieldEvent()`/`grabCrate()` |
+| 업적·오늘의 작전 | `ACH`/`checkAch()`(`META.ach`), `DAILY`/`showDaily()`(`RUN.daily`) |
 | 적 AI | `aiStep()` |
 | 사건 | `EVENTS` |
 | 지형·바이옴 | `BIOMES`, `FEAT`, `genTerrain()`, `buildGround()` |

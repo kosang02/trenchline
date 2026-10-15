@@ -17,14 +17,15 @@ POLICIES = {
 JS = """async ({pol,floor,n,type,patch,runx})=>{const T=window.__TL,P=eval(%s),out=[];
  for(const k in (patch||{}))Object.assign(T.U[k],patch[k]);
  for(let k=0;k<n;k++){T.RUN=T.mkRun(runx);const node={id:'sim'+k,f:floor,i:0,n:1,type,next:[],seed:1000+k};
-  T.startBattle(node);const S=T.S;S.paused=true;S.started=true;const ctx={S,i:0};let acc=0;
+  T.startBattle(node);const S=T.S;S.paused=true;S.started=true;S.noLS=true;S.noEvents=true;const ctx={S,i:0};let acc=0;
   while(!S.over&&S.t<600){T.step(1/30);acc+=1/30;if(acc>=.25){acc=0;const a=P(ctx);T.setStance(a.stance);
      const d=S.ST[1][a.pick];if(S.pts[1]>=d.cost&&!(S.cd[1][a.pick]>0)){T.spawn(1,a.pick);if(a.adv)ctx.i++}}}
   out.push({win:S.hq[-1]<=0,t:Math.round(S.t),hq:Math.round(S.hq[1]),k:S.kills,l:S.lost})}
  return out}"""
 PATCH = json.loads(os.environ.get('PATCH','{}'))
 RUNX = json.loads(os.environ.get('RUNX','{}'))  # 예: '{"perks":{"income":2},"relics":["coin"]}'
-FLOORS = [(0,'battle'),(4,'battle')] if os.environ.get('QUICK') else [(0,'battle'),(4,'battle'),(6,'elite'),(9,'boss')]
+FLOORS = [(int(a),b) for a,b in (x.split(':') for x in os.environ['SIMF'].split(','))] if os.environ.get('SIMF') else [(0,'battle'),(4,'battle')] if os.environ.get('QUICK') else [(0,'battle'),(4,'battle'),(6,'elite'),(9,'boss')]
+# 3막 작전: RUNX='{"floors":24}' SIMF='7:boss,15:boss,23:boss'
 N = int(os.environ.get('N','6'))
 pols = sys.argv[1:] or list(POLICIES)
 with sync_playwright() as p:
