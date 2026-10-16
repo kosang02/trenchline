@@ -52,6 +52,9 @@ sed -n '/<script>/,/<\/script>/p' public/index.html | sed '1d;$d' > /tmp/g.js &&
 | 생환병 | `VET_NAMES`, `VET_RANKS`, `vetsAfter()`, `vetDied()`, `RUN.vets`, `META.fallen` |
 | 마지막 방어선·돌발 사건 | `lastStand()`/`applyLS()`, `fieldEvent()`/`grabCrate()` |
 | 업적·오늘의 작전 | `ACH`/`checkAch()`(`META.ach`), `DAILY`/`showDaily()`(`RUN.daily`) |
+| 사기·연쇄 사살 | `morale(side,d)`(`S.mor`, 붕괴 `S.rout`, 기세 `S.surgeT`), `onKill()`(사기·연쇄 `S.chain`·교리 보상), 총공세 `bigPush()`/`pushMax()`, 적 총반격 `S.eCounter` |
+| 교리·백병전 | `PERKS[k].t`(inf·art·arm·def·mob·log), `DOCT`, `doctLv()`/`doct(t,n)`, `MELEE`(병과별 백병전 승률), 전설 특성 `PERKS[k].gold` |
+| 가스·갱도·전투 명령 | `SUP.gas`/`SUP.tunnel`(`callSupport`, `S.gases`), `OBJ`(전투 명령), 역사 사건은 `EVENTS` 뒤쪽 + `giveSup()`/`givePerk()` |
 | 적 AI | `aiStep()` |
 | 사건 | `EVENTS` |
 | 지형·바이옴 | `BIOMES`, `FEAT`, `genTerrain()`, `buildGround()` |
