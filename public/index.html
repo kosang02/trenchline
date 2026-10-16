@@ -65,6 +65,11 @@ h1 small{font-family:var(--pix);font-size:10px;color:var(--muted);margin-left:6p
 .tip p.lore{color:var(--muted);font-size:12px}
 .chip.u{border-color:var(--friend-dim)}
 .chip.r{border-color:#8a6f3a;color:#e8c98a}
+.vig.sm{width:min(70%,240px);margin:0 auto 4px}
+.vig{display:block;width:min(100%,384px);height:auto;image-rendering:pixelated;border:2px solid var(--line);margin:2px 0 10px}
+.node image{image-rendering:pixelated;pointer-events:none}
+.acthd img{width:96px;height:42px;image-rendering:pixelated;border:1px solid var(--line)}
+.metasec{grid-column:1/-1;border:2px solid var(--line);background:var(--panel);padding:0 12px}.metasec summary{cursor:pointer;padding:10px 0;font-weight:600;list-style:none}.metasec summary::before{content:'▸ ';color:var(--alert)}.metasec[open] summary::before{content:'▾ '}.metasec .relic-list{margin:0 0 10px}
 .clears{display:flex;flex-direction:column;gap:6px;margin-top:6px;font-size:13px}
 .clears table{border-collapse:collapse;font-variant-numeric:tabular-nums}
 .clears th,.clears td{border:1px solid var(--line);padding:3px 8px;text-align:center;font-weight:400;color:var(--muted)}
@@ -81,7 +86,7 @@ h1 small{font-family:var(--pix);font-size:10px;color:var(--muted);margin-left:6p
 /* map */
 .mapwrap{overflow-x:auto;border:2px solid var(--line);background:var(--panel);-webkit-overflow-scrolling:touch}
 .mapwrap svg{display:block}
-.acthd{display:flex;justify-content:space-between;align-items:baseline;padding:8px 12px 0;font-size:13px}.acthd span{font-family:var(--pix);font-size:10px;color:var(--muted)}
+.acthd{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 12px 0;font-size:13px}.acthd span{font-family:var(--pix);font-size:10px;color:var(--muted)}
 .mapwrap line{stroke:var(--line);stroke-width:2;stroke-dasharray:3 3}
 .mapwrap line.done{stroke:var(--friend);stroke-dasharray:none}
 .node circle{fill:var(--panel2);stroke:var(--line);stroke-width:2}
@@ -105,6 +110,8 @@ h1 small{font-family:var(--pix);font-size:10px;color:var(--muted);margin-left:6p
 .choice{font:inherit;text-align:left;color:var(--fg);background:var(--panel2);border:2px solid var(--line);padding:12px;display:flex;flex-direction:column;gap:5px;cursor:pointer;min-width:0;touch-action:manipulation}
 .choice:hover:not(:disabled){border-color:var(--alert)}
 .choice:disabled{opacity:.4;cursor:default}
+.choice.gold{border-color:#d9b25a;background:linear-gradient(#3a3018,var(--panel2))}.choice.gold .tag{color:#e8c96a}
+.chip.d{border-color:#5d6a2e}.chip.d.on3{border-color:#d9b25a;color:#e8c96a}
 .choice .tag{font-family:var(--pix);font-size:9px;letter-spacing:.1em;color:var(--alert)}
 .choice b{font-size:15px}
 .choice span{font-size:13px;color:var(--muted);line-height:1.45}
@@ -117,6 +124,9 @@ h1 small{font-family:var(--pix);font-size:10px;color:var(--muted);margin-left:6p
 .hpbar.e i{background:var(--enemy);left:auto;right:0}
 .btop{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
 .btop .hq{margin-left:auto}
+.btn.push{border-color:#d9b25a;color:#e8c96a}.btn.push:disabled{opacity:.35}
+.mod.obj{border-color:#d9b25a;color:#e8c96a}.mod.obj.done{background:#3a3018}
+.mor{display:flex;align-items:center;gap:8px;font-family:var(--pix);font-size:10px;color:var(--muted);width:100%;justify-content:flex-end}.hpbar.m{height:5px}.hpbar.m i{background:#d9b25a}.hpbar.m.e i{background:#8ea3b6}#morTag{min-width:64px;color:var(--alert)}
 .mod{font-size:11px;border:1px solid var(--alert);color:var(--alert);padding:2px 6px}
 .stage{position:relative;aspect-ratio:240/168;max-height:calc(100vh - 230px);margin-inline:auto;width:100%;border:2px solid var(--line);background:#000;touch-action:none;user-select:none}
 #cv{width:100%;height:100%;display:block;image-rendering:pixelated;image-rendering:crisp-edges}
@@ -206,6 +216,7 @@ body.pc .keys{display:block}
     <div class="status" id="panelStatus"></div>
     <div class="panel">
       <h2 id="pTitle"></h2>
+      <img id="pArt" class="vig" alt="" hidden>
       <p id="pText"></p>
       <div class="choices" id="pChoices"></div>
       <div><button class="btn" id="pSkip" hidden></button></div>
@@ -213,8 +224,9 @@ body.pc .keys{display:block}
   </section>
 
   <section class="view" id="vBattle" hidden>
-    <div class="btop"><span id="bName"></span><span class="mod" id="bMod" hidden></span>
-      <div class="hq">아군<div class="hpbar"><i id="hpP"></i></div><div class="hpbar e"><i id="hpE"></i></div>적군</div></div>
+    <div class="btop"><span id="bName"></span><span class="mod" id="bMod" hidden></span><span class="mod obj" id="bObj" hidden></span>
+      <div class="hq">아군<div class="hpbar"><i id="hpP"></i></div><div class="hpbar e"><i id="hpE"></i></div>적군</div>
+      <div class="mor" title="사기">사기<div class="hpbar m"><i id="morP"></i></div><div class="hpbar m e"><i id="morE"></i></div><span id="morTag"></span></div></div>
     <div class="stage"><canvas id="cv"></canvas><div class="evb" id="evb" hidden></div><div class="ov" id="ov" hidden></div></div>
     <canvas id="mini" width="240" height="12"></canvas>
     <div class="bar">
@@ -229,6 +241,7 @@ body.pc .keys{display:block}
         <button class="btn" id="bSpeed">×1</button>
         <button class="btn" id="bPause">일시정지</button>
         <button class="btn" id="bSound">소리</button>
+        <button class="btn push" id="bPush">총공세</button>
       </div>
     </div>
     <div class="cards" id="cards"></div>
@@ -571,9 +584,7 @@ const I18N_EN={
   "공적으로 모든 작전에 남는 강화를 삽니다. 보유 공적 {0}. 도감 유물 {1}/{2}개 · 영구 보너스 CP 수입 +{3}%, 사령부 +{4}.{5}":"Spend Merit on upgrades that carry across all operations. Merit held: {0}. Codex relics {1}/{2} · permanent bonus: CP income +{3}%, HQ +{4}.{5}",
   " 다음 작전 계승 유물: {0}.":" Carried over to next operation: {0}.",
   "새 작전 시작":"Start New Operation",
-  "<li style=\"margin-top:6px\"><b style=\"color:var(--fg)\">유물 도감</b></li>":"<li style=\"margin-top:6px\"><b style=\"color:var(--fg)\">Relic Codex</b></li>",
   "<li class=\"no\"><b>◇ ???</b> · 아직 발견하지 못함</li>":"<li class=\"no\"><b>◇ ???</b> · Not yet found</li>",
-  "<b>지휘관 명부</b><table><tr><th></th>":"<b>Commander Roster</b><table><tr><th></th>",
   "</table><p>★ 클리어 · ○ 도전 가능 · · 잠김(등급 미개방)</p>":"</table><p>★ Cleared · ○ Available · · Locked (rank not open)</p>",
   "최고 기록 {0}번째 전선 · 작전 완수 {1}회 · 열린 등급 {2} · 명부 {3}/{4} · 보유 공적 <span class=\"merit\">{5}</span> · 유물 도감 {6}/{7}":"Best: Front {0} · Operations won {1} · Ranks open {2} · Roster {3}/{4} · Merit <span class=\"merit\">{5}</span> · Relic Codex {6}/{7}",
   "진흙 평원":"Mud Plain",
@@ -805,9 +816,7 @@ const I18N_EN={
   "이름 있는 부대":"Named Unit",
   "생환병 5명을 동시에 거느림":"Command 5 Survivors at once",
   "업적: {0}":"Achievement: {0}",
-  "<li style=\"margin-top:6px\"><b style=\"color:var(--fg)\">업적 {0}/{1}</b></li>":"<li style=\"margin-top:6px\"><b style=\"color:var(--fg)\">Achievements {0}/{1}</b></li>",
   " · 공적 +{0}":" · Merit +{0}",
-  "<li style=\"margin-top:6px\"><b style=\"color:var(--fg)\">전사자 명부</b></li>":"<li style=\"margin-top:6px\"><b style=\"color:var(--fg)\">Roll of the Fallen</b></li>",
   "사살 {0} · {1}번째 전선":"Kills {0} · Front {1}",
   "철갑의 날":"Day of Steel",
   "적 전차가 1번째 전선부터. 대전차병 비용 -30%.":"Enemy tanks from Front 1. Anti-Tank cost -30%.",
@@ -854,7 +863,330 @@ const I18N_EN={
   "보급 +500":"Supply +500",
   "다음 막 보스 앞으로":"Skip to act boss",
   "모두 해금(공적·등급·출신·도감·강화)":"Unlock everything (merit, ranks, origins, codex, upgrades)",
-  "모두 해금했습니다.":"Everything unlocked."
+  "모두 해금했습니다.":"Everything unlocked.",
+  "장교":"Officer",
+  "가스탄":"Gas Shell",
+  "8초간 독가스 구름. 안의 병사는 참호와 상관없이 초당 2 피해, 명중 -40%, 사기 하락. 바람에 실려 적 쪽으로 흐르고 아군도 다칩니다. 이프르, 1915.":"Poison gas cloud for 8 s. Troops inside take 2 damage per second even in trenches, -40% accuracy, falling morale. Drifts on the wind toward the enemy and can hurt your own troops. Ypres, 1915.",
+  "갱도 폭파":"Tunnel Mine",
+  "12초 동안 땅굴을 판 뒤 지정한 곳에서 가까운 적 참호를 통째로 폭파합니다. 참호 안 적은 거의 전멸, 적 사기 -30. 메신 능선, 1917.":"Digs for 12 s, then blows up the enemy trench nearest the target. Troops inside are nearly wiped out; enemy morale -30. Messines Ridge, 1917.",
+  "권총만 찹니다. 최전방 바로 뒤를 따라가며 반경 40 안 아군 명중 +12%, 살아 있으면 사기가 더 높게 유지됩니다. 쓰러지면 아군 사기 -8(적 장교는 -15), 4초 동안 주변 명중 -30%. 저격수가 먼저 노립니다.":"Pistol only. Follows just behind the front line. Allies within 40 get +12% accuracy, and morale stays higher while alive. If killed: your morale -8 (enemy officer -15), nearby accuracy -30% for 4 s. Snipers target officers first.",
+  "총검술":"Bayonet Drill",
+  "소총수·돌격조가 백병전에서 이길 확률 +15%":"Riflemen and Assault Teams win melee +15% more often",
+  "잠망경 소총":"Periscope Rifle",
+  "참호 안 소총수가 맞을 확률 -25%. 갈리폴리, 1915.":"Riflemen in trenches are 25% less likely to be hit. Gallipoli, 1915.",
+  "명사수 선발":"Marksman Selection",
+  "소총수 5명째마다 명사수(체력 +50%, 명중 ×1.5)":"Every 5th Rifleman is a marksman (HP +50%, accuracy ×1.5)",
+  "군악대":"Regimental Band",
+  "아군 사기가 오를 때 +50%":"Allied morale gains +50%",
+  "허리케인 포격":"Hurricane Bombardment",
+  "포격 탄 수 ×1.5. 대가: 떨어지기까지 +1초":"Barrage shells ×1.5. Cost: lands 1 s later",
+  "지연 신관":"Delay Fuze",
+  "아군 폭발이 참호 안 적에게 주는 피해 +60%":"Allied explosions deal +60% damage to enemies in trenches",
+  "가스 전문가":"Gas Specialist",
+  "가스탄 지속 +4초, 반경 +25%":"Gas Shell lasts +4 s, radius +25%",
+  "대포병 사격":"Counter-Battery Fire",
+  "적이 포격·야포를 쓰면 15초 동안 내 포격 비용 0":"When the enemy calls a barrage or howitzer, your Barrage costs 0 for 15 s",
+  "암수형 전차":"Hermaphrodite Tank",
+  "아군 전차가 포와 함께 보병에게 기관총도 쏨. 마크 V, 1918.":"Allied Tanks fire machine guns at infantry as well as the main gun. Mark V, 1918.",
+  "궤도 보강":"Reinforced Tracks",
+  "전차·수송차가 철조망·늪 감속을 무시":"Tanks and APCs ignore barbed wire and swamp slowdown",
+  "전차 공포":"Tank Terror",
+  "아군 전차 곁(30)의 적 명중 -25%. 전차를 처음 투입하면 적 사기 -10. 플레르, 1916.":"Enemies within 30 of an allied Tank have -25% accuracy. First Tank deployed: enemy morale -10. Flers, 1916.",
+  "구난반":"Recovery Crew",
+  "아군 전차·수송차가 파괴되면 비용의 40%를 CP로 돌려받음":"When an allied Tank or APC is destroyed, refund 40% of its cost as CP",
+  "철조망 가설":"Wire Entanglements",
+  "전투 시작 때 아군 두 번째 참호 앞에 철조망":"At battle start, barbed wire is laid in front of your second trench",
+  "방독면":"Gas Mask",
+  "아군이 받는 가스 피해·사기 하락 -70%, 가스 속에서도 명중 감소 없음":"Allies take 70% less gas damage and morale loss, and keep full accuracy in gas",
+  "콘크리트 벙커":"Concrete Bunker",
+  "참호 안 아군이 받는 폭발 피해 추가 -40%":"Allies in trenches take an extra -40% explosion damage",
+  "갱도 청음병":"Tunnel Listeners",
+  "적 갱도 폭파가 8초 늦게 터짐":"Enemy tunnel mines detonate 8 s later",
+  "군기":"Discipline",
+  "아군은 사기가 0이 돼도 무너지지 않음":"Allies do not rout even at 0 morale",
+  "침투조":"Infiltrators",
+  "돌격조 이동 속도 +25%, 철조망 무시":"Assault Team speed +25%, ignore barbed wire",
+  "돌격 나팔":"Assault Bugle",
+  "전진 명령을 내리면 4초간 아군 이동 +40%, 사기 +10 (재사용 30초)":"An advance order gives allies +40% speed and +10 morale for 4 s (30 s cooldown)",
+  "참호 소탕":"Trench Clearing",
+  "아군 것이 아닌 참호 안에서 백병전 승률 +25%":"+25% melee win chance inside trenches you do not hold",
+  "수류탄 묶음":"Grenade Bundle",
+  "돌격조 수류탄의 장갑 피해 2배":"Assault Team grenades deal double damage to armor",
+  "전쟁 채권":"War Bonds",
+  "전투 승리 때 보급 +15":"Winning a battle gives Supply +15",
+  "군수 정산":"Quartermaster's Audit",
+  "전투가 끝날 때 남은 CP 10당 보급 +1":"At battle end, Supply +1 per 10 CP left over",
+  "제2파":"Second Wave",
+  "전투마다 총공세를 한 번 더 쓸 수 있음":"Use Big Push one extra time per battle",
+  "선전 전단":"Propaganda Leaflets",
+  "적이 사기 35로 전투를 시작":"Enemy starts the battle at 35 morale",
+  "참호를 넘어라":"Over the Top",
+  "전진 명령 때 아군 모두 4초간 무적·이동 +60% (재사용 40초). 대가: 사수 중 아군 명중 -10%":"On Advance, all allies are invulnerable and move +60% for 4 s (40 s cooldown). Cost: -10% accuracy while holding",
+  "국민 총동원":"General Mobilization",
+  "병력 상한 54 → 90, 소총수 비용 5. 대가: 소총수 체력 -20%":"Troop cap 54 → 90, Rifleman cost 5. Cost: Rifleman HP -20%",
+  "포탄 충격":"Shell Shock",
+  "아군 폭발에 맞은 적은 2초 동안 아무것도 못 함":"Enemies hit by your explosions are stunned for 2 s",
+  "소모전":"War of Attrition",
+  "아군이 쓰러질 때마다 CP +5, 적 사기 -2. 대가: 아군 사기 상승 절반":"Each ally lost gives +5 CP and enemy morale -2. Cost: your morale gains halved",
+  "기습 개전":"Surprise Opening",
+  "전투 첫 45초 동안 아군 이동·연사 +50%. 대가: 그 뒤 연사 -10%":"For the first 45 s of each battle, allies move and fire 50% faster. Cost: -10% fire rate afterwards",
+  "최후의 1인":"Last Man Standing",
+  "아군이 3명 이하일 때 아군이 주는 피해 ×3, 무너지지 않음":"With 3 or fewer allies left, they deal ×3 damage and never rout",
+  "보병 교리":"Infantry Doctrine",
+  "총검 돌격: 소총수가 백병전에서 이길 확률 +20%":"Bayonet Charge: Riflemen win melee +20% more often",
+  "매드 미닛: 45초마다 8초 동안 소총수 연사 2배":"Mad Minute: every 45 s, Rifleman fire rate doubles for 8 s",
+  "포병 교리":"Artillery Doctrine",
+  "이동 탄막: 아군 포격이 표시한 곳 20 뒤에서 시작해 적 쪽으로 40 전진하며 떨어짐":"Creeping Barrage: your Barrage starts 20 behind the marked spot and walks 40 toward the enemy",
+  "일제 사격: 15초마다 모든 박격포가 함께 쏘고 그 탄은 폭발 범위 +50%":"Time on Target: every 15 s all Mortars fire together, with +50% blast radius",
+  "기갑 교리":"Armor Doctrine",
+  "전차 정비: 아군 전차가 초당 체력 1 회복, 전차가 적을 쓰러뜨리면 사기 +3":"Tank Maintenance: allied Tanks regain 1 HP per second; when a Tank kills an enemy, morale +3",
+  "돌파구: 아군 전차가 적 참호에 들어서면 그 참호의 적 모두 피해 20, 적 사기 -15":"Breakthrough: when an allied Tank enters an enemy trench, everyone there takes 20 damage and enemy morale -15",
+  "참호 교리":"Trench Doctrine",
+  "종심 방어: 보급마다 점령한 참호 1개당 CP +2":"Defense in Depth: each supply drop gives CP +2 per trench held",
+  "철벽: 사령부가 처음 50% 아래로 내려가면 참호 안 아군 완치, 10초간 명중 +30%":"Backs to the Wall: the first time HQ falls below 50%, allies in trenches are fully healed and +30% accuracy for 10 s",
+  "돌격 교리":"Assault Doctrine",
+  "돌격대: 돌격조가 지형 감속을 무시하고 이동 +20%":"Stormtroopers: Assault Teams ignore terrain slowdown and move +20% faster",
+  "침투 전술: 돌격조가 아군 최전방 참호에서 나타남":"Infiltration Tactics: Assault Teams appear at your frontmost trench",
+  "병참 교리":"Logistics Doctrine",
+  "보급 대박: 보급마다 10% 확률로 3배":"Supply Windfall: each supply drop has a 10% chance of paying ×3",
+  "전시 경제: 적을 쓰러뜨리면 그 병력 비용의 10%를 CP로":"War Economy: each kill refunds 10% of the victim's cost as CP",
+  "교리":"Doctrine",
+  "3단계":"Tier 3",
+  "6단계":"Tier 6",
+  "크리스마스 휴전":"Christmas Truce",
+  "1914년 겨울. 서리 내린 무인지대 너머에서 캐럴이 들립니다. 적 병사들이 작은 트리를 세워 놓고 참호 위로 올라옵니다.":"Winter 1914. Carols drift across the frosted no man's land. Enemy soldiers set up small trees and climb out of their trench.",
+  "함께 공을 찬다":"Kick a ball around together",
+  "사령부 +40, 다음 전투 적 사기 40으로 시작":"HQ +40; next battle, the enemy starts at 40 morale",
+  "하루 동안 아무도 총을 들지 않았습니다. 적은 다시 싸울 마음이 덜합니다.":"For one day, nobody raised a rifle. The enemy has less heart for the fight.",
+  "기습 기회로 삼는다":"Use it for a surprise attack",
+  "보급 +60, 다음 전투 아군 사기 30으로 시작":"Supply +60; next battle, your side starts at 30 morale",
+  "보급을 빼앗았지만 병사들은 말이 없습니다.":"You seized their supplies, but the men say nothing.",
+  "메신 능선의 땅굴":"Tunnels Under Messines",
+  "1917년. 공병대가 2년 가까이 적 진지 아래까지 땅굴을 파 왔습니다. 폭약만 채우면 됩니다.":"1917. Sappers have tunnelled under the enemy line for nearly two years. All that remains is to pack the charges.",
+  "보급 70으로 폭약을 채운다":"Pack the charges (Supply 70)",
+  "갱도 폭파 카드 획득":"Gain Tunnel Mine card",
+  "땅굴을 메운다":"Fill in the tunnels",
+  "보급 +25":"Supply +25",
+  "공병대가 아쉬워하며 철수했습니다.":"The sappers withdrew, reluctantly.",
+  "이프르의 녹색 구름":"The Green Cloud at Ypres",
+  "1915년. 바람이 적 쪽으로 붑니다. 노획한 염소가스 실린더가 참호에 쌓여 있습니다.":"1915. The wind blows toward the enemy. Captured chlorine cylinders are stacked in the trench.",
+  "가스를 푼다":"Release the gas",
+  "가스탄 카드 획득, 사령부 -20":"Gain Gas Shell card, HQ -20",
+  "바람이 잠깐 돌아서 아군도 마셨습니다.":"The wind shifted for a moment, and your own men breathed it in.",
+  "방독면을 나눠 준다":"Issue gas masks",
+  "방독면 특성 획득":"Gain Gas Mask perk",
+  "전서구 셰르 아미":"Cher Ami",
+  "1918년. 고립된 대대가 마지막 비둘기를 날려 보냈습니다. 비둘기는 한쪽 다리가 거의 잘려 나가고도 사령부에 닿았습니다.":"1918. A cut-off battalion released its last pigeon. Its leg nearly severed, the bird still reached headquarters.",
+  "오인 포격을 멈춘다":"Stop the friendly fire",
+  "사령부 +50":"HQ +50",
+  "아군 포격이 멈췄습니다. 사령부 +50.":"Your own guns fell silent. HQ +50.",
+  "적 좌표를 포병에 넘긴다":"Pass enemy coordinates to the artillery",
+  "포병 연대 특성 +1":"Artillery Regiment perk +1",
+  "플레르의 강철 괴물":"The Steel Monsters of Flers",
+  "1916년. 처음 보는 강철 차량이 전선에 도착했습니다. 적은 이것을 본 적이 없습니다.":"1916. A strange steel vehicle has arrived at the front. The enemy has never seen anything like it.",
+  "보급 80으로 받는다":"Accept it (Supply 80)",
+  "전차 편성과 전차 공포 특성":"Adds a Tank and the Tank Terror perk",
+  "지나보낸다":"Let it pass",
+  "괴물은 다른 전선으로 갔습니다.":"The monster went off to another front.",
+  "돌격대 교관":"Stormtrooper Instructor",
+  "1918년 봄 공세를 앞두고, 침투 전술을 익힌 돌격대 교관이 부대를 찾아왔습니다.":"Spring 1918, before the offensive. A stormtrooper instructor trained in infiltration tactics visits your unit.",
+  "돌격조를 맡긴다":"Hand him the Assault Teams",
+  "침투조 특성 획득":"Gain Infiltrators perk",
+  "총검술을 배운다":"Learn bayonet drill",
+  "총검술 특성 +1":"Bayonet Drill perk +1",
+  "스페인 독감":"Spanish Flu",
+  "1918년. 병영에 열병이 번집니다. 기침 소리가 포성보다 큽니다.":"1918. Fever spreads through the barracks. The coughing is louder than the guns.",
+  "격리한다":"Quarantine them",
+  "다음 전투 시작 CP -30":"Next battle starts with CP -30",
+  "환자를 후방으로 옮겼습니다. 다음 전투는 병력이 모자랍니다.":"The sick were moved to the rear. You will be short of troops in the next battle.",
+  "그대로 버틴다":"Tough it out",
+  "사령부 최대 내구도 -25, 보급 +40":"Max HQ HP -25, Supply +40",
+  "병사들이 기침을 하며 진지를 지킵니다.":"The men hold the line, coughing.",
+  "붉은 남작":"The Red Baron",
+  "1918년. 붉은 삼엽기가 전선 위를 맴돕니다. 적의 에이스입니다.":"1918. A red triplane circles above the front. It is the enemy's ace.",
+  "대공 사격을 한다":"Open fire on it",
+  "반반 확률: 기총소사 카드 획득 / 사령부 -25":"50/50: gain Strafing Run card / HQ -25",
+  "추락한 기체에서 작전 지도를 건졌습니다.":"You recovered an operations map from the downed plane.",
+  "삼엽기가 사령부를 훑고 사라졌습니다. 사령부 -25.":"The triplane strafed HQ and vanished. HQ -25.",
+  "몸을 숨긴다":"Take cover",
+  "붉은 기체가 지나갔습니다.":"The red plane passed overhead.",
+  "잃어버린 대대":"The Lost Battalion",
+  "1918년. 아르곤 숲에서 닷새 가까이 고립됐던 대대가 돌아왔습니다. 살아남은 이들의 눈빛이 다릅니다.":"1918. A battalion cut off in the Argonne Forest for nearly five days has come back. The survivors have a different look in their eyes.",
+  "부대에 받아들인다":"Take them in",
+  "생환병 2명 합류":"2 Survivors join",
+  "생환병이 합류했습니다.":"Survivors have joined.",
+  "후방으로 보낸다":"Send them to the rear",
+  "그들은 집으로 갔습니다. 보급 +30.":"They went home. Supply +30.",
+  "{0} 카드는 이미 있어 보급 +40.":"You already have {0}, so Supply +40.",
+  "{0} 카드를 얻었습니다.":"You gained {0}.",
+  "{0}은(는) 이미 최대라 보급 +40.":"{0} is already maxed, so Supply +40.",
+  "{0} 특성을 얻었습니다.":"You gained the {0} perk.",
+  "땅굴 파는 소리! 곧 아군 참호 하나가 폭파됩니다. 표시된 참호에서 병력을 빼세요.":"Digging sounds! One of your trenches is about to be blown up. Pull troops out of the marked trench.",
+  "기세! 8초 동안 아군 연사·이동이 빨라집니다.":"Momentum! Allied fire rate and speed rise for 8 s.",
+  "아군 전선 붕괴! 6초 동안 병사들이 물러납니다.":"Allied line routed! Your troops fall back for 6 s.",
+  "적 전선 붕괴! 6초 동안 적이 달아납니다. 지금 밀어붙이세요.":"Enemy line routed! They flee for 6 s. Press the attack now.",
+  "적 총반격! 적이 사령부를 지키려고 전부 뛰쳐나옵니다.":"Enemy counterattack! They pour out to defend their HQ.",
+  "총공세! 모든 병력이 참호를 넘어 돌격합니다.":"Big Push! All troops go over the top.",
+  "총공세":"Big Push",
+  "아군 붕괴":"Allied Rout",
+  "적 붕괴":"Enemy Rout",
+  "아군 기세":"Allied Momentum",
+  "적 기세":"Enemy Momentum",
+  "속전속결":"Swift Victory",
+  "150초 안에 승리":"Win within 150 s",
+  "병력 보존":"Preserve the Force",
+  "아군 손실 8 이하로 승리":"Win with 8 or fewer losses",
+  "섬멸":"Annihilation",
+  "연쇄 사살 ×10 달성":"Reach a ×10 kill chain",
+  "전선 장악":"Seize the Front",
+  "참호 3개를 동시에 점령":"Hold 3 trenches at once",
+  "자력 돌파":"Going Alone",
+  "지원 카드 없이 승리":"Win without support cards",
+  "전투 명령 '{0}': {1} → 보급 +{2}. ":"Battle Order '{0}': {1} → Supply +{2}. ",
+  "전투 명령 '{0}' 달성: 보급 +{1}":"Battle Order '{0}' met: Supply +{1}",
+  "전투 명령 '{0}' 실패":"Battle Order '{0}' failed",
+  "최대 연쇄 사살 ×{0}":"Longest kill chain ×{0}",
+  "사기":"Morale",
+  "유물 도감 {0}/{1}":"Relic Codex {0}/{1}",
+  "업적 {0}/{1}":"Achievements {0}/{1}",
+  "전사자 명부 {0}":"Roll of Honour {0}",
+  "지휘관 명부 {0}/{1}":"Commander Roster {0}/{1}",
+  " 강화를 하나 살 때마다 모든 가격이 10%씩 오릅니다(지금 +{0}%).":" Every upgrade you buy raises all prices by 10% (now +{0}%).",
+  "파스샹달의 진흙":"The Mud of Passchendaele",
+  "1917년 가을. 비가 그치지 않아 포탄 구덩이가 늪이 됐습니다. 사람도 말도 빠지면 나오지 못합니다.":"Autumn 1917. The rain never stops and every shell hole is a swamp. Men and horses who slip in do not come out.",
+  "판자 길을 깐다":"Lay duckboards",
+  "보급 -30, 다음 전투 시작 CP +40":"Supply -30, next battle starts with +40 CP",
+  "판자 길 덕분에 다음 전투에 병력이 빨리 닿습니다.":"The duckboards will get troops forward faster next battle.",
+  "버틴다":"Endure it",
+  "사령부 -15, 보급 +20":"HQ -15, Supply +20",
+  "진흙 속에서 보급품 몇 상자를 건졌습니다.":"You fished a few supply crates out of the mud.",
+  "포로 심문":"Interrogation",
+  "정찰대가 적 하사관 한 명을 붙잡아 왔습니다. 그는 겁에 질렸지만 입을 다물고 있습니다.":"A patrol brought in an enemy sergeant. He is terrified but says nothing.",
+  "정중히 대우한다":"Treat him decently",
+  "지금은 아무 일도 없음. 언젠가 돌아올지도 모릅니다.":"Nothing now. It may come back to you.",
+  "그는 담배 한 개비를 받고 고개를 숙였습니다. 후방으로 보냈습니다.":"He took a cigarette, bowed his head, and was sent to the rear.",
+  "거칠게 심문한다":"Interrogate him hard",
+  "다음 전투 적 사기 40으로 시작":"Next battle: enemy starts at 40 morale",
+  "적 진지의 약점을 알아냈습니다. 적은 아직 모릅니다.":"You learned a weak point in the enemy line. They do not know yet.",
+  "포로의 편지":"A Letter from the Prisoner",
+  "예전에 정중히 대해 준 포로가 수용소에서 편지를 보냈습니다. 봉투 안에 적 진지 배치도가 접혀 있습니다.":"The prisoner you once treated decently has written from his camp. Folded inside is a sketch of the enemy positions.",
+  "배치도를 받는다":"Take the sketch",
+  "노획 지도 유물(없으면 보급 +50)":"Captured Map relic (or +50 Supply if owned)",
+  "노획 지도를 얻었습니다. 적이 CP 0으로 전투를 시작합니다.":"You gained the Captured Map. The enemy starts battles with 0 CP.",
+  "이미 아는 내용이라 정보 장교에게 넘기고 보급 50을 받았습니다.":"You already knew this; intelligence paid 50 Supply for it.",
+  "답장을 쓴다":"Write back",
+  "사령부 +30":"HQ +30",
+  "짧은 답장을 썼습니다. 이상하게 마음이 가벼워졌습니다.":"You wrote a short reply. Oddly, it lifted your spirits.",
+  "종군 기자":"War Correspondent",
+  "신문사 기자가 카메라를 들고 참호에 왔습니다. 영웅담을 원합니다.":"A newspaper correspondent has come to the trench with a camera. He wants a hero story.",
+  "영웅담을 들려준다":"Give him a story",
+  "공적 +15, 언젠가 기사가 실릴지도 모릅니다":"Merit +15; the story may run someday",
+  "기자가 신이 나서 받아 적었습니다. 공적 +15.":"He scribbled it all down happily. Merit +15.",
+  "돌려보낸다":"Send him away",
+  "사령부 +10":"HQ +10",
+  "기자 대신 병사들을 쉬게 했습니다.":"You let the men rest instead.",
+  "신문 1면":"Front Page",
+  "당신 부대의 기사가 본국 신문 1면에 실렸습니다. 후원과 지원자가 몰립니다.":"Your unit made the front page back home. Donations and volunteers are pouring in.",
+  "후원금을 받는다":"Take the donations",
+  "보급 +60":"Supply +60",
+  "보급 60이 도착했습니다.":"60 Supply has arrived.",
+  "지원병을 받는다":"Take the volunteers",
+  "다음 전투 시작 때 소총수 6명":"6 Riflemen join at the start of the next battle",
+  "지원병 6명이 다음 전투에 합류합니다.":"6 volunteers will join the next battle.",
+  "군목":"The Chaplain",
+  "군목이 참호를 돌며 촛불을 켜고 기도를 올립니다. 병사들이 하나둘 모여듭니다.":"The chaplain walks the trench lighting candles and saying prayers. One by one the men gather.",
+  "예배를 연다":"Hold a service",
+  "사령부 +20, 다음 전투 아군 사기 80으로 시작":"HQ +20, next battle your morale starts at 80",
+  "병사들의 얼굴이 조금 밝아졌습니다.":"The men look a little brighter.",
+  "편지를 대신 써 달라고 한다":"Ask him to write letters home",
+  "편지 묶음 유물(없으면 보급 +30)":"Bundle of Letters relic (or +30 Supply if owned)",
+  "편지 묶음을 얻었습니다.":"You gained the Bundle of Letters.",
+  "편지는 이미 충분합니다. 보급 30을 아꼈습니다.":"There are letters enough already. You saved 30 Supply.",
+  "탈영병":"The Deserter",
+  "밤중에 참호를 빠져나가던 병사가 붙잡혔습니다. 열아홉 살입니다.":"A soldier was caught slipping out of the trench at night. He is nineteen.",
+  "본보기로 처벌한다":"Make an example of him",
+  "군기 특성 획득, 다음 전투 아군 사기 40":"Gain the Discipline perk; next battle your morale starts at 40",
+  "조용히 돌려보낸다":"Quietly send him back",
+  "사령부 -10, 다음 전투 아군 사기 70":"HQ -10, next battle your morale starts at 70",
+  "그는 아무 말 없이 자기 자리로 돌아갔습니다.":"He went back to his post without a word.",
+  "보급 열차":"The Supply Train",
+  "협궤 열차가 탄약과 식량을 싣고 전선 바로 뒤까지 들어왔습니다. 짐을 다 내릴 시간은 없습니다.":"A light railway train has run right up behind the line with ammunition and food. There is no time to unload it all.",
+  "포탄을 내린다":"Unload the shells",
+  "포격 카드(있으면 포병 연대 특성)":"Barrage card (Artillery Regiment perk if you have it)",
+  "식량을 내린다":"Unload the food",
+  "사령부 +35":"HQ +35",
+  "따뜻한 식사가 돌았습니다. 사령부 +35.":"Hot food went round. HQ +35.",
+  "장군 시찰":"The General's Visit",
+  "장군이 전선을 시찰하러 옵니다. 깔끔한 참호를 보고 싶어 합니다.":"The general is coming to inspect the line. He wants to see tidy trenches.",
+  "보여 주기식으로 정비한다":"Put on a show",
+  "보급 -20, 공적 +25":"Supply -20, Merit +25",
+  "장군이 흡족해했습니다. 공적 +25.":"The general was pleased. Merit +25.",
+  "진짜 상황을 보고한다":"Report the truth",
+  "반반 확률: 다음 전투 소총수 6명 증원 / 사령부 -20":"50/50: 6 Riflemen next battle / HQ -20",
+  "장군이 증원을 약속했습니다. 소총수 6명이 옵니다.":"The general promised reinforcements. 6 Riflemen are coming.",
+  "문책을 받았습니다. 사령부 -20.":"You were reprimanded. HQ -20.",
+  "참호 쥐":"Trench Rats",
+  "고양이만 한 쥐들이 보급품을 갉아 먹고 있습니다.":"Rats the size of cats are gnawing through the stores.",
+  "쥐잡이 개를 데려온다":"Bring in a ratter",
+  "보급 -15":"Supply -15",
+  "테리어 한 마리가 밤새 일했습니다.":"A terrier worked all night.",
+  "내버려 둔다":"Leave them",
+  "보급 -30%":"Supply -30%",
+  "아침이 되자 상자 몇 개가 비어 있었습니다.":"By morning several crates were empty.",
+  "야전 병원":"The Field Hospital",
+  "부상병으로 가득한 천막 병원입니다. 의약품이 모자랍니다.":"A tent hospital packed with wounded. Medical supplies are running out.",
+  "의약품을 나눈다":"Share your supplies",
+  "보급 -40. 위생병 편성(있으면 구급 지원 카드)":"Supply -40. Gain the Medic unit (Field Aid card if you have it)",
+  "위생병이 부대에 합류했습니다.":"A medic joined your unit.",
+  "경상자를 복귀시킨다":"Send the walking wounded back",
+  "다음 전투 소총수 3명, 사령부 -10":"3 Riflemen next battle, HQ -10",
+  "붕대를 감은 병사 셋이 돌아왔습니다.":"Three bandaged men came back.",
+  "적의 편지":"The Enemy's Letters",
+  "쓰러진 적병의 품에서 편지 묶음이 나왔습니다. 집에서 온 편지입니다.":"A bundle of letters was found on a fallen enemy soldier. Letters from home.",
+  "읽어서 정보를 찾는다":"Read them for intelligence",
+  "다음 전투 적 사기 45로 시작":"Next battle: enemy starts at 45 morale",
+  "적 후방의 굶주림이 적혀 있었습니다. 적도 지쳤습니다.":"They spoke of hunger behind the enemy lines. The enemy is tired too.",
+  "주인과 함께 묻어 준다":"Bury them with him",
+  "다음 전투 아군 사기 75로 시작":"Next battle your morale starts at 75",
+  "병사들이 말없이 흙을 덮었습니다.":"The men covered the grave in silence.",
+  "항공 정찰":"Air Reconnaissance",
+  "복엽기 정찰대가 적 진지 사진을 들고 돌아왔습니다.":"A biplane recon flight has returned with photographs of the enemy lines.",
+  "포병에게 넘긴다":"Pass them to the artillery",
+  "야포 사격 카드":"Howitzer Strike card",
+  "지도를 다시 그린다":"Redraw the maps",
+  "지도 통 유물(없으면 보급 +40)":"Map Case relic (or +40 Supply if owned)",
+  "지도 통을 얻었습니다.":"You gained the Map Case.",
+  "보급 40을 받았습니다.":"You received 40 Supply.",
+  "지뢰밭 발견":"A Minefield Found",
+  "공병이 무인지대에서 적의 매설 흔적을 찾았습니다.":"Engineers have found signs of enemy mines in no man's land.",
+  "파내서 우리가 쓴다":"Dig them up and reuse them",
+  "지뢰 살포 카드":"Minefield card",
+  "표시만 하고 돌아간다":"Mark them and withdraw",
+  "사령부 +15":"HQ +15",
+  "안전한 길을 표시했습니다.":"You marked a safe path.",
+  "흰 깃발":"The White Flag",
+  "적이 부상병을 수습하겠다며 흰 깃발을 올렸습니다.":"The enemy has raised a white flag to recover their wounded.",
+  "응한다":"Agree",
+  "한 시간 동안 양쪽이 부상병을 날랐습니다.":"For an hour both sides carried their wounded.",
+  "그 틈을 노린다":"Exploit the pause",
+  "다음 전투 적 사기 30, 아군 사기 40으로 시작":"Next battle: enemy morale 30, your morale 40",
+  "기습은 통했지만 병사들은 마음이 무겁습니다.":"The surprise worked, but the men are uneasy.",
+  "보급 착오":"A Supply Mix-up",
+  "탄약 상자를 열었더니 겨울 외투가 가득합니다.":"You opened the ammunition crates and found them full of winter coats.",
+  "후방에 팔아넘긴다":"Sell them to the rear",
+  "보급 +45":"Supply +45",
+  "보급 45를 받았습니다.":"You received 45 Supply.",
+  "나눠 입힌다":"Hand them out",
+  "병사들이 오랜만에 따뜻하게 잤습니다.":"The men slept warm for once.",
+  "기병대":"The Cavalry",
+  "말을 탄 기병대가 참호 뒤로 지나갑니다. 아직 돌파를 기다리고 있습니다.":"A cavalry troop rides behind the trenches, still waiting for the breakthrough.",
+  "정찰을 부탁한다":"Ask them to scout",
+  "무작위 유물 1개":"A random relic",
+  "쓸 만한 것을 찾지 못했습니다. 보급 +40.":"They found nothing useful. Supply +40.",
+  "{0}을(를) 얻었습니다.":"Gained {0}.",
+  "말을 징발한다":"Requisition the horses",
+  "보급 +40":"Supply +40",
+  "말들이 포차를 끌게 됐습니다. 보급 +40.":"The horses will pull the guns now. Supply +40."
 };
 const LANG=(()=>{try{const v=localStorage.getItem('trenchline.lang');if(v==='ko'||v==='en')return v}catch(e){}return /^ko\b/i.test(navigator.language||'')?'ko':'en'})();
 function _t(k,...a){const s=LANG==='en'&&I18N_EN[k]?I18N_EN[k]:k;return a.length?s.replace(/\{(\d+)\}/g,(m,i)=>a[+i]):s}
@@ -887,6 +1219,8 @@ const U={
   corpsman:{name:_t('위생병'), cost:30, hp:10, dmg:0, range:0, rof:9,  spd:11,cd:8,  kind:'aux',aux:true,heal:3,hr:22},
   observer:{name:_t('관측병'), cost:45, hp:4,  dmg:0, range:0, rof:9,  spd:11,cd:30, kind:'aux',aux:true,exposed:true,sr:70,spot:.5,spotRange:1.25,spotCd:.75},
   // 수송차: 사령부에서 보병 cap명을 태우고 아군 최전방 참호에 내려준 뒤 돌아온다. 무장 없음.
+  // 장교: 반경 40 아군 명중 +12%, 쓰러지면 그 편 사기 -15·4초간 명중 -30%
+  officer:{name:_t('장교'),   cost:40, hp:14, dmg:6, range:30, rof:1.2,spd:11,cd:20, kind:'small',acc:.5,officer:true},
   apc:    {name:_t('수송차'),  cost:30, hp:60, dmg:0, range:0, rof:9,  spd:26,cd:25, kind:'apc',armor:true,cap:5},
 };
 const APC_RIDE={rifle:1,assault:1,at:1,corpsman:1};
@@ -899,10 +1233,12 @@ const SUP={
   aid:     {name:_t('구급 지원'),cost:45,cd:40,delay:0,  r:28,shape:'circle',desc:_t('반경 안 아군이 4초에 걸쳐 체력 12를 회복합니다.')},
   howitzer:{name:_t('야포 사격'),cost:80,cd:45,delay:4,  r:16,shape:'circle',desc:_t('4초 뒤 대형 포탄 한 발. 피해 80, 전차에도 통합니다. 움직이는 적은 피합니다.')},
   strafe:  {name:_t('기총소사'), cost:90,cd:50,delay:2.5,r:9, shape:'line',  desc:_t('2.5초 뒤 전투기가 세로 한 줄을 두 번 훑습니다. 참호 한 줄 소탕용.')},
+  gas:     {name:_t('가스탄'),   cost:50,cd:45,delay:1.2,r:30,shape:'circle',desc:_t('8초간 독가스 구름. 안의 병사는 참호와 상관없이 초당 2 피해, 명중 -40%, 사기 하락. 바람에 실려 적 쪽으로 흐르고 아군도 다칩니다. 이프르, 1915.')},
+  tunnel:  {name:_t('갱도 폭파'),cost:120,cd:90,delay:12,r:22,shape:'circle',desc:_t('12초 동안 땅굴을 판 뒤 지정한 곳에서 가까운 적 참호를 통째로 폭파합니다. 참호 안 적은 거의 전멸, 적 사기 -30. 메신 능선, 1917.')},
 };
-const SUP_ORDER=['bar','smoke','mines','aid','howitzer','strafe'];
-const ORDER=['rifle','assault','mg','at','flame','sniper','mortar','tank','corpsman','observer','apc'];
-const UNIT_DESC={flame:_t('짧은 사거리에서 불을 뿜습니다. 불은 참호와 엄폐를 무시하고 4초 동안 탑니다. 참호를 비울 때 씁니다.'),corpsman:_t('무기가 없습니다. 최전방 바로 뒤를 따라가며 반경 안 아군 보병을 초당 3씩 치료합니다.'),observer:_t('무기가 없습니다. 살아 있는 동안 포격·야포·기총소사 재사용 대기 -25%. 반경 70 안에서는 박격포·포격 탄착이 절반으로 모이고, 야포는 근처 적을 따라가며, 박격포 사거리 +25%. 여러 명이어도 겹치지 않습니다. 몸을 드러내고 있어 참호·엄폐 보호를 못 받고 잘 맞습니다.'),apc:_t('보병 5명(소총수·돌격조·대전차병·위생병)을 태워 최전방 참호까지 실어 나릅니다. 카드를 누르면 차가 나오고, 그다음 산 병력이 탑승합니다. 다시 누르면 바로 출발합니다. 파괴되면 탑승병 절반이 살아남습니다.'),sniper:_t('사거리가 아주 길고 한 발이면 쓰러뜨립니다. 기관총·박격포·대전차병·저격수를 먼저 노립니다. 연사가 느립니다.'),mortar:_t('곡사로 범위 피해를 줍니다. 멀리 쏠수록 탄착이 크게 흩어지고, 가까운 적은 못 쏩니다. 저격수에게 약합니다.'),tank:_t('튼튼하고 범위 포격을 합니다. 대전차병과 수류탄에 약합니다.')};
+const SUP_ORDER=['bar','smoke','mines','aid','howitzer','strafe','gas','tunnel'];
+const ORDER=['rifle','assault','mg','at','flame','sniper','mortar','tank','corpsman','observer','officer','apc'];
+const UNIT_DESC={officer:_t('권총만 찹니다. 최전방 바로 뒤를 따라가며 반경 40 안 아군 명중 +12%, 살아 있으면 사기가 더 높게 유지됩니다. 쓰러지면 아군 사기 -8(적 장교는 -15), 4초 동안 주변 명중 -30%. 저격수가 먼저 노립니다.'),flame:_t('짧은 사거리에서 불을 뿜습니다. 불은 참호와 엄폐를 무시하고 4초 동안 탑니다. 참호를 비울 때 씁니다.'),corpsman:_t('무기가 없습니다. 최전방 바로 뒤를 따라가며 반경 안 아군 보병을 초당 3씩 치료합니다.'),observer:_t('무기가 없습니다. 살아 있는 동안 포격·야포·기총소사 재사용 대기 -25%. 반경 70 안에서는 박격포·포격 탄착이 절반으로 모이고, 야포는 근처 적을 따라가며, 박격포 사거리 +25%. 여러 명이어도 겹치지 않습니다. 몸을 드러내고 있어 참호·엄폐 보호를 못 받고 잘 맞습니다.'),apc:_t('보병 5명(소총수·돌격조·대전차병·위생병)을 태워 최전방 참호까지 실어 나릅니다. 카드를 누르면 차가 나오고, 그다음 산 병력이 탑승합니다. 다시 누르면 바로 출발합니다. 파괴되면 탑승병 절반이 살아남습니다.'),sniper:_t('사거리가 아주 길고 한 발이면 쓰러뜨립니다. 기관총·박격포·대전차병·저격수를 먼저 노립니다. 연사가 느립니다.'),mortar:_t('곡사로 범위 피해를 줍니다. 멀리 쏠수록 탄착이 크게 흩어지고, 가까운 적은 못 쏩니다. 저격수에게 약합니다.'),tank:_t('튼튼하고 범위 포격을 합니다. 대전차병과 수류탄에 약합니다.')};
 const PERKS={
   rifleDmg:{name:_t('정밀 사격'),desc:_t('소총수 명중률 +30%'),max:2},
   mgSetup:{name:_t('신속 거치'),desc:_t('기관총 사격 준비 시간 절반'),max:1},
@@ -932,7 +1268,52 @@ const PERKS={
   bounty:{name:_t('전과 포상'),desc:_t('적을 처치할 때마다 CP +2'),max:2},
   rally:{name:_t('복수의 함성'),desc:_t('아군이 쓰러지면 주변 아군이 4초간 연사 +50%'),max:1},
   ghillie:{name:_t('위장복'),desc:_t('저격수가 맞을 확률 -50%, 사거리 +15%'),max:1,req:'sniper'},
+  // 2026-10-16: 교리 계열(t)이 붙은 특성. 계열 단계 합 3·6에서 교리 효과가 켜진다(DOCT).
+  bayonet:{name:_t('총검술'),desc:_t('소총수·돌격조가 백병전에서 이길 확률 +15%'),max:2,t:'inf'},
+  periscope:{name:_t('잠망경 소총'),desc:_t('참호 안 소총수가 맞을 확률 -25%. 갈리폴리, 1915.'),max:1,t:'inf'},
+  marksman:{name:_t('명사수 선발'),desc:_t('소총수 5명째마다 명사수(체력 +50%, 명중 ×1.5)'),max:1,t:'inf'},
+  band:{name:_t('군악대'),desc:_t('아군 사기가 오를 때 +50%'),max:1,t:'inf'},
+  hurricane:{name:_t('허리케인 포격'),desc:_t('포격 탄 수 ×1.5. 대가: 떨어지기까지 +1초'),max:1,t:'art'},
+  delayfuse:{name:_t('지연 신관'),desc:_t('아군 폭발이 참호 안 적에게 주는 피해 +60%'),max:1,t:'art'},
+  gasmaster:{name:_t('가스 전문가'),desc:_t('가스탄 지속 +4초, 반경 +25%'),max:1,t:'art',req:'gas'},
+  counter:{name:_t('대포병 사격'),desc:_t('적이 포격·야포를 쓰면 15초 동안 내 포격 비용 0'),max:1,t:'art'},
+  hermaphrodite:{name:_t('암수형 전차'),desc:_t('아군 전차가 포와 함께 보병에게 기관총도 쏨. 마크 V, 1918.'),max:1,t:'arm',req:'tank'},
+  tracks:{name:_t('궤도 보강'),desc:_t('전차·수송차가 철조망·늪 감속을 무시'),max:1,t:'arm',req:['tank','apc']},
+  tankterror:{name:_t('전차 공포'),desc:_t('아군 전차 곁(30)의 적 명중 -25%. 전차를 처음 투입하면 적 사기 -10. 플레르, 1916.'),max:1,t:'arm',req:'tank'},
+  salvage:{name:_t('구난반'),desc:_t('아군 전차·수송차가 파괴되면 비용의 40%를 CP로 돌려받음'),max:1,t:'arm',req:['tank','apc']},
+  wire:{name:_t('철조망 가설'),desc:_t('전투 시작 때 아군 두 번째 참호 앞에 철조망'),max:2,t:'def'},
+  gasmask:{name:_t('방독면'),desc:_t('아군이 받는 가스 피해·사기 하락 -70%, 가스 속에서도 명중 감소 없음'),max:1,t:'def'},
+  bunker:{name:_t('콘크리트 벙커'),desc:_t('참호 안 아군이 받는 폭발 피해 추가 -40%'),max:1,t:'def'},
+  listen:{name:_t('갱도 청음병'),desc:_t('적 갱도 폭파가 8초 늦게 터짐'),max:1,t:'def'},
+  discipline:{name:_t('군기'),desc:_t('아군은 사기가 0이 돼도 무너지지 않음'),max:1,t:'def'},
+  infiltrate:{name:_t('침투조'),desc:_t('돌격조 이동 속도 +25%, 철조망 무시'),max:1,t:'mob'},
+  bugle:{name:_t('돌격 나팔'),desc:_t('전진 명령을 내리면 4초간 아군 이동 +40%, 사기 +10 (재사용 30초)'),max:1,t:'mob'},
+  clearing:{name:_t('참호 소탕'),desc:_t('아군 것이 아닌 참호 안에서 백병전 승률 +25%'),max:1,t:'mob'},
+  bundle:{name:_t('수류탄 묶음'),desc:_t('돌격조 수류탄의 장갑 피해 2배'),max:1,t:'mob'},
+  bonds:{name:_t('전쟁 채권'),desc:_t('전투 승리 때 보급 +15'),max:2,t:'log'},
+  leftover:{name:_t('군수 정산'),desc:_t('전투가 끝날 때 남은 CP 10당 보급 +1'),max:1,t:'log'},
+  secondwave:{name:_t('제2파'),desc:_t('전투마다 총공세를 한 번 더 쓸 수 있음'),max:2,t:'mob'},
+  leaflets:{name:_t('선전 전단'),desc:_t('적이 사기 35로 전투를 시작'),max:1,t:'log'},
+  // 전설 특성: 보상에 가끔(12%, 정예·보스 25%) 한 칸 나온다. 규칙을 바꾸고 대가가 있다.
+  overtop:{name:_t('참호를 넘어라'),desc:_t('전진 명령 때 아군 모두 4초간 무적·이동 +60% (재사용 40초). 대가: 사수 중 아군 명중 -10%'),max:1,gold:true},
+  levee:{name:_t('국민 총동원'),desc:_t('병력 상한 54 → 90, 소총수 비용 5. 대가: 소총수 체력 -20%'),max:1,gold:true},
+  shellshock:{name:_t('포탄 충격'),desc:_t('아군 폭발에 맞은 적은 2초 동안 아무것도 못 함'),max:1,gold:true},
+  attrition:{name:_t('소모전'),desc:_t('아군이 쓰러질 때마다 CP +5, 적 사기 -2. 대가: 아군 사기 상승 절반'),max:1,gold:true},
+  blitz:{name:_t('기습 개전'),desc:_t('전투 첫 45초 동안 아군 이동·연사 +50%. 대가: 그 뒤 연사 -10%'),max:1,gold:true},
+  lastman:{name:_t('최후의 1인'),desc:_t('아군이 3명 이하일 때 아군이 주는 피해 ×3, 무너지지 않음'),max:1,gold:true},
 };
+for(const [k,t] of Object.entries({rifleDmg:'inf',veteran:'inf',vanguard:'inf',scope:'inf',doubleTap:'inf',ghillie:'inf',mortarSplash:'art',barrage:'art',incendiary:'art',smoke:'art',atDmg:'arm',tankHp:'arm',motor:'arm',apAmmo:'arm',mgSetup:'def',trench:'def',medic:'def',hqArmor:'def',mines:'def',grenade:'mob',capture:'mob',rally:'mob',income:'log',logistics:'log',startCP:'log',cheap:'log',drill:'log',bounty:'log'}))PERKS[k].t=t;
+const DOCT={
+  inf:{name:_t('보병 교리'),b3:_t('총검 돌격: 소총수가 백병전에서 이길 확률 +20%'),b6:_t('매드 미닛: 45초마다 8초 동안 소총수 연사 2배')},
+  art:{name:_t('포병 교리'),b3:_t('이동 탄막: 아군 포격이 표시한 곳 20 뒤에서 시작해 적 쪽으로 40 전진하며 떨어짐'),b6:_t('일제 사격: 15초마다 모든 박격포가 함께 쏘고 그 탄은 폭발 범위 +50%')},
+  arm:{name:_t('기갑 교리'),b3:_t('전차 정비: 아군 전차가 초당 체력 1 회복, 전차가 적을 쓰러뜨리면 사기 +3'),b6:_t('돌파구: 아군 전차가 적 참호에 들어서면 그 참호의 적 모두 피해 20, 적 사기 -15')},
+  def:{name:_t('참호 교리'),b3:_t('종심 방어: 보급마다 점령한 참호 1개당 CP +2'),b6:_t('철벽: 사령부가 처음 50% 아래로 내려가면 참호 안 아군 완치, 10초간 명중 +30%')},
+  mob:{name:_t('돌격 교리'),b3:_t('돌격대: 돌격조가 지형 감속을 무시하고 이동 +20%'),b6:_t('침투 전술: 돌격조가 아군 최전방 참호에서 나타남')},
+  log:{name:_t('병참 교리'),b3:_t('보급 대박: 보급마다 10% 확률로 3배'),b6:_t('전시 경제: 적을 쓰러뜨리면 그 병력 비용의 10%를 CP로')},
+};
+const doctLv=t=>{let n=0;if(RUN)for(const k in RUN.perks)if(PERKS[k]&&PERKS[k].t===t)n+=RUN.perks[k];return n};
+const doct=(t,n)=>doctLv(t)>=n;
+const MELEE={rifle:.22,assault:.4,flame:.3,at:.15,mg:.08,sniper:.08,mortar:.05,officer:.3};
 const MODS={rain:{name:_t('폭우'),desc:_t('모든 병력 이동 속도 -20%')},fog:{name:_t('짙은 안개'),desc:_t('모든 사거리 -18%')},arty:{name:_t('적 포병 우세'),desc:_t('적 포격 재사용 대기 절반')}};
 const NODE_LABEL={battle:_t('전투'),elite:_t('정예'),shop:_t('보급'),event:'?',rest:_t('휴식'),boss:_t('사령부'),cache:_t('유물')};
 const RELICS={
@@ -988,16 +1369,16 @@ const RELICS={
 };
 const reqOk=r=>!r.req||r.req.some(q=>RUN.units.includes(q)||supOwned().includes(q)||lv(q)>0);
 const META_UP={
-  hq:{name:_t('사령부 증축'),desc:_t('시작 사령부 내구도 +20'),max:5,cost:[20,35,55,80,110]},
-  supply:{name:_t('비상 금고'),desc:_t('시작 보급 +25'),max:3,cost:[20,40,70]},
-  cp:{name:_t('예비 탄약고'),desc:_t('전투 시작 CP +15'),max:3,cost:[25,45,75]},
-  payroll:{name:_t('군수 예산'),desc:_t('보급 1회당 CP +3'),max:4,cost:[25,45,70,100]},
-  reroll:{name:_t('참모 회의'),desc:_t('보상 화면마다 다시 뽑기 1회'),max:2,cost:[40,90]},
-  academy:{name:_t('사관학교'),desc:_t('보상 선택지 3개 → 4개'),max:1,cost:[70]},
-  mortarDoc:{name:_t('박격포 교범'),desc:_t('작전 시작부터 박격포 편성'),max:1,cost:[50]},
-  sniperDoc:{name:_t('저격 교범'),desc:_t('작전 시작부터 저격수 편성'),max:1,cost:[50]},
-  chest:{name:_t('전리품 상자'),desc:_t('작전 시작 시 무작위 유물 1개'),max:1,cost:[90]},
-  slots:{name:_t('지원 참모부'),desc:_t('지원 카드 출전 슬롯 +1 (2칸 → 3칸)'),max:1,cost:[80]},
+  hq:{name:_t('사령부 증축'),desc:_t('시작 사령부 내구도 +20'),max:5,cost:[30,70,140,260,450]},
+  supply:{name:_t('비상 금고'),desc:_t('시작 보급 +25'),max:3,cost:[30,80,180]},
+  cp:{name:_t('예비 탄약고'),desc:_t('전투 시작 CP +15'),max:3,cost:[40,100,220]},
+  payroll:{name:_t('군수 예산'),desc:_t('보급 1회당 CP +3'),max:4,cost:[40,100,220,450]},
+  reroll:{name:_t('참모 회의'),desc:_t('보상 화면마다 다시 뽑기 1회'),max:2,cost:[60,200]},
+  academy:{name:_t('사관학교'),desc:_t('보상 선택지 3개 → 4개'),max:1,cost:[150]},
+  mortarDoc:{name:_t('박격포 교범'),desc:_t('작전 시작부터 박격포 편성'),max:1,cost:[80]},
+  sniperDoc:{name:_t('저격 교범'),desc:_t('작전 시작부터 저격수 편성'),max:1,cost:[80]},
+  chest:{name:_t('전리품 상자'),desc:_t('작전 시작 시 무작위 유물 1개'),max:1,cost:[180]},
+  slots:{name:_t('지원 참모부'),desc:_t('지원 카드 출전 슬롯 +1 (2칸 → 3칸)'),max:1,cost:[200]},
 };
 
 /* ---------- storage ---------- */
@@ -1157,6 +1538,7 @@ const BODY={
   assault:["....sss....","..ccccc....","..cuouu....","..uouuoggg.","..uuouugg..","...uuu....."],
   at:["....sss....","zzqzsszzzzk","zzqzsszzzzk","..ooouu....","..oouuu....","...uuu....."],
   flame:["....sss....",".BB.ss.....","BybBuuu....","BybBuuggggq","BybBuuw..q.",".BB.uuu...."],
+  officer:["....sss....","....ss.....","..uyuuu....","..uuyuukk..","..uuuyu....","...uuu....."],
   corpsman:["....sss....","....ss.....","..unuuu....","..nqnuu.B..","..unuuuwB..","...uuu.BB.."],
   observer:["....sggk...","....ss.....","..ouuuu....","..ouuuu....","..ouuwwk...","...uuu....."]};
 const LEGS={a:["...ddd.....","...d.d.....","..d...d....","..k...k...."],
@@ -1185,7 +1567,7 @@ function bake(map,pal){
 const SPR={1:{},'-1':{}};
 for(const s of [1,-1]){
   const P=PAL[s],o=SPR[s];
-  for(const t of ['rifle','assault','at','flame','corpsman','observer']){o[t]={};const hd=t==='assault'?CAP[s]:HEAD[s],lg=t==='assault'?RUN_LEGS:LEGS;for(const l in lg)o[t][l]=bake([...hd,...BODY[t],...lg[l]],P)}
+  for(const t of ['rifle','assault','at','flame','corpsman','observer','officer']){o[t]={};const hd=t==='assault'||t==='officer'?CAP[s]:HEAD[s],lg=t==='assault'?RUN_LEGS:LEGS;for(const l in lg)o[t][l]=bake([...hd,...BODY[t],...lg[l]],P)}
   o.sniper={};for(const l in LEGS)o.sniper[l]=bake([...SNIPER,...LEGS[l].map(r=>r+'..')],P);
   o.mg={s:bake(MAPS.mg,P)};o.mortar={s:bake(MAPS.mortar,P)};
   o.tank={a:bake(MAPS.tankA,P),b:bake(MAPS.tankB,P),s:bake(MAPS.tankA,P)};
@@ -1263,6 +1645,8 @@ const SUP_ICON={
   aid:["............","....kkkk....","...kk..kk...",".kkkkkkkkkk.",".kOOOOOOOOk.",".kOOOwwOOOk.",".kOOwwwwOOk.",".kOOwwwwOOk.",".kOOOwwOOOk.",".kOOOOOOOOk.",".kkkkkkkkkk.","............"],
   howitzer:["....kkkk....","...kGggGk...","...kgggGk...","..kSSSSSSk..","..kSsSSSSk..","..kSsSSSSk..","..kSsSSSSk..","..kSsSSSSk..","..kSsSSSSk..","..kGGGGGGk..","..kggggggk..","..kkkkkkkk.."],
   strafe:[".....kk.....",".....kk.....","....kSSk....","kkkkkSSkkkkk","kSSSSSSSSSSk","kkkkkSSkkkkk","....kSSk....",".....SS.....","....kSSk....","...kkSSkk...","...kSSSSk...","....kkkk...."],
+  gas:["..mmm..mm...",".mcmmmmcmm..","mmmmcmmmmmm.",".mmmmmmcmm..","...mmmmm....",".....kk.....","....kSSk....","...kOOOOk...","...kOooOk...","...kOOOOk...","...kOooOk...","....kkkk...."],
+  tunnel:["..g.r..g....","...grgg.....",".rggGggr....","..gGrGg.....",".rggGggr....","...g.rg.....","......kk....",".....kbk....","....kbk.....","..kSSk......",".kSSSk......","..kkk......."],
 };
 const SUP_URL={};
 function supIcon(k){if(SUP_URL[k])return SUP_URL[k];const c=bake(SUP_ICON[k],RELIC_PAL);SUP_URL[k]=c.toDataURL();return SUP_URL[k]}
@@ -1274,6 +1658,139 @@ const iconImg=(k,cls)=>{const u=relicIcon(k);return u?`<img class="${cls||'ico'}
 const WHITE=new WeakMap();
 function whiteOf(img){let c=WHITE.get(img);if(!c){c=document.createElement('canvas');c.width=img.width;c.height=img.height;c.lw=img.lw;c.lh=img.lh;const x=c.getContext('2d');x.drawImage(img,0,0);x.globalCompositeOperation='source-in';x.fillStyle='#fff6dc';x.fillRect(0,0,c.width,c.height);WHITE.set(img,c)}return c}
 
+/* ---------- vignettes & icons ----------
+   삽화: 64×28 장면을 소품(문자 격자, RELIC_PAL)과 병사 스프라이트로 합성한 뒤 Scale2x. 하늘·땅 색은 BIOMES 팔레트를 쓴다.
+   아이콘: 12×12 문자 격자(RELIC_PAL). 새 사건이나 장면은 VIGS에 소품 배치만 추가하면 된다. */
+const VIG_W=64,VIG_H=28,GROUND_Y=19;
+const VP={
+  deadtree:["..k....","k.k..k.",".kk.k..","..kk...","...k.k.","...kk..","...k...","...k...","...k...","..kBk..",".kBBBk."],
+  xtree:["...g...","..oOo..",".oOgOo.","..oOo..",".oOOOo.","oOgOOOo","...b...","..kkk.."],
+  crate:["kkkkkk","kbBbBk","kBbBbk","kbBbBk","kkkkkk"],
+  cross:["..k..",".kSk.","kSSSk",".kSk.",".kSk.",".kSk.","..k.."],
+  gcross:[".g.","ggg",".g.",".g.",".g."],
+  helmet:[".kkk.","kOOOk","kkkkk"],
+  candle:[".g.",".w.",".w.",".k."],
+  ball:[".w.","wkw",".w."],
+  shell:[".g.","gGg","SsS","SsS","SsS","kkk"],
+  cyl:[".kk.","kOok","kOok","kOok","kOok","kOok","kkkk"],
+  gas:["...mm..mmm....",".mmcmmmmcmmm..","mmmmmmcmmmmmm.",".mmmcmmmmmcmm.","...mmmm..mm..."],
+  triplane:["...rrrrrr...","...kkkkkk...","kk.rrrrrr.k.","krrrrBrrrrrk","kk.rrrrrr.k.","...kkkkkk...","....k..k...."],
+  biplane:["...OOOOOO...","..k......k..","kkOOOoOOOOOk",".k.OOOOOO...","...k....k..."],
+  tank:[".....kkkkk......","....kOOOOOkkkkkk","..kkkOOOOOOk....",".kOOOOOOOOOOOk..","kOoOOOOOOOOOOOk.","kkkkkkkkkkkkkkk.",".kSkSkSkSkSkSk.."],
+  pigeon:["..kk..",".kSSk.","kSSwSk","..k.k."],
+  tunnel:[".bbbbbbbbbb.",".bkkkkkkkkb.",".bkkkkkkkkb.",".bkkkkkkkkb.",".bkkkkkkkkb.","bbbbbbbbbbbb"],
+  boom:["....g....",".g.gGg.g.","..gGrGg..",".gGrrrGg.","gGrrwrrGg",".gGrrrGg.","..gGrGg..",".g.gGg.g.","....g...."],
+  tent:[".....kk.....","....kcck....","...kcrrck...","..kccrrcck..",".kcrrrrrrck.","kccccrrcccck","kcccckkcccck","kkkkkkkkkkkk"],
+  train:["..kk................","..kk.kkkkk..kkkkkkk.","kkkkkkSSSk..kbbbbbk.","kSSSSSSSSk..kbbbbbk.","kSSSSSSSSkkkkbbbbbkk","kkkkkkkkkk..kkkkkkk.",".kSk..kSk....kSk.kSk"],
+  rat:["..kk.","kSSSk",".k.kk"],
+  letter:["kkkkkk","kpPPpk","kpprpk","kkkkkk"],
+  fire:["..r...",".rgr..","rggGr.","bkbkb.",".bbb.."],
+  wire:["k.k.k.k.k.","SkSkSkSkSk","k.k.k.k.k."],
+  moon:[".pp.","pppP","pppP",".pP."],
+  ruin:["......k.......",".....kSk......",".....kSk......","....kSSSk.....","...kSSSSSk....","...kSkSkSk..k.","...kSSSSSk.kSk","..kkSSkSSkkSSk",".kSSSSkSSSSSSk","kkkkkkkkkkkkkk"],
+  camera:["..kk...","kkkkkkk","kSSkSSk","kSkwkSk","kkkkkkk"],
+  shovel:[".S.","SSS","SSS",".b.",".b.",".b.",".b.",".b.","bbb"],
+  map:["kkkkkkkk","kpprppPk","kprpPppk","kpPprrpk","kppPpprk","kkkkkkkk"],
+  mine:[".kk.","kSSk"],
+  horse:["......kk....",".....kbbk...","kk..kbbk....",".kbbbbbk....",".kbbbbbbk...","..kbbbbk....","..k.k..k.k..","..k.k..k.k.."],
+  coat:[".kkkk.","kOOOOk","kOOOOk","kOkkOk","kOkkOk","kk..kk"],
+  wflag:[".kwww.",".kwwww",".kwww.",".k....",".k....",".k....",".k....","kkk..."],
+  oflag:[".kooo.",".koOoo",".kooo.",".k....",".k....",".k....",".k....","kkk..."],
+  plank:["bbbbbbbbbbbb","BkBkBkBkBkBk"],
+  puddle:[".llll.","llPlll"],
+  bag:[".kkkkk.","kcPcPck","kkkkkkk"],
+  smoke:["..SS..",".SSSS.","SSsSSS",".SSSS.","..SS.."],
+};
+// 병사 소품: 유닛 스프라이트 격자를 그대로 굽는다(얼굴이 보이지 않는 크기)
+const VSOL={sol:['rifle',1],solE:['rifle',-1],aslt:['assault',1],asltE:['assault',-1],off:['officer',1],offE:['officer',-1],med:['corpsman',1]};
+// BIOMES는 아래(지형 섹션)에서 정의되므로 그릴 때 꺼낸다
+const vigSky=k=>({night:['#17140e','#1f2224','#2e3440'],gas:['#232a26','#3e4a3c','#6a7a50']})[k]||BIOMES[{dusk:'mud',forest:'forest',ruins:'ruins',snow:'snow'}[k]].sky;
+// 장면: s=하늘, g=땅, t=참호(아군 쪽 x), p=[소품, x, 바닥 y(생략 시 지면)] — x는 소품 왼쪽
+const VIGS={
+  relic:{s:'dusk',g:'mud',t:30,p:[['deadtree',6],['shovel',22],['helmet',27,20],['crate',40],['deadtree',54]]},
+  depot:{s:'ruins',g:'ruins',p:[['ruin',4],['crate',28],['crate',34],['crate',31,14],['smoke',46,12]]},
+  stragglers:{s:'dusk',g:'mud',p:[['sol',18],['sol',27],['sol',36],['deadtree',52]]},
+  liaison:{s:'dusk',g:'mud',p:[['off',14],['map',26,17],['shell',40],['shell',44],['crate',50]]},
+  captured:{s:'ruins',g:'ruins',p:[['ruin',44],['tank',14],['shovel',34]]},
+  raid:{s:'night',g:'mud',t:18,p:[['moon',50,6],['wire',30],['sol',10],['sol',16],['solE',50]]},
+  xmas:{s:'night',g:'snow',t:12,p:[['moon',54,6],['sol',8],['candle',22],['xtree',28],['ball',38],['candle',42],['solE',48]]},
+  messines:{s:'dusk',g:'mud',p:[['tunnel',14],['crate',30],['crate',36],['shovel',46]]},
+  ypres:{s:'gas',g:'mud',t:44,p:[['cyl',8],['cyl',13],['gas',22,14],['gas',38,17],['sol',48]]},
+  pigeon:{s:'forest',g:'forest',p:[['deadtree',6],['pigeon',30,10],['deadtree',50]]},
+  flers:{s:'dusk',g:'mud',p:[['wire',6],['tank',24],['smoke',44,12]]},
+  storm:{s:'ruins',g:'ruins',p:[['ruin',48],['aslt',12],['aslt',20],['aslt',28],['wire',34]]},
+  flu:{s:'night',g:'mud',p:[['tent',14],['cross',36],['cross',44],['cross',52]]},
+  baron:{s:'dusk',g:'mud',t:20,p:[['triplane',24,9],['smoke',44,8]]},
+  lost:{s:'forest',g:'forest',p:[['deadtree',2],['deadtree',14],['sol',26],['sol',34],['deadtree',48]]},
+  passchendaele:{s:'dusk',g:'mud',p:[['puddle',6],['plank',14,20],['plank',26,21],['puddle',40],['deadtree',50],['sol',30]]},
+  prisoner:{s:'ruins',g:'ruins',p:[['off',16],['solE',30],['sol',42],['ruin',50]]},
+  pletter:{s:'dusk',g:'mud',p:[['letter',22,17],['map',32,18],['candle',44]]},
+  press:{s:'dusk',g:'mud',t:40,p:[['camera',16,17],['off',26],['sol',46]]},
+  news:{s:'ruins',g:'ruins',p:[['letter',18,16],['letter',26,18],['crate',38],['oflag',50]]},
+  chaplain:{s:'dusk',g:'mud',p:[['candle',18],['gcross',26,16],['candle',34],['sol',42]]},
+  deserter:{s:'night',g:'mud',p:[['moon',8,6],['wire',20],['sol',40]]},
+  train:{s:'dusk',g:'mud',p:[['train',10],['crate',36],['crate',42]]},
+  general:{s:'dusk',g:'mud',p:[['oflag',8],['off',22],['sol',32],['sol',40],['sol',48]]},
+  rats:{s:'dusk',g:'mud',t:30,p:[['crate',18],['rat',26],['rat',34],['rat',42]]},
+  hospital:{s:'ruins',g:'ruins',p:[['tent',10],['med',28],['sol',36],['cross',50]]},
+  eletter:{s:'night',g:'mud',p:[['helmet',20,20],['letter',28,19],['candle',40]]},
+  recon:{s:'dusk',g:'mud',p:[['biplane',24,8],['oflag',48]]},
+  minefield:{s:'dusk',g:'mud',p:[['wflag',8],['mine',20],['mine',28],['mine',36],['mine',44],['wire',50]]},
+  whiteflag:{s:'dusk',g:'mud',t:14,p:[['wire',18],['wflag',32],['solE',44]]},
+  coats:{s:'snow',g:'snow',p:[['coat',18],['coat',26],['crate',36],['crate',42]]},
+  cavalry:{s:'dusk',g:'mud',p:[['horse',12],['horse',28],['deadtree',50]]},
+  rest:{s:'night',g:'mud',p:[['moon',52,6],['sol',14],['fire',26],['sol',36]]},
+  shop:{s:'dusk',g:'mud',p:[['crate',14],['crate',20],['crate',17,14],['shell',32],['shell',36],['cyl',44]]},
+  cache:{s:'ruins',g:'ruins',p:[['ruin',40],['crate',16],['helmet',24,20]]},
+  act0:{s:'dusk',g:'mud',t:24,p:[['deadtree',6],['wire',36],['deadtree',52]]},
+  act1:{s:'ruins',g:'ruins',p:[['ruin',4],['ruin',36],['smoke',24,12]]},
+  act2:{s:'snow',g:'snow',t:30,p:[['deadtree',8],['wire',40],['deadtree',54]]},
+  win:{s:'dusk',g:'mud',t:30,p:[['oflag',30],['sol',22],['sol',40]]},
+  lose:{s:'night',g:'ruins',p:[['ruin',20],['smoke',22,10],['boom',40,20]]},
+};
+const VIG_URL={};
+function vig(k){
+  if(VIG_URL[k])return VIG_URL[k];const V=VIGS[k];if(!V)return '';
+  const [c,x]=mk(VIG_W,VIG_H),rnd=mulberry(hashSeed('vig'+k)),sky=vigSky(V.s),G=BIOMES[V.g];
+  const band=[0,7,13,GROUND_Y];for(let i=0;i<3;i++){x.fillStyle=sky[i];x.fillRect(0,band[i],VIG_W,band[i+1]-band[i]);if(i<2)for(let px=(i%2);px<VIG_W;px+=2){x.fillRect(px,band[i+1],1,1)}}
+  if(V.s==='night')for(let i=0;i<10;i++){x.fillStyle='#e0d6b8';x.fillRect(rnd()*VIG_W|0,rnd()*10|0,1,1)}
+  x.fillStyle=G.hill[0];for(let px=0;px<VIG_W;px++){const h=2+Math.round(2*Math.sin(px*.21+rnd()*.5)+Math.sin(px*.07));x.fillRect(px,GROUND_Y-h,1,h)}
+  const rgb=a=>`rgb(${a[0]},${a[1]},${a[2]})`;x.fillStyle=rgb(G.cols[0]);x.fillRect(0,GROUND_Y,VIG_W,VIG_H-GROUND_Y);
+  x.fillStyle=rgb(G.top);x.fillRect(0,GROUND_Y,VIG_W,1);
+  for(let i=0;i<70;i++){x.fillStyle=rgb(G.cols[1+(rnd()*3|0)]);x.fillRect(rnd()*VIG_W|0,GROUND_Y+1+rnd()*(VIG_H-GROUND_Y-1)|0,1,1)}
+  if(V.t!=null){x.fillStyle=G.pit;x.fillRect(0,23,VIG_W,3);x.fillStyle=G.pit2;x.fillRect(0,23,VIG_W,1);x.fillStyle=RELIC_PAL.c;for(let px=0;px<VIG_W;px+=3)x.fillRect(px,22,2,1)}
+  for(const [n,px,py] of V.p){let img,flip=false;
+    if(VSOL[n]){const [t,sd]=VSOL[n],hd=t==='assault'||t==='officer'?CAP[sd]:HEAD[sd];img=bake([...hd,...BODY[t],...LEGS.s],PAL[sd]);flip=sd===-1}
+    else img=bake(VP[n],RELIC_PAL);
+    const by=py==null?GROUND_Y+3:py;
+    if(flip){x.save();x.translate(px+img.width,0);x.scale(-1,1);x.drawImage(img,0,by-img.height);x.restore()}else x.drawImage(img,px,by-img.height)}
+  return VIG_URL[k]=epx(c).toDataURL();
+}
+// 12×12 아이콘: 지도 노드, 교리 문장, 지휘관 휘장, 전설 표식
+const ICONS={
+  battle:["S..........S",".S........S.","..S......S..","...S....S...","....S..S....",".....SS.....",".....SS.....","....b..b....","...b....b...","..kb....bk..",".k........k.","............"],
+  elite:["g..........g",".g........g.","..g......g..","...g....g...","....g..g....",".....gg.....",".....gg.....","....b..b....","...b....b...","..kb....bk..",".k........k.","............"],
+  shop:["............",".kkkkkkkkkk.",".kbbbbbbbbk.",".kbBkkkkBbk.",".kbkbbbbkbk.",".kbkbbbbkbk.",".kbBkkkkBbk.",".kbbbbbbbbk.",".kkkkkkkkkk.","............","............","............"],
+  rest:["............",".....r......","....rgr.....","...rggGr....","...rgGGr....","..rggGgGr...","..rgGggGr...","...rrrrr....",".kbbkbbkbb..","..kbbkbbk...","............","............"],
+  cache:["............","..kkkkkkkk..",".kGgggggggk.",".kgGGGGGGgk.",".kkkkggkkkk.",".kbbbkkbbbk.",".kbbbbbbbbk.",".kbBbbbbBbk.",".kkkkkkkkkk.","............","............","............"],
+  event:["...kkkkkk...","..kppppppk..","..kpkkkkpk..","..kpkppkpk..","..kpppkkpk..","..kppkkppk..","..kppkpppk..","..kppppppk..","..kppkpppk..","..kppppppk..","...kkkkkk...","............"],
+  boss:[".k..........",".kooooooo...",".koOOOOoo...",".kooooooo...",".koOOOOoo...",".k..........",".k..........",".k..........",".k..........","kkk.........","............","............"],
+  inf:[".....S......",".....S......",".....S......","....kbk.....","....kbk.....","....kbk.....","....kbk.....","....kbbk....","....kbbk....","....kBBk....",".....kk.....","............"],
+  art:["....kk......","...kggk.....","...kgGk.....","..kSSSSk....","..kSsSSk....","..kSsSSk....","..kSsSSk....","..kSSSSk....","..kGGGGk....","..kggggk....","..kkkkkk....","............"],
+  arm:["............","...kkkk.....","..kOOOOkkkk.",".kkOOOOk....","kOOOOOOOOk..","kOoOOOOOOk..","kkkkkkkkkk..","kSkSkSkSkk..",".kkkkkkkk...","............","............","............"],
+  def:["............","............","...kkkkkk...","..kcccPcck..","..kccPcccPk.",".kkkkkkkkkk.",".kcPcckcccPk",".kccckcPcck.","kkkkkkkkkkkk","kcccPckccPck","kkkkkkkkkkkk","............"],
+  mob:["......kk....",".....kSSk...","....kSSSSk..","....kSsSSk..","....kSSSSk..",".....kSSk...","......bk....",".....bk.....","....bk......","...bk.......","..kk........","............"],
+  log:["............","....kkkk....","...kggggk...","...kGGGGk...","...kggggk...","..kkkkkkkk..","..kggggggk..","..kGGGGGGk..","..kggggggk..",".kkkkkkkkkk.",".kgggggggGk.",".kkkkkkkkkk."],
+  hart:["..........S.",".........SS.","........SS..",".......SS...","......SS....",".....SS.....","..k.SS......","..kgS.......","...kg.......","..kgk.......",".kb.k.......","kk.........."],
+  schranz:["............","............",".........kk.",".......kkSk.",".....kkSSk..","...kkSSSk...","..kSSSSk....",".kbbbkbbk...","kbkkbkbkbk..","kbk.kbk.kb..",".k...k...k..","............"],
+  karson:["............",".....g......","....ggg.....","..kkkgkkkk..",".kOOOOOOOOk.",".kOOOOOOOOk.",".kkkkkkkkkk.","kGGGGGGGGGGk",".kkkkkkkkkk.","............","............","............"],
+  gold:[".....k......","....kgk.....","....kgk.....","kkkkgGgkkkk.","kgggGGGgggk.",".kgGGGGGgk..","..kgGGGgk...","..kgGkGgk...",".kgk...kgk..",".kk.....kk..","............","............"],
+  medal:["..r.r.r.....","..rrrrr.....","...rrr......","....k.......","...kgk......","..kgGgk.....","...kgk......","....k.......","............","............","............","............"],
+};
+ICONS.wren=ICONS.arm;
+const ICON_URL2={};
+const pixIcon=k=>ICON_URL2[k]||(ICON_URL2[k]=epx(bake(ICONS[k],RELIC_PAL)).toDataURL());
+const iconTag=(k,cls)=>`<img class="${cls||'ico'}" src="${pixIcon(k)}" alt="">`;
 /* ---------- helpers ---------- */
 const $=s=>document.querySelector(s);
 const R=(a,b)=>a+Math.random()*(b-a);
@@ -1418,8 +1935,9 @@ function chipsHTML(){
   let s=RUN.units.map(u=>`<button type="button" class="chip u" data-k="unit:${u}">${U[u].name}</button>`).join('');
   for(const k of supOwned())s+=`<button type="button" class="chip s" data-k="sup:${k}"><img class="ico sm" src="${supIcon(k)}" alt="">${SUP[k].name}</button>`;
   for(const k of RUN.relics||[])s+=`<button type="button" class="chip r" data-k="relic:${k}">${iconImg(k,'ico sm')}${RELICS[k].name}</button>`;
+  for(const t in DOCT){const n=doctLv(t);if(n)s+=`<button type="button" class="chip d${n>=3?' on3':''}" data-k="doct:${t}">${iconTag(t,'ico sm')}${DOCT[t].name} ${n}/${n>=3?6:3}</button>`}
   for(const v of RUN.vets||[])s+=`<button type="button" class="chip v" data-k="vet:${v.id}">★ ${vetLabel(v)}</button>`;
-  for(const k in RUN.perks)s+=`<button type="button" class="chip" data-k="perk:${k}">${PERKS[k].name}${RUN.perks[k]>1?`<i>${RUN.perks[k]}</i>`:''}</button>`;
+  for(const k in RUN.perks)s+=`<button type="button" class="chip" data-k="perk:${k}">${PERKS[k].gold?iconTag('gold','ico sm'):PERKS[k].t?iconTag(PERKS[k].t,'ico sm'):''}${PERKS[k].name}${RUN.perks[k]>1?`<i>${RUN.perks[k]}</i>`:''}</button>`;
   return s;
 }
 function showMap(){
@@ -1430,13 +1948,13 @@ function showMap(){
   const CW=acts?(Math.max(300,Math.min(640,$('#mapWrap').clientWidth||640))/ACT|0):78,H=236,W=(f1-f0)*CW;
   const P=n=>[(n.f-f0)*CW+CW/2,(n.i+1)*H/(n.n+1)];
   const rows=RUN.map.slice(f0,f1);
-  let s=(acts?`<div class="acthd"><b>${ACTS[act].name}</b><span>${_t("{0}/3막",act+1)}</span></div>`:'')+_t("<svg viewBox=\"0 0 {0} {1}\" width=\"{2}\" height=\"{3}\" role=\"img\" aria-label=\"작전 지도\">",W,H,W,H);
+  let s=(acts?`<div class="acthd"><img src="${vig('act'+act)}" alt=""><b>${ACTS[act].name}</b><span>${_t("{0}/3막",act+1)}</span></div>`:'')+_t("<svg viewBox=\"0 0 {0} {1}\" width=\"{2}\" height=\"{3}\" role=\"img\" aria-label=\"작전 지도\">",W,H,W,H);
   for(const row of rows)for(const a of row)for(const j of a.next){if(a.f+1>=f1)continue;const b=RUN.map[a.f+1][j];const [x1,y1]=P(a),[x2,y2]=P(b);
     const dn=done.has(a.id)&&done.has(b.id)&&RUN.path.indexOf(b.id)===RUN.path.indexOf(a.id)+1;
     s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="${dn?'done':''}"/>`}
   for(const row of rows)for(const n of row){const [x,y]=P(n);
     const cls=['node',n.type,done.has(n.id)?'done':reach.has(n.id)?'reach':(n.f<= (curNode()?.f??-1)?'lock':'')].join(' ');
-    s+=`<g class="${cls}" data-id="${n.id}" ${reach.has(n.id)?'tabindex="0" role="button"':''}><circle cx="${x}" cy="${y}" r="${n.type==='boss'?20:16}"/><text x="${x}" y="${y}">${NODE_LABEL[n.type]}</text>${n.mod?`<text x="${x}" y="${y+27}" style="font-size:9px;fill:var(--alert)">${MODS[n.mod].name}</text>`:''}</g>`}
+    s+=`<g class="${cls}" data-id="${n.id}" ${reach.has(n.id)?'tabindex="0" role="button"':''}><circle cx="${x}" cy="${y}" r="${n.type==='boss'?20:16}"/><image href="${pixIcon(n.type)}" x="${x-(n.type==='boss'?13:11)}" y="${y-(n.type==='boss'?13:11)}" width="${n.type==='boss'?26:22}" height="${n.type==='boss'?26:22}"/><text x="${x}" y="${y+(n.type==='boss'?27:23)}" style="font-size:9px">${NODE_LABEL[n.type]}</text>${n.mod?`<text x="${x}" y="${y+33}" style="font-size:9px;fill:var(--alert)">${MODS[n.mod].name}</text>`:''}</g>`}
   s+='</svg>';
   const w=$('#mapWrap');w.innerHTML=s;
   w.querySelectorAll('.node.reach').forEach(g=>{const go=()=>enterNode(nodeById(g.dataset.id));g.onclick=go;g.onkeydown=e=>{if(e.key==='Enter'||e.key===' ')go()}});
@@ -1455,8 +1973,9 @@ function finishNode(n){RUN.path.push(n.id);saveRun();showMap()}
 function tipFor(key){
   const [t,k]=key.split(':');
   if(t==='relic'){const r=RELICS[k];return {icon:iconImg(k,'ico lg'),tag:_t('유물'),name:r.name,desc:r.desc,lore:r.lore}}
-  if(t==='perk'){const p=PERKS[k],l=lv(k);return {tag:_t("특성 · {0}/{1}단계",l,p.max),name:p.name,desc:p.desc+(l>1?` (×${l})`:'')}}
+  if(t==='perk'){const p=PERKS[k],l=lv(k);return {icon:p.gold?iconTag('gold','ico lg'):p.t?iconTag(p.t,'ico lg'):'',tag:_t("특성 · {0}/{1}단계",l,p.max)+(p.t?' · '+DOCT[p.t].name:'')+(p.gold?' · LEGEND':''),name:p.name,desc:p.desc+(l>1?` (×${l})`:'')}}
   if(t==='sup'){const d=SUP[k];return {icon:`<img class="ico lg" src="${supIcon(k)}" alt="">`,tag:_t('지원 카드'),name:d.name,desc:d.desc+_t(" 비용 {0} · 대기 {1}초",d.cost,d.cd)}}
+  if(t==='doct'){const D=DOCT[k],n=doctLv(k);return {icon:iconTag(k,'ico lg'),tag:_t('교리'),name:D.name+` (${n})`,desc:(n>=3?'✔ ':'· ')+_t('3단계')+' — '+D.b3+' / '+(n>=6?'✔ ':'· ')+_t('6단계')+' — '+D.b6}}
   if(t==='vet'){const v=(RUN.vets||[]).find(x=>x.id===+k);if(!v)return;const r=vetRank(v.k),m=has('heroes')?1.5:1;return {tag:_t('생환병'),name:vetLabel(v),desc:_t("{0} · 누적 사살 {1} · 체력 +{2}% · 명중 +{3}%. 전투가 시작되면 맨 먼저 배치됩니다. 쓰러지면 전사자 명부에 오릅니다.",U[v.t].name,v.k,Math.round(r[2]*m*100),Math.round(r[3]*m*100))}}
   if(t==='unit'){const u=U[k];return {tag:_t('병과'),name:u.name,desc:(UNIT_DESC[k]?UNIT_DESC[k]+' ':'')+_t("비용 {0} · 체력 {1} · 사거리 {2}",u.cost,u.hp,u.range)}}
 }
@@ -1472,22 +1991,22 @@ function showTip(btn){
 function hideTip(){const tp=$('#tip');if(tp){tp.hidden=true;tp.dataset.k=''}document.querySelectorAll('.chip.on').forEach(c=>c.classList.remove('on'))}
 document.addEventListener('click',e=>{const c=e.target.closest('.chip[data-k]');if(c){showTip(c);return}if(!e.target.closest('#tip'))hideTip()});
 addEventListener('scroll',hideTip,{passive:true});addEventListener('resize',hideTip);
-function panel(title,text,choices,skip){
-  show('vPanel');$('#panelStatus').innerHTML=statusHTML();$('#pTitle').textContent=title;$('#pText').textContent=text;
+function panel(title,text,choices,skip,art){
+  show('vPanel');{const pa=$('#pArt');pa.hidden=!art;if(art)pa.src=vig(art)}$('#panelStatus').innerHTML=statusHTML();$('#pTitle').textContent=title;$('#pText').textContent=text;
   const box=$('#pChoices');box.innerHTML='';
-  for(const c of choices){const b=document.createElement('button');b.className='choice';b.disabled=!!c.disabled;
+  for(const c of choices){const b=document.createElement('button');b.className='choice'+(c.gold?' gold':'');b.disabled=!!c.disabled;
     b.innerHTML=`${c.icon?c.icon:''}${c.tag?`<em class="tag">${c.tag}</em>`:''}<b>${c.name}</b><span>${c.desc}</span>${c.price!=null?`<em class="price">${c.price} ${c.unit||_t('보급')}</em>`:''}`;
     b.onclick=c.go;box.append(b)}
   const sk=$('#pSkip');sk.hidden=!skip;if(skip){sk.textContent=skip.label;sk.onclick=skip.go}
 }
 function optionPool(){
   const pool=[];
-  for(const k in PERKS){const p=PERKS[k];if(lv(k)<p.max&&(!p.req||RUN.units.includes(p.req)))pool.push({kind:'perk',k})}
-  for(const u of ['sniper','mortar','tank','flame','corpsman','observer','apc'])if(!RUN.units.includes(u)&&RUN.daily!=='rifle'){pool.push({kind:'unit',k:u});pool.push({kind:'unit',k:u})}
+  for(const k in PERKS){const p=PERKS[k];if(!p.gold&&lv(k)<p.max&&(!p.req||[].concat(p.req).some(q=>RUN.units.includes(q)||supOwned().includes(q))))pool.push({kind:'perk',k})}
+  for(const u of ['sniper','mortar','tank','flame','corpsman','observer','officer','apc'])if(!RUN.units.includes(u)&&RUN.daily!=='rifle'){pool.push({kind:'unit',k:u});pool.push({kind:'unit',k:u})}
   for(const k of SUP_ORDER)if(!supOwned().includes(k)){pool.push({kind:'support',k});pool.push({kind:'support',k})}
   return shuffle(pool).filter((o,i,a)=>a.findIndex(p=>p.k===o.k&&p.kind===o.kind)===i);
 }
-function optView(o){if(o.kind==='support')return {icon:`<img class="ico lg" src="${supIcon(o.k)}" alt="">`,tag:'NEW SUPPORT',name:_t('{0} 지원',SUP[o.k].name),desc:SUP[o.k].desc+_t(" 비용 {0} · 대기 {1}초",SUP[o.k].cost,SUP[o.k].cd)};return o.kind==='unit'?{tag:'NEW UNIT',name:_t('{0} 편성',U[o.k].name),desc:UNIT_DESC[o.k]}:{tag:'PERK'+(lv(o.k)?` LV${lv(o.k)+1}`:''),name:PERKS[o.k].name,desc:PERKS[o.k].desc}}
+function optView(o){if(o.kind==='support')return {icon:`<img class="ico lg" src="${supIcon(o.k)}" alt="">`,tag:'NEW SUPPORT',name:_t('{0} 지원',SUP[o.k].name),desc:SUP[o.k].desc+_t(" 비용 {0} · 대기 {1}초",SUP[o.k].cost,SUP[o.k].cd)};return o.kind==='unit'?{tag:'NEW UNIT',name:_t('{0} 편성',U[o.k].name),desc:UNIT_DESC[o.k]}:{tag:(PERKS[o.k].gold?'LEGEND':'PERK'+(lv(o.k)?` LV${lv(o.k)+1}`:''))+(PERKS[o.k].t?' · '+DOCT[PERKS[o.k].t].name+` ${doctLv(PERKS[o.k].t)}→${doctLv(PERKS[o.k].t)+1}`:''),name:PERKS[o.k].name,desc:PERKS[o.k].desc,gold:PERKS[o.k].gold,icon:PERKS[o.k].gold?iconTag('gold','ico lg'):PERKS[o.k].t?iconTag(PERKS[o.k].t,'ico lg'):''}}
 function applyOpt(o){
   if(o.kind==='unit'){RUN.units.push(o.k);return}
   if(o.kind==='support'){const own=supOwned();if(!own.includes(o.k))own.push(o.k);const lo=supLoadout();if(lo.length<supSlots()&&!lo.includes(o.k))lo.push(o.k);return}
@@ -1500,6 +2019,7 @@ function grantRandom(){const o=optionPool().find(o=>o.kind==='perk');if(!o)retur
 function showReward(n,gain,keep){
   if(!keep){RUN.rr=mlv('reroll')}
   const cnt=Math.min(5,3+mlv('academy')+(has('staffbook')?1:0)+(has('mapcase')&&n.type==='elite'?1:0)+(has('ledger')?2:0)),opts=optionPool().slice(0,cnt);
+  {const g=Object.keys(PERKS).filter(k=>PERKS[k].gold&&!lv(k));if(g.length&&opts.length&&Math.random()<(n.type==='elite'||n.type==='boss'?.25:.12))opts[opts.length-1]={kind:'perk',k:pick(g)}}
   const hide=has('ledger');
   const ch=opts.map(o=>({...(hide?{tag:'???',name:_t('가려진 보상'),desc:_t('무엇이 나올지 모릅니다.')}:optView(o)),go:()=>{applyOpt(o);if(n.type==='elite')relicChoice(n,_t('정예 전리품'),_t('정예 부대의 물자에서 유물을 하나 고르세요.'));else finishNode(n)}}));
   if(RUN.rr>0)ch.push({tag:'REROLL',name:_t("다시 뽑기 ({0}회)",RUN.rr),desc:_t('선택지를 새로 받습니다.'),go:()=>{RUN.rr--;showReward(n,gain,true)}});
@@ -1513,25 +2033,25 @@ function keystoneChoice(n){
   const M=getMeta();
   panel(_t('지휘관의 전리품'),_t('작전의 방향을 바꿀 유물입니다. 하나만 고르세요. 효과가 크고 대가가 붙습니다.'),pool.map(k=>({...relicView(k,!M.found.includes(k)),tag:'KEYSTONE'+(!M.found.includes(k)?' · NEW':''),go:()=>{gainRelic(k);finishNode(n)}})));
 }
-function relicChoice(n,title,text,count){
+function relicChoice(n,title,text,count,art){
   const pool=relicPool(n&&n.type).slice(0,(count||2)+(RUN.daily==='lonely'?1:0)),M=getMeta();
   if(!pool.length)return panel(title,_t('더 얻을 유물이 없습니다.'),[],{label:_t('지도로'),go:()=>finishNode(n)});
   panel(title,text,pool.map(k=>({...relicView(k,!M.found.includes(k)),go:()=>{const nw=gainRelic(k);
-    panel(title,_t("{0}을(를) 얻었습니다.{1}",RELICS[k].name,nw?_t(' 처음 발견한 유물이라 도감에 기록됩니다. 앞으로 모든 작전에서 CP 수입 +1%, 사령부 +2가 영구 적용됩니다.'):''),[],{label:_t('지도로'),go:()=>finishNode(n)})}})));
+    panel(title,_t("{0}을(를) 얻었습니다.{1}",RELICS[k].name,nw?_t(' 처음 발견한 유물이라 도감에 기록됩니다. 앞으로 모든 작전에서 CP 수입 +1%, 사령부 +2가 영구 적용됩니다.'):''),[],{label:_t('지도로'),go:()=>finishNode(n)},art)}})),null,art);
 }
-function showCache(n){relicChoice(n,_t('버려진 유물 상자'),_t('무너진 벙커에서 상자를 찾았습니다. 하나만 챙길 수 있습니다.'),3)}
+function showCache(n){relicChoice(n,_t('버려진 유물 상자'),_t('무너진 벙커에서 상자를 찾았습니다. 하나만 챙길 수 있습니다.'),3,'cache')}
 function showShop(n){
   const disc=(has('wagon')?.75:1)*(has('interest')?1.2:1);
   if(!n.stock){n.stock=optionPool().slice(0,3).map(o=>({...o,price:Math.round((o.kind==='unit'?110:o.kind==='support'?95:R(55,85))*disc/5)*5}));const rk=relicPool()[0];if(rk)n.stock.push({kind:'relic',k:rk,price:Math.round(R(120,150)*disc/5)*5});n.repair=true}
   const ch=n.stock.map((o,i)=>({...(o.kind==='relic'?relicView(o.k,!getMeta().found.includes(o.k)):optView(o)),price:o.price,disabled:RUN.supply<o.price,go:()=>{RUN.supply-=o.price;if(o.kind==='relic')gainRelic(o.k);else applyOpt(o);n.stock.splice(i,1);showShop(n)}}));
   if(n.repair)ch.push({tag:'REPAIR',name:_t('사령부 보수'),desc:_t('사령부 내구도 +70'),price:Math.round(40*disc),disabled:RUN.supply<Math.round(40*disc)||RUN.hq>=RUN.hqMax,go:()=>{RUN.supply-=Math.round(40*disc);RUN.hq=Math.min(RUN.hqMax,RUN.hq+70);n.repair=false;showShop(n)}});
-  panel(_t('후방 보급소'),_t('보급을 써서 특성이나 병과를 들입니다.'),ch,{label:_t('떠나기'),go:()=>{delete n.stock;finishNode(n)}});
+  panel(_t('후방 보급소'),_t('보급을 써서 특성이나 병과를 들입니다.'),ch,{label:_t('떠나기'),go:()=>{delete n.stock;finishNode(n)}},'shop');
 }
 function showRest(n){
   const heal=Math.round(RUN.hqMax*.35);
   panel(_t('후방 휴식'),_t('하루 동안 전선이 조용합니다. 한 가지만 할 수 있습니다.'),[
     {tag:'REPAIR',name:_t('사령부 보수'),desc:_t("사령부 내구도 +{0}",heal),go:()=>{RUN.hq=Math.min(RUN.hqMax,RUN.hq+heal);finishNode(n)}},
-    {tag:'DRILL',name:_t('훈련'),desc:_t('무작위 특성 1개 획득'),go:()=>{const r=grantRandom();panel(_t('훈련 완료'),r,[],{label:_t('지도로'),go:()=>finishNode(n)})}}]);
+    {tag:'DRILL',name:_t('훈련'),desc:_t('무작위 특성 1개 획득'),go:()=>{const r=grantRandom();panel(_t('훈련 완료'),r,[],{label:_t('지도로'),go:()=>finishNode(n)},'rest')}}],null,'rest');
 }
 const EVENTS=[
   {t:_t('무너진 참호의 유품'),d:_t('포격에 묻힌 참호에서 장교의 소지품이 보입니다. 파내려면 시간이 걸리고, 그동안 사령부가 노출됩니다.'),c:[
@@ -1552,10 +2072,103 @@ const EVENTS=[
   {t:_t('야간 기습 제안'),d:_t('중대장이 오늘 밤 적 참호 기습을 건의합니다. 성공하면 적 보급을 빼앗지만 실패하면 병력을 잃습니다.'),c:[
     {name:_t('기습한다'),desc:_t('60%: 보급 +60 / 40%: 사령부 -35'),go:()=>{if(Math.random()<.6){RUN.supply+=60;return _t('기습 성공. 보급 60을 노획했습니다.')}RUN.hq=Math.max(1,RUN.hq-35);return _t('기습이 발각돼 사령부가 35 피해를 입었습니다.')}},
     {name:_t('참호를 보강한다'),desc:_t('참호 보강 특성 (최대치면 사령부 +20)'),go:()=>{if(lv('trench')<2){RUN.perks.trench=lv('trench')+1;return _t('참호 보강 특성을 얻었습니다.')}RUN.hq=Math.min(RUN.hqMax,RUN.hq+20);return _t('사령부를 20 보강했습니다.')}}]},
+  // 2026-10-16 역사 사건 (제1차 세계대전 실제 일화에서 따옴)
+  {t:_t('크리스마스 휴전'),d:_t('1914년 겨울. 서리 내린 무인지대 너머에서 캐럴이 들립니다. 적 병사들이 작은 트리를 세워 놓고 참호 위로 올라옵니다.'),c:[
+    {name:_t('함께 공을 찬다'),desc:_t('사령부 +40, 다음 전투 적 사기 40으로 시작'),go:()=>{RUN.hq=Math.min(RUN.hqMax,RUN.hq+40);RUN.nextEMor=40;return _t('하루 동안 아무도 총을 들지 않았습니다. 적은 다시 싸울 마음이 덜합니다.')}},
+    {name:_t('기습 기회로 삼는다'),desc:_t('보급 +60, 다음 전투 아군 사기 30으로 시작'),go:()=>{RUN.supply+=60;RUN.nextMor=30;return _t('보급을 빼앗았지만 병사들은 말이 없습니다.')}}]},
+  {t:_t('메신 능선의 땅굴'),d:_t('1917년. 공병대가 2년 가까이 적 진지 아래까지 땅굴을 파 왔습니다. 폭약만 채우면 됩니다.'),c:[
+    {name:_t('보급 70으로 폭약을 채운다'),desc:_t('갱도 폭파 카드 획득'),need:70,go:()=>{RUN.supply-=70;return giveSup('tunnel')}},
+    {name:_t('땅굴을 메운다'),desc:_t('보급 +25'),go:()=>{RUN.supply+=25;return _t('공병대가 아쉬워하며 철수했습니다.')}}]},
+  {t:_t('이프르의 녹색 구름'),d:_t('1915년. 바람이 적 쪽으로 붑니다. 노획한 염소가스 실린더가 참호에 쌓여 있습니다.'),c:[
+    {name:_t('가스를 푼다'),desc:_t('가스탄 카드 획득, 사령부 -20'),go:()=>{RUN.hq=Math.max(1,RUN.hq-20);return giveSup('gas')+' '+_t('바람이 잠깐 돌아서 아군도 마셨습니다.')}},
+    {name:_t('방독면을 나눠 준다'),desc:_t('방독면 특성 획득'),go:()=>givePerk('gasmask')}]},
+  {t:_t('전서구 셰르 아미'),d:_t('1918년. 고립된 대대가 마지막 비둘기를 날려 보냈습니다. 비둘기는 한쪽 다리가 거의 잘려 나가고도 사령부에 닿았습니다.'),c:[
+    {name:_t('오인 포격을 멈춘다'),desc:_t('사령부 +50'),go:()=>{RUN.hq=Math.min(RUN.hqMax,RUN.hq+50);return _t('아군 포격이 멈췄습니다. 사령부 +50.')}},
+    {name:_t('적 좌표를 포병에 넘긴다'),desc:_t('포병 연대 특성 +1'),go:()=>givePerk('barrage')}]},
+  {t:_t('플레르의 강철 괴물'),d:_t('1916년. 처음 보는 강철 차량이 전선에 도착했습니다. 적은 이것을 본 적이 없습니다.'),c:[
+    {name:_t('보급 80으로 받는다'),desc:_t('전차 편성과 전차 공포 특성'),need:80,go:()=>{RUN.supply-=80;if(!RUN.units.includes('tank'))RUN.units.push('tank');return givePerk('tankterror')}},
+    {name:_t('지나보낸다'),desc:_t('아무 일도 없음'),go:()=>_t('괴물은 다른 전선으로 갔습니다.')}]},
+  {t:_t('돌격대 교관'),d:_t('1918년 봄 공세를 앞두고, 침투 전술을 익힌 돌격대 교관이 부대를 찾아왔습니다.'),c:[
+    {name:_t('돌격조를 맡긴다'),desc:_t('침투조 특성 획득'),go:()=>givePerk('infiltrate')},
+    {name:_t('총검술을 배운다'),desc:_t('총검술 특성 +1'),go:()=>givePerk('bayonet')}]},
+  {t:_t('스페인 독감'),d:_t('1918년. 병영에 열병이 번집니다. 기침 소리가 포성보다 큽니다.'),c:[
+    {name:_t('격리한다'),desc:_t('다음 전투 시작 CP -30'),go:()=>{RUN.nextCP=-30;return _t('환자를 후방으로 옮겼습니다. 다음 전투는 병력이 모자랍니다.')}},
+    {name:_t('그대로 버틴다'),desc:_t('사령부 최대 내구도 -25, 보급 +40'),go:()=>{RUN.hqMax=Math.max(100,RUN.hqMax-25);RUN.hq=Math.min(RUN.hq,RUN.hqMax);RUN.supply+=40;return _t('병사들이 기침을 하며 진지를 지킵니다.')}}]},
+  {t:_t('붉은 남작'),d:_t('1918년. 붉은 삼엽기가 전선 위를 맴돕니다. 적의 에이스입니다.'),c:[
+    {name:_t('대공 사격을 한다'),desc:_t('반반 확률: 기총소사 카드 획득 / 사령부 -25'),go:()=>{if(Math.random()<.5)return giveSup('strafe')+' '+_t('추락한 기체에서 작전 지도를 건졌습니다.');RUN.hq=Math.max(1,RUN.hq-25);return _t('삼엽기가 사령부를 훑고 사라졌습니다. 사령부 -25.')}},
+    {name:_t('몸을 숨긴다'),desc:_t('아무 일도 없음'),go:()=>_t('붉은 기체가 지나갔습니다.')}]},
+  {t:_t('잃어버린 대대'),d:_t('1918년. 아르곤 숲에서 닷새 가까이 고립됐던 대대가 돌아왔습니다. 살아남은 이들의 눈빛이 다릅니다.'),c:[
+    {name:_t('부대에 받아들인다'),desc:_t('생환병 2명 합류'),go:()=>{RUN.vets=RUN.vets||[];let id=RUN.vetId||0;for(let i=0;i<2&&RUN.vets.length<vetMax();i++)RUN.vets.push({id:++id,n:Math.random()*VET_NAMES.length|0,t:'rifle',k:4});RUN.vetId=id;return _t('생환병이 합류했습니다.')}},
+    {name:_t('후방으로 보낸다'),desc:_t('보급 +30'),go:()=>{RUN.supply+=30;return _t('그들은 집으로 갔습니다. 보급 +30.')}}]},
+  // 2026-10-16 사건 확장: era는 잘 나오는 막(0~2), req는 앞선 선택이 남긴 RUN.flags 조건(연속 사건)
+  {art:'passchendaele',era:[1],t:_t("파스샹달의 진흙"),d:_t("1917년 가을. 비가 그치지 않아 포탄 구덩이가 늪이 됐습니다. 사람도 말도 빠지면 나오지 못합니다."),c:[
+    {name:_t("판자 길을 깐다"),desc:_t("보급 -30, 다음 전투 시작 CP +40"),need:30,go:()=>{RUN.supply-=30;RUN.nextCP=40;return _t("판자 길 덕분에 다음 전투에 병력이 빨리 닿습니다.")}},
+    {name:_t("버틴다"),desc:_t("사령부 -15, 보급 +20"),go:()=>{RUN.hq=Math.max(1,RUN.hq-15);RUN.supply+=20;return _t("진흙 속에서 보급품 몇 상자를 건졌습니다.")}}]},
+  {art:'prisoner',era:[],t:_t("포로 심문"),d:_t("정찰대가 적 하사관 한 명을 붙잡아 왔습니다. 그는 겁에 질렸지만 입을 다물고 있습니다."),c:[
+    {name:_t("정중히 대우한다"),desc:_t("지금은 아무 일도 없음. 언젠가 돌아올지도 모릅니다."),go:()=>{RUN.flags=RUN.flags||{};RUN.flags.prisoner=1;return _t("그는 담배 한 개비를 받고 고개를 숙였습니다. 후방으로 보냈습니다.")}},
+    {name:_t("거칠게 심문한다"),desc:_t("다음 전투 적 사기 40으로 시작"),go:()=>{RUN.nextEMor=40;return _t("적 진지의 약점을 알아냈습니다. 적은 아직 모릅니다.")}}]},
+  {art:'pletter',era:[],req:f=>f.prisoner&&!f.pletter,t:_t("포로의 편지"),d:_t("예전에 정중히 대해 준 포로가 수용소에서 편지를 보냈습니다. 봉투 안에 적 진지 배치도가 접혀 있습니다."),c:[
+    {name:_t("배치도를 받는다"),desc:_t("노획 지도 유물(없으면 보급 +50)"),go:()=>{RUN.flags.pletter=1;if(!has('map')){gainRelic('map');return _t("노획 지도를 얻었습니다. 적이 CP 0으로 전투를 시작합니다.")}RUN.supply+=50;return _t("이미 아는 내용이라 정보 장교에게 넘기고 보급 50을 받았습니다.")}},
+    {name:_t("답장을 쓴다"),desc:_t("사령부 +30"),go:()=>{RUN.flags.pletter=1;RUN.hq=Math.min(RUN.hqMax,RUN.hq+30);return _t("짧은 답장을 썼습니다. 이상하게 마음이 가벼워졌습니다.")}}]},
+  {art:'press',era:[],t:_t("종군 기자"),d:_t("신문사 기자가 카메라를 들고 참호에 왔습니다. 영웅담을 원합니다."),c:[
+    {name:_t("영웅담을 들려준다"),desc:_t("공적 +15, 언젠가 기사가 실릴지도 모릅니다"),go:()=>{RUN.flags=RUN.flags||{};RUN.flags.press=1;const M=getMeta();M.merit+=15;M.earned+=15;setMeta(M);return _t("기자가 신이 나서 받아 적었습니다. 공적 +15.")}},
+    {name:_t("돌려보낸다"),desc:_t("사령부 +10"),go:()=>{RUN.hq=Math.min(RUN.hqMax,RUN.hq+10);return _t("기자 대신 병사들을 쉬게 했습니다.")}}]},
+  {art:'news',era:[],req:f=>f.press&&!f.news,t:_t("신문 1면"),d:_t("당신 부대의 기사가 본국 신문 1면에 실렸습니다. 후원과 지원자가 몰립니다."),c:[
+    {name:_t("후원금을 받는다"),desc:_t("보급 +60"),go:()=>{RUN.flags.news=1;RUN.supply+=60;return _t("보급 60이 도착했습니다.")}},
+    {name:_t("지원병을 받는다"),desc:_t("다음 전투 시작 때 소총수 6명"),go:()=>{RUN.flags.news=1;RUN.recruits+=6;return _t("지원병 6명이 다음 전투에 합류합니다.")}}]},
+  {art:'chaplain',era:[],t:_t("군목"),d:_t("군목이 참호를 돌며 촛불을 켜고 기도를 올립니다. 병사들이 하나둘 모여듭니다."),c:[
+    {name:_t("예배를 연다"),desc:_t("사령부 +20, 다음 전투 아군 사기 80으로 시작"),go:()=>{RUN.hq=Math.min(RUN.hqMax,RUN.hq+20);RUN.nextMor=80;return _t("병사들의 얼굴이 조금 밝아졌습니다.")}},
+    {name:_t("편지를 대신 써 달라고 한다"),desc:_t("편지 묶음 유물(없으면 보급 +30)"),go:()=>{if(!has('letter')){gainRelic('letter');return _t("편지 묶음을 얻었습니다.")}RUN.supply+=30;return _t("편지는 이미 충분합니다. 보급 30을 아꼈습니다.")}}]},
+  {art:'deserter',era:[1, 2],t:_t("탈영병"),d:_t("밤중에 참호를 빠져나가던 병사가 붙잡혔습니다. 열아홉 살입니다."),c:[
+    {name:_t("본보기로 처벌한다"),desc:_t("군기 특성 획득, 다음 전투 아군 사기 40"),go:()=>{RUN.nextMor=40;return givePerk('discipline')}},
+    {name:_t("조용히 돌려보낸다"),desc:_t("사령부 -10, 다음 전투 아군 사기 70"),go:()=>{RUN.hq=Math.max(1,RUN.hq-10);RUN.nextMor=70;return _t("그는 아무 말 없이 자기 자리로 돌아갔습니다.")}}]},
+  {art:'train',era:[],t:_t("보급 열차"),d:_t("협궤 열차가 탄약과 식량을 싣고 전선 바로 뒤까지 들어왔습니다. 짐을 다 내릴 시간은 없습니다."),c:[
+    {name:_t("포탄을 내린다"),desc:_t("포격 카드(있으면 포병 연대 특성)"),go:()=>{if(!supOwned().includes('bar'))return giveSup('bar');return givePerk('barrage')}},
+    {name:_t("식량을 내린다"),desc:_t("사령부 +35"),go:()=>{RUN.hq=Math.min(RUN.hqMax,RUN.hq+35);return _t("따뜻한 식사가 돌았습니다. 사령부 +35.")}}]},
+  {art:'general',era:[1],t:_t("장군 시찰"),d:_t("장군이 전선을 시찰하러 옵니다. 깔끔한 참호를 보고 싶어 합니다."),c:[
+    {name:_t("보여 주기식으로 정비한다"),desc:_t("보급 -20, 공적 +25"),go:()=>{RUN.supply=Math.max(0,RUN.supply-20);const M=getMeta();M.merit+=25;M.earned+=25;setMeta(M);return _t("장군이 흡족해했습니다. 공적 +25.")}},
+    {name:_t("진짜 상황을 보고한다"),desc:_t("반반 확률: 다음 전투 소총수 6명 증원 / 사령부 -20"),go:()=>{if(Math.random()<.5){RUN.recruits+=6;return _t("장군이 증원을 약속했습니다. 소총수 6명이 옵니다.")}RUN.hq=Math.max(1,RUN.hq-20);return _t("문책을 받았습니다. 사령부 -20.")}}]},
+  {art:'rats',era:[0, 1],t:_t("참호 쥐"),d:_t("고양이만 한 쥐들이 보급품을 갉아 먹고 있습니다."),c:[
+    {name:_t("쥐잡이 개를 데려온다"),desc:_t("보급 -15"),go:()=>{RUN.supply=Math.max(0,RUN.supply-15);return _t("테리어 한 마리가 밤새 일했습니다.")}},
+    {name:_t("내버려 둔다"),desc:_t("보급 -30%"),go:()=>{RUN.supply=Math.floor(RUN.supply*.7);return _t("아침이 되자 상자 몇 개가 비어 있었습니다.")}}]},
+  {art:'hospital',era:[],t:_t("야전 병원"),d:_t("부상병으로 가득한 천막 병원입니다. 의약품이 모자랍니다."),c:[
+    {name:_t("의약품을 나눈다"),desc:_t("보급 -40. 위생병 편성(있으면 구급 지원 카드)"),need:40,go:()=>{RUN.supply-=40;if(!RUN.units.includes('corpsman')){RUN.units.push('corpsman');return _t("위생병이 부대에 합류했습니다.")}return giveSup('aid')}},
+    {name:_t("경상자를 복귀시킨다"),desc:_t("다음 전투 소총수 3명, 사령부 -10"),go:()=>{RUN.recruits+=3;RUN.hq=Math.max(1,RUN.hq-10);return _t("붕대를 감은 병사 셋이 돌아왔습니다.")}}]},
+  {art:'eletter',era:[],t:_t("적의 편지"),d:_t("쓰러진 적병의 품에서 편지 묶음이 나왔습니다. 집에서 온 편지입니다."),c:[
+    {name:_t("읽어서 정보를 찾는다"),desc:_t("다음 전투 적 사기 45로 시작"),go:()=>{RUN.nextEMor=45;return _t("적 후방의 굶주림이 적혀 있었습니다. 적도 지쳤습니다.")}},
+    {name:_t("주인과 함께 묻어 준다"),desc:_t("다음 전투 아군 사기 75로 시작"),go:()=>{RUN.nextMor=75;return _t("병사들이 말없이 흙을 덮었습니다.")}}]},
+  {art:'recon',era:[0, 1],t:_t("항공 정찰"),d:_t("복엽기 정찰대가 적 진지 사진을 들고 돌아왔습니다."),c:[
+    {name:_t("포병에게 넘긴다"),desc:_t("야포 사격 카드"),go:()=>{return giveSup('howitzer')}},
+    {name:_t("지도를 다시 그린다"),desc:_t("지도 통 유물(없으면 보급 +40)"),go:()=>{if(!has('mapcase')){gainRelic('mapcase');return _t("지도 통을 얻었습니다.")}RUN.supply+=40;return _t("보급 40을 받았습니다.")}}]},
+  {art:'minefield',era:[],t:_t("지뢰밭 발견"),d:_t("공병이 무인지대에서 적의 매설 흔적을 찾았습니다."),c:[
+    {name:_t("파내서 우리가 쓴다"),desc:_t("지뢰 살포 카드"),go:()=>{return giveSup('mines')}},
+    {name:_t("표시만 하고 돌아간다"),desc:_t("사령부 +15"),go:()=>{RUN.hq=Math.min(RUN.hqMax,RUN.hq+15);return _t("안전한 길을 표시했습니다.")}}]},
+  {art:'whiteflag',era:[2],t:_t("흰 깃발"),d:_t("적이 부상병을 수습하겠다며 흰 깃발을 올렸습니다."),c:[
+    {name:_t("응한다"),desc:_t("사령부 +30"),go:()=>{RUN.hq=Math.min(RUN.hqMax,RUN.hq+30);return _t("한 시간 동안 양쪽이 부상병을 날랐습니다.")}},
+    {name:_t("그 틈을 노린다"),desc:_t("다음 전투 적 사기 30, 아군 사기 40으로 시작"),go:()=>{RUN.nextEMor=30;RUN.nextMor=40;return _t("기습은 통했지만 병사들은 마음이 무겁습니다.")}}]},
+  {art:'coats',era:[],t:_t("보급 착오"),d:_t("탄약 상자를 열었더니 겨울 외투가 가득합니다."),c:[
+    {name:_t("후방에 팔아넘긴다"),desc:_t("보급 +45"),go:()=>{RUN.supply+=45;return _t("보급 45를 받았습니다.")}},
+    {name:_t("나눠 입힌다"),desc:_t("사령부 +25"),go:()=>{RUN.hq=Math.min(RUN.hqMax,RUN.hq+25);return _t("병사들이 오랜만에 따뜻하게 잤습니다.")}}]},
+  {art:'cavalry',era:[0],t:_t("기병대"),d:_t("말을 탄 기병대가 참호 뒤로 지나갑니다. 아직 돌파를 기다리고 있습니다."),c:[
+    {name:_t("정찰을 부탁한다"),desc:_t("무작위 유물 1개"),go:()=>{const k=relicPool()[0];if(!k){RUN.supply+=40;return _t("쓸 만한 것을 찾지 못했습니다. 보급 +40.")}gainRelic(k);return _t("{0}을(를) 얻었습니다.",RELICS[k].name)}},
+    {name:_t("말을 징발한다"),desc:_t("보급 +40"),go:()=>{RUN.supply+=40;return _t("말들이 포차를 끌게 됐습니다. 보급 +40.")}}]}
 ];
+// 기존 사건의 삽화와 시기
+[['relic'],['depot'],['stragglers'],['liaison'],['captured'],['raid'],['xmas',[0]],['messines',[1]],['ypres',[0]],['pigeon',[2]],['flers',[1]],['storm',[2]],['flu',[2]],['baron',[1,2]],['lost',[2]]].forEach(([a,e],i)=>{EVENTS[i].art=a;if(e)EVENTS[i].era=e});
+// 사건 고르기: 이번 작전에서 본 것은 빼고, 지금 막과 시기가 맞으면 더 자주, 연속 사건은 아주 자주
+function pickEvent(n){
+  const act=FL()===10?Math.min(2,n.f/4|0):Math.min(2,n.f/ACT|0),fl=RUN.flags||{},seen=RUN.seen||(RUN.seen=[]);
+  let pool=EVENTS.map((e,i)=>[i,e]).filter(([i,e])=>!seen.includes(i)&&(!e.req||e.req(fl)));
+  if(!pool.length)pool=EVENTS.map((e,i)=>[i,e]).filter(([i,e])=>!e.req);
+  const w=([i,e])=>(e.req?6:1)*(e.era?(e.era.includes(act)?2.5:.4):1);
+  let r=Math.random()*pool.reduce((a,p)=>a+w(p),0);for(const p of pool){r-=w(p);if(r<=0){seen.push(p[0]);return p[0]}}
+  seen.push(pool[0][0]);return pool[0][0];
+}
+function giveSup(k){const own=supOwned();if(own.includes(k)){RUN.supply+=40;return _t("{0} 카드는 이미 있어 보급 +40.",SUP[k].name)}own.push(k);const lo=supLoadout();if(lo.length<supSlots())lo.push(k);return _t("{0} 카드를 얻었습니다.",SUP[k].name)}
+function givePerk(k){const p=PERKS[k];if(lv(k)>=p.max){RUN.supply+=40;return _t("{0}은(는) 이미 최대라 보급 +40.",p.name)}RUN.perks[k]=lv(k)+1;return _t("{0} 특성을 얻었습니다.",p.name)}
 function showEvent(n){
-  const e=n.ev!=null?EVENTS[n.ev]:EVENTS[n.ev=Math.random()*EVENTS.length|0];
-  panel(e.t,e.d,e.c.map(c=>({name:c.name,desc:c.desc,disabled:c.need&&RUN.supply<c.need,go:()=>{const r=c.go();panel(e.t,r,[],{label:_t('지도로'),go:()=>finishNode(n)})}})));
+  const e=n.ev!=null&&EVENTS[n.ev]?EVENTS[n.ev]:EVENTS[n.ev=pickEvent(n)];
+  panel(e.t,e.d,e.c.map(c=>({name:c.name,desc:c.desc,disabled:c.need&&RUN.supply<c.need,go:()=>{const r=c.go();panel(e.t,r,[],{label:_t('지도로'),go:()=>finishNode(n)},e.art)}})),null,e.art);
 }
 function gameOver(win){
   const c=curNode(),floor=win?FL():(CFG&&CFG.floor!=null?CFG.floor+1:CFG?CFG.f+1:c?c.f+1:0);
@@ -1571,8 +2184,8 @@ function gameOver(win){
   RUN=null;
   if(relics.length){
     panel(win?_t('작전 완수'):_t('작전 실패'),text+_t(' 이번 작전의 유물 하나를 다음 작전에 가져갈 수 있습니다.'),
-      relics.map(k=>({...relicView(k),tag:'INHERIT',go:()=>{const m=getMeta();m.heir=k;setMeta(m);afterRun()}})),{label:_t('가져가지 않음'),go:afterRun});
-  }else panel(win?_t('작전 완수'):_t('작전 실패'),text,[],{label:_t('계속'),go:afterRun});
+      relics.map(k=>({...relicView(k),tag:'INHERIT',go:()=>{const m=getMeta();m.heir=k;setMeta(m);afterRun()}})),{label:_t('가져가지 않음'),go:afterRun},win?'win':'lose');
+  }else panel(win?_t('작전 완수'):_t('작전 실패'),text,[],{label:_t('계속'),go:afterRun},win?'win':'lose');
 }
 // 업적: 달성하면 공적을 바로 준다. M.ach[id]=달성 시각
 const ACH=[
@@ -1605,24 +2218,24 @@ function checkAch(ev,extra){
 }
 function toast(t){let el=$('#toast');if(!el){el=document.createElement('div');el.id='toast';el.className='toast';el.setAttribute('role','status');document.body.append(el)}el.textContent=t;el.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>{el.hidden=true},4000)}
 function afterRun(){showMeta()}
+// 사령부 보급창 가격: 단계마다 크게 오르고, 무엇이든 하나 살 때마다 모든 가격 +10%(누적)
+const metaBought=M=>Object.values(M.up).reduce((a,b)=>a+(b||0),0);
+const metaPrice=(M,k,l)=>Math.round(META_UP[k].cost[l]*(1+.1*metaBought(M))/5)*5;
 function showMeta(){
   const M=getMeta(),L=legacy();
-  const ch=Object.entries(META_UP).map(([k,u])=>{const l=M.up[k]||0,max=l>=u.max,c=u.cost[l];
-    return {tag:`LV ${l}/${u.max}`,name:u.name,desc:u.desc,price:max?null:c,unit:_t('공적'),disabled:max||M.merit<c,go:()=>{const m=getMeta();if(m.merit<c)return;m.merit-=c;m.up[k]=l+1;setMeta(m);showMeta()}}});
-  panel(_t('사령부 보급창'),_t("공적으로 모든 작전에 남는 강화를 삽니다. 보유 공적 {0}. 도감 유물 {1}/{2}개 · 영구 보너스 CP 수입 +{3}%, 사령부 +{4}.{5}",M.merit,L.n,Object.keys(RELICS).length,Math.round(L.inc*100),L.hq,M.heir?_t(" 다음 작전 계승 유물: {0}.",RELICS[M.heir].name):''),ch.map(c=>({...c,price:c.price})),{label:_t('새 작전 시작'),go:startSetup});
+  const ch=Object.entries(META_UP).map(([k,u])=>{const l=M.up[k]||0,max=l>=u.max,c=max?0:metaPrice(M,k,l);
+    return {tag:`LV ${l}/${u.max}`,name:u.name,desc:u.desc,price:max?null:c,unit:_t('공적'),disabled:max||M.merit<c,go:()=>{const m=getMeta(),cc=metaPrice(m,k,m.up[k]||0);if(m.merit<cc)return;m.merit-=cc;m.up[k]=(m.up[k]||0)+1;setMeta(m);showMeta()}}});
+  panel(_t('사령부 보급창'),_t("공적으로 모든 작전에 남는 강화를 삽니다. 보유 공적 {0}. 도감 유물 {1}/{2}개 · 영구 보너스 CP 수입 +{3}%, 사령부 +{4}.{5}",M.merit,L.n,Object.keys(RELICS).length,Math.round(L.inc*100),L.hq,M.heir?_t(" 다음 작전 계승 유물: {0}.",RELICS[M.heir].name):'')+_t(" 강화를 하나 살 때마다 모든 가격이 10%씩 오릅니다(지금 +{0}%).",metaBought(M)*10),ch.map(c=>({...c,price:c.price})),{label:_t('새 작전 시작'),go:startSetup});
   const box=$('#pChoices');
-  const ul=document.createElement('ul');ul.className='relic-list';ul.style.gridColumn='1/-1';
-  ul.innerHTML=_t('<li style="margin-top:6px"><b style="color:var(--fg)">유물 도감</b></li>')+Object.entries(RELICS).map(([k,r])=>M.found.includes(k)?`<li>${iconImg(k,'ico sm')}<b>${r.name}</b> · ${r.desc}</li>`:_t('<li class="no"><b>◇ ???</b> · 아직 발견하지 못함</li>')).join('');
-  box.append(ul);
-  const ua=document.createElement('ul');ua.className='relic-list';ua.style.gridColumn='1/-1';
-  ua.innerHTML=_t("<li style=\"margin-top:6px\"><b style=\"color:var(--fg)\">업적 {0}/{1}</b></li>",ACH.filter(a=>M.ach[a.id]).length,ACH.length)+ACH.map(a=>`<li class="${M.ach[a.id]?'':'no'}"><b>${M.ach[a.id]?'★':'☆'} ${a.name}</b> · ${a.desc}${a.r?_t(" · 공적 +{0}",a.r):''}</li>`).join('');
-  box.append(ua);
-  if(M.fallen.length){const uf=document.createElement('ul');uf.className='relic-list';uf.style.gridColumn='1/-1';
-    uf.innerHTML=_t('<li style="margin-top:6px"><b style="color:var(--fg)">전사자 명부</b></li>')+M.fallen.map(f=>`<li>✝ <b>${VET_NAMES[f.n%VET_NAMES.length]}</b> · ${U[f.t]?U[f.t].name:''} · ${_t("사살 {0} · {1}번째 전선",f.k,f.f)}</li>`).join('');box.append(uf)}
-  const g=document.createElement('div');g.className='clears';g.style.gridColumn='1/-1';
-  let h=_t('<b>지휘관 명부</b><table><tr><th></th>')+[1,2,3,4,5,6].map(i=>`<th>${i}</th>`).join('')+'</tr>';
+  // 긴 목록은 접어 둔다. 펼친 상태는 기기마다 기억한다.
+  const sec=(id,title,html)=>{const d=document.createElement('details');d.className='metasec';let open=false;try{open=localStorage.getItem('trenchline.sec.'+id)==='1'}catch(e){}d.open=open;
+    d.innerHTML=`<summary>${title}</summary>${html}`;d.ontoggle=()=>{try{localStorage.setItem('trenchline.sec.'+id,d.open?'1':'0')}catch(e){}};box.append(d)};
+  sec('codex',_t("유물 도감 {0}/{1}",M.found.length,Object.keys(RELICS).length),'<ul class="relic-list">'+Object.entries(RELICS).map(([k,r])=>M.found.includes(k)?`<li>${iconImg(k,'ico sm')}<b>${r.name}</b> · ${r.desc}</li>`:_t('<li class="no"><b>◇ ???</b> · 아직 발견하지 못함</li>')).join('')+'</ul>');
+  sec('ach',_t("업적 {0}/{1}",ACH.filter(a=>M.ach[a.id]).length,ACH.length),'<ul class="relic-list">'+ACH.map(a=>`<li class="${M.ach[a.id]?'':'no'}">${M.ach[a.id]?iconTag('medal','ico sm'):'☆ '}<b>${a.name}</b> · ${a.desc}${a.r?_t(" · 공적 +{0}",a.r):''}</li>`).join('')+'</ul>');
+  if(M.fallen.length)sec('fallen',_t("전사자 명부 {0}",M.fallen.length),'<ul class="relic-list">'+M.fallen.map(f=>`<li>✝ <b>${VET_NAMES[f.n%VET_NAMES.length]}</b> · ${U[f.t]?U[f.t].name:''} · ${_t("사살 {0} · {1}번째 전선",f.k,f.f)}</li>`).join('')+'</ul>');
+  let h='<div class="clears"><table><tr><th></th>'+[1,2,3,4,5,6].map(i=>`<th>${i}</th>`).join('')+'</tr>';
   for(const k of ORIGIN_ORDER){h+=`<tr><th>${ORIGINS[k].short}</th>`+[1,2,3,4,5,6].map(i=>`<td class="${M.clears[k+':'+i]?'on':i>M.rank?'lock':''}">${M.clears[k+':'+i]?'★':i>M.rank?'·':'○'}</td>`).join('')+'</tr>'}
-  g.innerHTML=h+_t('</table><p>★ 클리어 · ○ 도전 가능 · · 잠김(등급 미개방)</p>');box.append(g);
+  sec('roster',_t("지휘관 명부 {0}/{1}",Object.keys(M.clears).length,ORIGIN_ORDER.length*6),h+_t('</table><p>★ 클리어 · ○ 도전 가능 · · 잠김(등급 미개방)</p>')+'</div>');
 }
 function showTitle(){
   show('vTitle');renderAccount();const sv=store.get('trenchline.run');$('#bCont').hidden=!sv;
@@ -1762,7 +2375,8 @@ function buildStats(side,cfg){
       if(k==='corpsman'&&has('medbag')){s.heal=4.5;s.hr=28}
       if(k==='observer'&&has('tripod'))s.sr=90;
       if(k==='apc'&&has('manual')){s.hp*=1.5;s.cd=17}
-      if(k==='rifle'){if(has('helmet'))s.hp*=1.3;if(has('horde'))s.hp*=.7}
+      if(k==='rifle'){if(has('helmet'))s.hp*=1.3;if(has('horde'))s.hp*=.7;if(lv('levee')){s.hp*=.8;s.cost=5}}
+      if(k==='assault'){if(lv('infiltrate'))s.spd*=1.25;if(doct('mob',3))s.spd*=1.2}
       if(k==='tank'&&has('ironreg'))s.hp*=1.8;
       if(has('binocs')){s.range*=1.1}
       if(k==='mg'&&has('ammobox')){s.setup=0;s.rof*=.83}
@@ -1790,26 +2404,28 @@ function buildStats(side,cfg){
 }
 function newGame(cfg){
   const TER=genTerrain(cfg.node.seed||hashSeed(cfg.node.id),cfg.f,cfg.boss);cfg.terrain=TER;CUR_CRATER=BIOMES[TER.biome].crater;CUR_BIOME=TER.biome;
+  if(lv('wire')){const tr=[...TER.trs].sort((a,b)=>a.x-b.x)[1];for(let i=0;i<lv('wire');i++)TER.feats.push({type:'wire',x:tr.x+18+i*10,y:FMID,rx:4,ry:44})}
   seeded((cfg.node.seed||1)^0x9e37,()=>buildGround(TER));buildBackdrop(TER.biome);const trs=TER.trs.map(t=>({...t}));
   const P=RUN;
   S={t:0,over:false,paused:true,speed:1,
     pts:{1:50+30*lv('startCP')+15*mlv('cp')+(has('bell')?150:0),'-1':has('map')?0:45+cfg.f*6},hq:{1:P.hq,'-1':cfg.ehq},hqMax:{1:P.hqMax,'-1':cfg.ehq},
     ST:{1:buildStats(1,cfg),'-1':buildStats(-1,cfg)},
-    inc:{1:(1+.15*lv('income'))*(1+legacy().inc),'-1':cfg.diff},trenchMul:{1:(1-.15*lv('trench'))*(has('netting')?.85:1)*(has('seal')?.65:1),'-1':1},dice:has('dice')?(Math.random()<.5?1.4:.75):1,
+    inc:{1:(1+.15*lv('income'))*(1+legacy().inc),'-1':cfg.diff},trenchMul:{1:(1-.15*lv('trench'))*(has('netting')?.85:1)*(has('seal')?.65:1),'-1':1},dice:has('dice')?(Math.random()<.5?1.4:.75):1,mor:{1:60,'-1':lv('leaflets')?35:60},rout:{1:0,'-1':0},surgeT:{1:0,'-1':0},chain:{n:0,t:0,best:0},gases:[],timers:{},
     barN:{1:BAR.n+4*lv('barrage'),'-1':BAR.n},strikes:[],heals:[],planes:[],
     stance:{1:'hold','-1':'hold'},cd:{1:{},'-1':{}},units:[],corpses:[],proj:[],tracers:[],bullets:[],rings:[],fires:[],smokes:[],mines:[],flares:[],glows:[],ash:[],nextFlare:R(6,14),nextGlow:1,warn:0,parts:[],flashes:[],barr:[],texts:[],
     trench:trs,terrain:TER,
     kills:0,lost:0,payT:{1:0,'-1':0},lastPay:0,payFlash:0,cam:0,follow:true,aim:false,shake:0,ai:{t:0,next:null},
-    eTypes:cfg.boss?ORDER.filter(k=>k!=='apc'):['rifle','assault','mg',...(cfg.f>=2?['at','mortar']:(RUN.units.includes('tank')||RUN.units.includes('apc')||RUN.daily==='iron'?['at']:[])),...(cfg.f>=3?['tank','sniper','corpsman']:(rk()>=2&&cfg.f>=2||RUN.daily==='iron'?['tank']:[])),...(cfg.f>=4?['flame']:[]),...(cfg.f>=5?['observer']:[])]};
+    eTypes:cfg.boss?ORDER.filter(k=>k!=='apc'):['rifle','assault','mg',...(cfg.f>=2?['at','mortar']:(RUN.units.includes('tank')||RUN.units.includes('apc')||RUN.daily==='iron'?['at']:[])),...(cfg.f>=3?['tank','sniper','corpsman']:(rk()>=2&&cfg.f>=2||RUN.daily==='iron'?['tank']:[])),...(cfg.f>=4?['flame']:[]),...(cfg.f>=3||cfg.elite?['officer']:[]),...(cfg.f>=5?['observer']:[])]};
   setStance('hold');
   for(let i=0;i<2*lv('vanguard')+P.recruits;i++)spawn(1,'rifle',true);P.recruits=0;
   for(const v of (P.vets||[])){if(!U[v.t])continue;spawn(1,v.t,true);const u=S.units[S.units.length-1],r=vetRank(v.k),m=has('heroes')?1.5:1;
     u.vet=v.id;u.max=u.hp=u.max*(1+r[2]*m);u.vacc=1+r[3]*m}
   S.hq0=S.hq[1];S.evT=R(40,65);S.evN=0;S.crates=[];
+  if(P.nextMor!=null){S.mor[1]=P.nextMor;delete P.nextMor}if(P.nextEMor!=null){S.mor[-1]=P.nextEMor;delete P.nextEMor}if(P.nextCP){S.pts[1]=Math.max(0,S.pts[1]+P.nextCP);delete P.nextCP}
   if(S.dice!==1)S.texts.push({x:HQ[1]+30,y:FY0-6,txt:S.dice>1?'DICE +40%':'DICE -25%',col:S.dice>1?'185,204,106':'200,85,61',life:6});
   for(let i=0;i<(has('minecrate')?7:5)*lv('mines');i++){const T=[...S.trench].sort((a,b)=>a.x-b.x)[1];S.mines.push({x:T.x+R(22,70),y:R(FY0+4,FY1-4)})}
   const half=a=>has('dossier')?a.filter((_,i)=>i%2===0):a;
-  if(cfg.elite){half(['mg','rifle','rifle','rifle',cfg.f>=5?'tank':'assault','mg',...(rk()>=4?['mg','rifle']:[])]).forEach(t=>spawn(-1,t,true))}
+  if(cfg.elite){half(['officer','mg','rifle','rifle','rifle',cfg.f>=5?'tank':'assault','mg',...(rk()>=4?['mg','rifle']:[])]).forEach(t=>spawn(-1,t,true))}
   if(cfg.boss){half(['tank','mg','mg','rifle','rifle','rifle','mortar','mg','rifle']).forEach(t=>spawn(-1,t,true))}
   else if(cfg.act===2)['mg','mg'].forEach(t=>spawn(-1,t,true));
   buildCards();
@@ -1819,6 +2435,9 @@ function spawn(side,type,free){
   const u={side,type,x:HQ[side]+side*(free?R(6,30):6),y:R(FY0,FY1)|0,hp:d.hp,max:d.hp,cd:R(.2,.8),anim:Math.random(),
     slot:R(-5,5),setupT:0,shots:0,moving:false,inTrench:false,hitT:0};
   if(!free){S.cd[side][type]=d.cd;S.pts[side]-=d.cost;if(side===1){const us=RUN.used||(RUN.used={u:{},sup:0,arty:0});us.u[type]=1;if(type==='mortar')us.arty=1}}
+  if(side===1&&type==='rifle'&&lv('marksman')){S.rcount=(S.rcount||0)+1;if(S.rcount%5===0){u.max=u.hp=u.max*1.5;u.vacc=1.5;u.mark=true}}
+  if(side===1&&type==='assault'&&!free&&doct('mob',6)){const L1=lines(1),T=S.trench.find(t=>Math.abs(t.x-L1.hold)<2);if(T){u.x=T.x+R(-4,4);u.y=R(T.y0+2,T.y1-2)|0}}
+  if(side===1&&type==='tank'&&lv('tankterror')&&!S.terror){S.terror=true;morale(-1,-10);floatText(u.x+30,FY0-14,'TANK TERROR','185,204,106')}
   if(type==='apc'){u.state=S.units.some(v=>v.type==='apc'&&v.side===side&&v.state==='load')?'wait':'load';u.cargo=[];u.x=HQ[side]+side*12;u.y=FMID}
   const tr=!free&&APC_RIDE[type]&&S.units.find(v=>v.type==='apc'&&v.side===side&&v.state==='load');
   if(tr){tr.cargo.push(u);if(tr.cargo.length>=S.ST[side].apc.cap)tr.state='go';return}
@@ -1877,7 +2496,7 @@ function lines(side){
   return {hold,fall:prev};
 }
 function nearTrench(x,r){for(const t of S.trench)if(Math.abs(t.x-x)<r)return t;return null}
-const PRIO={mg:1,mortar:1,at:1,sniper:1,flame:1,corpsman:1,observer:1};
+const PRIO={mg:1,mortar:1,at:1,sniper:1,flame:1,corpsman:1,observer:1,officer:1};
 function findTarget(u){
   const d=S.ST[u.side][u.type],mn=d.min||-4;let best=null,bd=1e9,armor=false;
   for(const e of S.units){if(e.side===u.side)continue;const fx=(e.x-u.x)*u.side;if(fx<mn)continue;const dist=Math.hypot(fx,e.y-u.y);if(dist>d.range*(u.rangeMul||1))continue;
@@ -1899,7 +2518,8 @@ function payInterval(s){return s===1?Math.max(PAY_INT*.45,PAY_INT*(1-.12*lv('log
 const surge=()=>1+.2*Math.floor(S.t/60);
 function payAmount(s){if(s!==1)return PAY_BASE*S.inc[-1]*surge();return Math.round((PAY_BASE+3*mlv('payroll'))*S.inc[1]*(has('gramophone')&&S.t<30?2:1)*(S.dice||1)*(RUN.daily==='lonely'?1.25:1)*surge())}
 function hit(t,amt,src){if(t.hq){S.hq[t.hq]-=amt*.6;return}
-  if(t.side===1&&!U[t.type].armor){if(S.holdT>0)amt*=.7;if(has('ironreg')&&S.units.some(v=>v.type==='tank'&&v.side===1&&Math.hypot(v.x-t.x,v.y-t.y)<20))amt*=.75}if(t.side===1&&!t.saved&&t.hp-amt<=0&&t.hp>0&&has('rosary')&&!U[t.type].armor){t.saved=true;t.hp=1;t.hitT=.3;floatText(t.x,t.y-14,'SAVED','232,201,138');return}t.hp-=amt;t.hitT=.12;if(t.hp<=0&&!t.dead){t.dead=true;if(src&&src.side!==t.side)src.kills=(src.kills||0)+1}}
+  if(t.side===1&&S.otT>0)return;
+  if(t.side===1&&!U[t.type].armor){if(S.holdT>0)amt*=.7;if(has('ironreg')&&S.units.some(v=>v.type==='tank'&&v.side===1&&Math.hypot(v.x-t.x,v.y-t.y)<20))amt*=.75}if(t.side===1&&!t.saved&&t.hp-amt<=0&&t.hp>0&&has('rosary')&&!U[t.type].armor){t.saved=true;t.hp=1;t.hitT=.3;floatText(t.x,t.y-14,'SAVED','232,201,138');return}t.hp-=amt;t.hitT=.12;if(t.hp<=0&&!t.dead){t.dead=true;if(src&&src.side!==t.side)src.kills=(src.kills||0)+1;onKill(t,src)}}
 function fire(u,t){
   const d=S.ST[u.side][u.type],s=u.side,w=sprOf(u).lw||sprOf(u).width;
   const tip={x:u.x+s*(w/2),y:u.y-(u.type==='tank'?8:u.type==='mortar'?11:u.type==='at'?10:7)};
@@ -1907,12 +2527,12 @@ function fire(u,t){
   const dist=Math.hypot(t.x-u.x,t.hq?0:t.y-u.y);
   if(d.kind==='small'){
     if(d.grenade&&(++u.shots)%d.gEvery===0&&dist<26){
-      S.proj.push({src:u,x0:tip.x,y0:tip.y,x1:t.x,y1:t.y,t:0,dur:.5,arc:14,side:s,dmg:d.gDmg,armorDmg:d.gArmor,splash:9,grenade:true,small:true});return}
+      S.proj.push({src:u,x0:tip.x,y0:tip.y,x1:t.x,y1:t.y,t:0,dur:.5,arc:14,side:s,dmg:d.gDmg,armorDmg:d.gArmor*(s===1&&lv('bundle')?2:1),splash:9,grenade:true,small:true});return}
     const acc=t.hq?.6:hitChance(d.acc,dist,d.range,t,d.decay,u),ok=Math.random()<acc;
     const ty=t.y-(t.type==='tank'?5:6)+R(-1,1);
     const tx=t.x+(ok?0:R(-6,6)),tyy=ok?ty:t.y+R(-2,3),len=Math.hypot(tx-tip.x,tyy-tip.y)||1;
     const bs=d.snipe?620:340;
-    S.bullets.push({src:u,x:tip.x,y:tip.y,tx,ty:tyy,vx:(tx-tip.x)/len*bs,vy:(tyy-tip.y)/len*bs,sp:bs,left:len,ok,t,dmg:isArmor(t)?d.dmg*.2*(d.apMul||1):d.dmg,armor:isArmor(t),snipe:d.snipe});
+    S.bullets.push({src:u,x:tip.x,y:tip.y,tx,ty:tyy,vx:(tx-tip.x)/len*bs,vy:(tyy-tip.y)/len*bs,sp:bs,left:len,ok,t,dmg:(isArmor(t)?d.dmg*.2*(d.apMul||1):d.dmg)*(s===1&&S.few&&lv('lastman')?3:1),armor:isArmor(t),snipe:d.snipe});
     sfx(d.snipe?'snipe':u.type==='mg'?'mg':'rifle',u.x);
   }else if(d.kind==='at'){
     const a=isArmor(t);
@@ -1928,7 +2548,7 @@ function fire(u,t){
   }else{
     sfx(u.type==='tank'?'tank':'thump',u.x);if(u.type==='tank')for(let i=0;i<3;i++)S.parts.push({x:tip.x+s*2,y:tip.y,vx:s*R(6,14),vy:R(-6,-1),g:0,life:R(.5,.9),max:.9,c:'smoke',sz:R(2,4)});
     const sc=(d.scatter+(d.spread||0)*dist)*(u.type==='mortar'&&spotted(s,t.x,t.y)?S.ST[s].observer.spot:1),ang=R(0,6.283),rr=Math.sqrt(Math.random())*sc;
-    S.proj.push({src:u,x0:tip.x,y0:tip.y,x1:t.x+Math.cos(ang)*rr,y1:clampY(t.y+Math.sin(ang)*rr*.8),t:0,dur:d.flight*(u.type==='mortar'?(.7+dist/d.range*.5):1),arc:d.arc,side:s,dmg:d.dmg,splash:d.splash,big:u.type==='tank',fire:d.fire});
+    S.proj.push({src:u,x0:tip.x,y0:tip.y,x1:t.x+Math.cos(ang)*rr,y1:clampY(t.y+Math.sin(ang)*rr*.8),t:0,dur:d.flight*(u.type==='mortar'?(.7+dist/d.range*.5):1),arc:d.arc,side:s,dmg:d.dmg*(s===1&&S.few&&lv('lastman')?3:1),splash:d.splash*(u.tot?1.5:1),big:u.type==='tank',fire:d.fire});u.tot=false;
   }
 }
 // 명중률: 기본값 × 거리 감쇠(최대 사거리에서 65%) × 이동 표적 85% × 참호 안 60%
@@ -1943,6 +2563,10 @@ function hitChance(base,dist,range,t,decay,shooter){
   if(shooter&&shooter.accMul)a*=shooter.accMul;
   if(shooter&&shooter.side===1&&shooter.type==='rifle'&&S.horde)a*=1.25;
   if(shooter&&shooter.vacc)a*=shooter.vacc;
+  if(t.side===1&&t.type==='rifle'&&t.inTrench&&lv('periscope'))a*=.75;
+  if(shooter){const ss=shooter.side;if(S.rout[ss]>0)a*=.5;if(shooter.gas)a*=.6;if(S.offs&&S.offs.some(o=>o.side===ss&&o!==shooter&&Math.abs(o.x-shooter.x)<40&&Math.abs(o.y-shooter.y)<40))a*=1.12;if(S.leaderless&&S.leaderless[ss]>0)a*=.7;
+    if(ss===1){if(S.bulwark>0)a*=1.3;if(lv('overtop')&&S.stance[1]==='hold')a*=.9}
+    else if(lv('tankterror')&&S.units.some(v=>v.type==='tank'&&v.side===1&&Math.hypot(v.x-shooter.x,v.y-shooter.y)<30))a*=.75}
   return a;
 }
 function impact(p){
@@ -1955,9 +2579,11 @@ function impact(p){
   for(const e of S.units){if(e.side===p.side)continue;
     const dd=Math.hypot(e.x-p.x1,e.y-p.y1);if(dd>p.splash)continue;nh++;if(p.bref){(p.bref.hit||(p.bref.hit=new Set)).add(e)}
     let dmg=(isArmor(e)?(p.armorDmg??p.dmg):p.dmg)*(1-dd/p.splash*.5);
-    if(!p.grenade&&!U[e.type].exposed){if(e.inTrench)dmg*=.55*S.trenchMul[e.side];else if(e.scov)dmg*=e.scov}hit(e,dmg,p.src)}
+    if(!p.grenade&&!U[e.type].exposed){if(e.inTrench)dmg*=.55*S.trenchMul[e.side]*(p.side===1&&lv('delayfuse')?1.6:1)*(e.side===1&&lv('bunker')?.6:1);else if(e.scov)dmg*=e.scov}
+    if(p.side===1&&lv('shellshock')&&!p.rocket)e.stun=2;hit(e,dmg,p.src)}
   if(Math.abs(HQ[-p.side]-p.x1)<16)hit({hq:-p.side},p.dmg*.8);
   if(p.fire)S.fires.push({x:p.x1,y:p.y1,r:11,life:4,side:p.side});
+  if(nh>=3)morale(-p.side,-Math.min(8,nh*1.2));
   if(p.bref&&!p.bref.rw&&p.bref.hit&&p.bref.hit.size>=3){p.bref.rw=true;batonHit(p.side,'bar',3)}
   return nh;
 }
@@ -1981,16 +2607,16 @@ function strength(side){let v=0;for(const u of S.units)if(u.side===side)v+=S.ST[
 function aiStep(dt){
   const A=S.ai;A.t-=dt;if(A.t>0)return;A.t=.6;
   const pu=S.units.filter(u=>u.side===1),cnt=k=>pu.filter(u=>u.type===k).length;
-  const pTank=cnt('tank')+cnt('apc')*.5,pInf=pu.filter(u=>!U[u.type].armor).length,pTr=pu.filter(u=>u.inTrench).length,eCnt=k=>S.units.filter(u=>u.side===-1&&u.type===k).length;
+  const pTank=cnt('tank')+cnt('apc')*.5,pInf=pu.filter(u=>!U[u.type].armor).length,pTr=pu.filter(u=>u.inTrench).length,eCnt=k=>S.units.filter(u=>u.side===-1&&u.type===k).length;S.maxOwned=Math.max(S.maxOwned||0,owned(1));
   const rushed=pu.some(u=>(HQ[-1]-u.x)<170);
   if(rushed&&A.next&&S.ST[-1][A.next].cost>35)A.next=null;
   if(!A.next){
-    const w={rifle:4,assault:1.5+pTank*1.5+(pTr>3?2:0),mg:1.2+(pInf>5?2.2:0),at:.4+pTank*4,mortar:.8+(pTr>3?2:0)+(pInf>8?1:0),sniper:S.units.filter(u=>u.side===-1&&u.type==='sniper').length>=(CFG.boss||CFG.f>=6?2:1)?0:.5+Math.min(4,cnt('mg')+cnt('mortar')+cnt('at'))*.4,tank:S.t>(rk()>=2||CFG.cmd==='wren'||RUN.daily==='iron'?30:CFG.cmd==='karson'?38:45)?.5+(pInf>7?1:0)+(CFG.boss?1:0):0,flame:eCnt('flame')>=3?0:.3+(pTr>3?.9:0),corpsman:eCnt('corpsman')>=1?0:.5+(S.units.length>30?.6:0),observer:eCnt('observer')>=1||!eCnt('mortar')?0:.9,apc:0};
+    const w={rifle:4,assault:1.5+pTank*1.5+(pTr>3?2:0),mg:1.2+(pInf>5?2.2:0),at:.4+pTank*4,mortar:.8+(pTr>3?2:0)+(pInf>8?1:0),sniper:S.units.filter(u=>u.side===-1&&u.type==='sniper').length>=(CFG.boss||CFG.f>=6?2:1)?0:.5+Math.min(4,cnt('mg')+cnt('mortar')+cnt('at'))*.4,tank:S.t>(rk()>=2||CFG.cmd==='wren'||RUN.daily==='iron'?30:CFG.cmd==='karson'?38:45)?.5+(pInf>7?1:0)+(CFG.boss?1:0):0,officer:eCnt('officer')>=1?0:.5,flame:eCnt('flame')>=3?0:.3+(pTr>3?.9:0),corpsman:eCnt('corpsman')>=1?0:.5+(S.units.length>30?.6:0),observer:eCnt('observer')>=1||!eCnt('mortar')?0:.9,apc:0};
     const cm=CFG.cmd;
     if(cm==='hart'||cm==='karson'){const m=cm==='hart'?1.4:1.2;w.rifle*=m;w.assault*=m}
     if(cm==='schranz'||cm==='karson'){w.mortar*=cm==='schranz'?1.5:1.25;if(eCnt('mortar')&&!eCnt('observer')&&S.eTypes.includes('observer'))w.observer=Math.max(w.observer,.9)}
     if((cm==='wren'||cm==='karson')&&w.tank)w.tank*=cm==='wren'?1.5*(cnt('at')<2?1.2:1):1.2;
-    if(rushed){w.mg+=3;w.rifle+=2;w.tank=0;w.mortar=0;w.sniper=0;w.observer=0;w.corpsman=0}
+    if(rushed){w.mg+=3;w.rifle+=2;w.tank=0;w.mortar=0;w.sniper=0;w.observer=0;w.corpsman=0;w.officer=0}
     let sum=0;for(const k of S.eTypes)sum+=w[k];let r=Math.random()*sum;
     for(const k of S.eTypes){r-=w[k];if(r<=0){A.next=k;break}}
   }
@@ -2014,16 +2640,31 @@ function aiStep(dt){
     let bx=null,bn=0;for(const u of pu){const n=pu.filter(v=>Math.abs(v.x-u.x)<9).length;if(n>bn){bn=n;bx=u.x}}
     if(bn>=5)return use('strafe',bx,FMID);
   }
+  if(F>=5&&supReady(-1,'gas')){
+    let bx=null,by=0,bn=0;for(const u of pu){if(!u.inTrench)continue;const n=pu.filter(v=>Math.hypot(v.x-u.x,v.y-u.y)<26).length;if(n>bn){bn=n;bx=u.x;by=u.y}}
+    if(bn>=6)return use('gas',bx+12,by);
+  }
+  if((F>=8||(CFG.boss&&CFG.act>=1))&&supReady(-1,'tunnel')&&!S.strikes.some(st=>st.k==='tunnel'&&st.side===-1)){
+    let T=null,bn=0;for(const t of S.trench){if(t.own!==1)continue;const n=pu.filter(u=>Math.abs(u.x-t.x)<11&&inTrenchSpan(t,u.y)).length;if(n>bn){bn=n;T=t}}
+    if(T&&bn>=5)return use('tunnel',T.x,(T.y0+T.y1)/2);
+  }
   if(F>=3&&S.stance[-1]==='advance'&&supReady(-1,'smoke')){
     const m=pu.find(u=>u.type==='mg'||u.type==='sniper');if(m)return use('smoke',m.x,m.y);
   }
 }
 function supCd(side,k){const b=SUP[k].cd*((k==='bar'||k==='howitzer'||k==='strafe')&&S&&S.units&&S.units.some(u=>u.side===side&&u.type==='observer')?U.observer.spotCd:1);if(side===1)return Math.max(SUP[k].cd*.45,b*(k==='bar'?1-.25*lv('barrage'):1)*(has('watch')?.7:1)*(has('phone')?.9:1)*(RUN.daily==='arty'?.5:1));return b*(CFG&&CFG.mod==='arty'?.5:1)*(S&&S.allout?.5:1)*(CFG&&CFG.act>=1?.8:1)*(RUN&&RUN.daily==='arty'?.5:1)}
-const supCost=(side,k)=>side===1&&has('baton')?Math.round(SUP[k].cost*1.3):SUP[k].cost;
+const supCost=(side,k)=>side===1&&k==='bar'&&S&&S.freeBar>0?0:side===1&&has('baton')?Math.round(SUP[k].cost*1.3):SUP[k].cost;
 function supReady(side,k){return S.pts[side]>=supCost(side,k)&&!(S.cd[side][k]>0)}
 function callSupport(side,k,x,y){
   const d=SUP[k],mine=side===1;if(mine){const us=RUN.used||(RUN.used={u:{},sup:0,arty:0});us.sup=1;if(k==='bar'||k==='howitzer')us.arty=1}S.pts[side]-=supCost(side,k);S.cd[side][k]=supCd(side,k);y=clampY(y);
-  if(k==='bar'){S.barr.push({side,x,y,t:-d.delay,n:S.barN[side],fired:0});return}
+  if(mine)S.usedSup=true;
+  if(!mine&&(k==='bar'||k==='howitzer')&&lv('counter')){S.freeBar=15;floatText(HQ[1]+40,FY0-20,'COUNTER-BATTERY','232,201,138')}
+  if(k==='bar'){const hu=mine&&lv('hurricane');S.barr.push({side,x:x-(mine&&doct('art',3)?20:0),y,t:-d.delay-(hu?1:0),n:Math.round(S.barN[side]*(hu?1.5:1)),fired:0});return}
+  if(k==='gas'){const big=mine&&lv('gasmaster');S.strikes.push({k,side,x,y,t:-d.delay,pass:0,r:d.r*(big?1.25:1),life:8+(big?4:0)});return}
+  if(k==='tunnel'){let T=null,bd=1e9;for(const t of S.trench){const dd=Math.abs(t.x-x)+(t.own===-side?0:60);if(dd<bd){bd=dd;T=t}}
+    S.strikes.push({k,side,x:T.x,y:(T.y0+T.y1)/2,T,t:-d.delay-(side===-1&&lv('listen')?8:0),pass:0});
+    if(side===-1){floatText(T.x,FY0-14,'TUNNELING','200,85,61');evBanner(_t('땅굴 파는 소리! 곧 아군 참호 하나가 폭파됩니다. 표시된 참호에서 병력을 빼세요.'))}
+    return}
   if(k==='mines'){for(let i=0;i<(mine&&has('minecrate')?9:6);i++){const a=R(0,6.283),rr=Math.sqrt(Math.random())*d.r;S.mines.push({x:x+Math.cos(a)*rr,y:clampY(y+Math.sin(a)*rr*.8),side})}sfx('pop',x,.5);return}
   if(k==='aid'){S.heals.push({x,y,r:d.r,life:4,side,rate:mine&&has('kit')?5:3});return}
   S.strikes.push({k,side,x,y,t:-d.delay,pass:0});
@@ -2031,47 +2672,90 @@ function callSupport(side,k,x,y){
 }
 function callBarrage(side,x,y){callSupport(side,'bar',x,y)}
 
+/* ---------- morale (사기) ----------
+   양쪽 0~100. 사살·참호·폭발로 오르내린다. 100이면 기세(8초 연사·이동↑), 0이면 붕괴(6초 후퇴, 명중 절반). */
+function morale(side,d){
+  if(!S||S.over||!d)return;
+  if(d>0&&side===1)d*=(lv('band')?1.5:1)*(lv('attrition')?.5:1);
+  const M=S.mor;M[side]=Math.max(0,Math.min(100,M[side]+d));
+  if(M[side]>=100&&!(S.surgeT[side]>0)){S.surgeT[side]=8;M[side]=75;floatText(side===1?HQ[1]+60:HQ[-1]-60,FY0-14,'MOMENTUM',side===1?'185,204,106':'200,85,61');if(side===1)evBanner(_t('기세! 8초 동안 아군 연사·이동이 빨라집니다.'))}
+  if(M[side]<=0&&!(S.rout[side]>0)){
+    if(side===1&&(lv('discipline')||(lv('lastman')&&S.few))){M[1]=15;floatText(HQ[1]+40,FY0-14,'DISCIPLINE','232,201,138');return}
+    S.rout[side]=6;M[side]=35;S.shake=Math.max(S.shake,3);floatText(side===1?HQ[1]+60:HQ[-1]-60,FY0-14,'ROUT!',side===1?'200,85,61':'185,204,106');
+    evBanner(side===1?_t('아군 전선 붕괴! 6초 동안 병사들이 물러납니다.'):_t('적 전선 붕괴! 6초 동안 적이 달아납니다. 지금 밀어붙이세요.'))}
+}
+function onKill(u,src){
+  if(u.type==='officer'){morale(u.side,u.side===1?-8:-15);S.leaderless=S.leaderless||{1:0,'-1':0};S.leaderless[u.side]=4;floatText(u.x,u.y-20,'OFFICER DOWN',u.side===-1?'185,204,106':'200,85,61')}
+  const c=U[u.type].cost,dv=.8+c/30+(u.type==='tank'?6:0);
+  morale(u.side,-dv);morale(-u.side,dv*.8*(S.capT&&S.capT[-u.side]>0?2:1));
+  if(u.side===-1){
+    const ch=S.chain;ch.n++;ch.t=2.6;ch.best=Math.max(ch.best,ch.n);
+    if(ch.n%5===0){const b=ch.n>=20?120:ch.n>=15?80:ch.n>=10?50:20;S.pts[1]+=b;morale(1,6);floatText(u.x,u.y-22,`×${ch.n} CHAIN +${b}`,'232,201,138');S.shake=Math.max(S.shake,1.5)}
+    if(doct('log',6))S.pts[1]+=c*.1;
+    if(src&&src.type==='tank'&&src.side===1&&doct('arm',3))morale(1,3);
+  }else if(lv('attrition')){S.pts[1]+=5;morale(-1,-2)}
+}
+const capN=()=>lv('levee')?90:54;
 /* ---------- step ---------- */
 function step(dt){
   S.t+=dt;
   for(const s of [1,-1]){
     S.payT[s]+=dt;const iv=payInterval(s);
-    if(S.payT[s]>=iv){S.payT[s]-=iv;const amt=payAmount(s);S.pts[s]=Math.min(250,S.pts[s]+amt);if(s===1){S.lastPay=amt;S.payFlash=.6;if(AU.on)sfx('pay',S.cam+VW/2)}}
+    if(S.payT[s]>=iv){S.payT[s]-=iv;let amt=payAmount(s);if(s===1){if(doct('def',3))amt+=2*owned(1);if(doct('log',3)&&Math.random()<.1){amt*=3;floatText(HQ[1],FY0-14,'JACKPOT ×3','232,201,138')}}S.pts[s]=Math.min(250,S.pts[s]+amt);if(s===1){S.lastPay=amt;S.payFlash=.6;if(AU.on)sfx('pay',S.cam+VW/2)}}
     for(const k in S.cd[s])S.cd[s][k]=Math.max(0,S.cd[s][k]-dt);
   }
   aiStep(dt);
   const L={1:lines(1),'-1':lines(-1)};
   const medic=lv('medic');
+  {const T=S.timers;for(const k in T)if(T[k]>0)T[k]-=dt;if(S.otT>0)S.otT-=dt;if(S.bulwark>0)S.bulwark-=dt;if(S.freeBar>0)S.freeBar-=dt;if(S.mad>0)S.mad-=dt;
+   S.offs=S.units.filter(u=>u.type==='officer');S.leaderless=S.leaderless||{1:0,'-1':0};
+   for(const s of [1,-1]){if(S.rout[s]>0)S.rout[s]-=dt;if(S.surgeT[s]>0)S.surgeT[s]-=dt;if(S.leaderless[s]>0)S.leaderless[s]-=dt;if(S.capT&&S.capT[s]>0)S.capT[s]-=dt;S.mor[s]+=((S.offs.some(o=>o.side===s)?62:52)-S.mor[s])*.012*dt}
+   if(!S.eCounter&&S.started&&S.hq[-1]<S.hqMax[-1]*.4&&S.hq[-1]>0){S.eCounter=true;S.stance[-1]='advance';morale(-1,25);S.surgeT[-1]=8;floatText(HQ[-1]-40,FY0-14,'COUNTERATTACK','200,85,61');evBanner(_t('적 총반격! 적이 사령부를 지키려고 전부 뛰쳐나옵니다.'))}
+   const ch=S.chain;if(ch.t>0){ch.t-=dt;if(ch.t<=0)ch.n=0}
+   S.few=S.units.filter(u=>u.side===1&&u.type!=='apc').length<=3&&S.t>20;
+   if(doct('inf',6)&&!(T.madCd>0)&&S.t>10){T.madCd=45;S.mad=8;floatText(HQ[1]+40,FY0-14,'MAD MINUTE','232,201,138')}
+   if(doct('art',6)&&!(T.totCd>0)&&S.t>8){const ms=S.units.filter(u=>u.side===1&&u.type==='mortar');if(ms.length){T.totCd=15;for(const m of ms){m.cd=0;m.tot=true}floatText(HQ[1]+40,FY0-20,'VOLLEY','232,201,138')}}
+   if(doct('def',6)&&!S.bulwarkUsed&&S.hq[1]<S.hqMax[1]*.5){S.bulwarkUsed=true;S.bulwark=10;for(const u of S.units)if(u.side===1&&u.inTrench)u.hp=u.max;floatText(HQ[1]+30,FY0-14,'BULWARK','232,201,138')}}
   S.dt=dt;S.horde=has('horde')&&S.units.reduce((n,u)=>n+(u.side===1),0)>=15;if(S.holdT>0)S.holdT-=dt;
   for(const u of S.units){
     const d=S.ST[u.side][u.type],s=u.side;u.cd-=dt;u.anim+=dt;if(u.rally>0)u.rally-=dt;u.hitT=Math.max(0,u.hitT-dt);
-    const t=d.aux||d.kind==='apc'?null:findTarget(u);let want=null;
+    if(u.stun>0){u.stun-=dt;u.moving=false;continue}
+    const routing=S.rout[s]>0&&!u.inTrench;
+    const t=d.aux||d.kind==='apc'||routing?null:findTarget(u);let want=null;
     if(d.kind==='apc'){if(u.state==='drop')apcUnload(u,dt);else want=apcStep(u,d,L)}
     else if(d.aux)want=auxWant(u,d,L);
+    else if(u.type==='officer'){if(t&&u.cd<=0){fire(u,t);u.cd=d.rof*R(.85,1.15)}want=auxWant(u,d,L)}
     else if(t){
       if(d.setup)u.setupT=Math.min(d.setup,u.setupT+dt);
       if((!d.setup||u.setupT>=d.setup)&&u.cd<=0){fire(u,t);
-        if(d.doubleTap&&!u.dt&&d.kind==='small'&&Math.random()<.3){u.dt=true;u.cd=.16}else{u.dt=false;u.cd=d.rof*R(.85,1.15)*(u.rally>0?.67:1)}}
+        if(d.doubleTap&&!u.dt&&d.kind==='small'&&Math.random()<.3){u.dt=true;u.cd=.16}else{u.dt=false;u.cd=d.rof*R(.85,1.15)*(u.rally>0?.67:1)*(S.surgeT[s]>0?.7:1)*(s===1?(S.mad>0&&u.type==='rifle'?.5:1)*(lv('blitz')?(S.t<45?.67:1.1):1):1)}}
       if(!d.armor){const T=nearTrench(u.x,9);if(T)want=T.x+u.slot*.6}
+      // 돌격: 전진 명령 중인 보병(소총·돌격·화염·대전차)은 쏘면서 반 속도로 다가가 백병전을 건다. 무너진 적은 제 속도로 쫓는다.
+      u.chg=0;if(!d.armor&&!t.hq&&(MELEE[u.type]||0)>=.15&&S.stance[s]==='advance'){want=t.x-s*2;u.chg=S.rout[-s]>0?1:.5;u.y=clampY(u.y+Math.sign(t.y-u.y)*d.spd*.5*dt)}
     }else{
       // 사거리 밖(세로로 먼) 적이 앞쪽에 있으면 그쪽으로 옆걸음
       let ne=null,nd=1e9;for(const e of S.units){if(e.side===s)continue;const fx=(e.x-u.x)*s;if(fx<-4||fx>d.range+30)continue;const dd=Math.abs(e.y-u.y);if(dd<nd){nd=dd;ne=e}}
       if(ne&&nd>d.range*.5){u.y=clampY(u.y+Math.sign(ne.y-u.y)*d.spd*.6*dt)}
-      const st=S.stance[s];
+      const st=routing?'fall':S.stance[s];
       if(st==='advance')want=HQ[-s]-s*18;
       else{want=st==='hold'?L[s].hold:L[s].fall;
         const T=S.trench.find(t=>Math.abs(t.x-want)<2);if(T&&!d.armor&&!inTrenchSpan(T,u.y)&&Math.abs(u.x-want)<40){u.y=clampY(u.y+Math.sign((T.y0+T.y1)/2-u.y)*d.spd*.7*dt)}
         want+=d.armor?-s*14:u.slot}
     }
     u.moving=false;
-    if(want!=null){const dx=want-u.x;if(Math.abs(dx)>1){const sp=d.spd*(u.slow||1)*(dx*s<0?.8:1)*(s===1&&S.stance[1]==='advance'?(has('whistle')?1.25:1)*(has('seal')?.75:1):1);u.x+=Math.sign(dx)*Math.min(Math.abs(dx),sp*dt);u.moving=true}}
+    if(want!=null){const dx=want-u.x;if(Math.abs(dx)>1){const sp=d.spd*(u.slow||1)*(dx*s<0?.8:1)*(s===1&&S.stance[1]==='advance'?(has('whistle')?1.25:1)*(has('seal')?.75:1)*(S.timers.bugle>0?1.4:1)*(S.otT>0?1.6:1):1)*(routing?1.3:1)*(u.chg&&t?u.chg:1)*(S.surgeT[s]>0?1.15:1)*(s===1&&lv('blitz')&&S.t<45?1.5:1);u.x+=Math.sign(dx)*Math.min(Math.abs(dx),sp*dt);u.moving=true}}
     if(u.moving&&d.setup)u.setupT=Math.max(0,u.setupT-dt*3);
     u.inTrench=!d.armor&&S.trench.some(T=>Math.abs(T.x-u.x)<=8&&inTrenchSpan(T,u.y));
     {const o=featAt(u.x,u.y),F=o&&FEAT[o.type];u.feat=o?o.type:null;
-     if(d.armor){u.cover=1;u.scov=1;u.slow=F&&F.tankSlow?F.tankSlow:1;u.rangeMul=F&&F.range?F.range:1;u.accMul=1}
+     if(d.armor){u.cover=1;u.scov=1;u.slow=F&&F.tankSlow&&!(s===1&&lv('tracks'))?F.tankSlow:1;u.rangeMul=F&&F.range?F.range:1;u.accMul=1}
      else{u.cover=F?F.cover:1;u.scov=F?F.splash:1;u.slow=F?(s===1&&o.type==='wire'&&has('cutters')?1-(1-F.slow)/2:F.slow):1;u.rangeMul=F&&F.range?F.range:1;u.accMul=F&&F.acc?F.acc:1}
      if(u.type==='mortar'&&spotted(s,u.x,u.y))u.rangeMul*=S.ST[s].observer.spotRange;
-     if(s===1&&S.flareT>0)u.rangeMul*=1.15}
+     if(s===1&&S.flareT>0)u.rangeMul*=1.15;
+     if(s===1&&u.type==='assault'&&(doct('mob',3)||(lv('infiltrate')&&o&&o.type==='wire')))u.slow=1}
+    if(s===1&&u.type==='tank'){if(doct('arm',3))u.hp=Math.min(u.max,u.hp+dt);
+      if(doct('arm',6)){const T=S.trench.find(T=>Math.abs(T.x-u.x)<10&&T.own===-1&&!T.broke);if(T){T.broke=true;for(const e of S.units)if(e.side===-1&&Math.abs(e.x-T.x)<10&&inTrenchSpan(T,e.y))hit(e,20,u);morale(-1,-15);floatText(T.x,FY0-14,'BREAKTHROUGH','185,204,106');S.shake=3}}
+      if(lv('hermaphrodite')){u.mgcd=(u.mgcd||0)-dt;if(u.mgcd<=0){let e=null,bd=44;for(const v of S.units){if(v.side===1||U[v.type].armor)continue;const dd=Math.hypot(v.x-u.x,v.y-u.y);if((v.x-u.x)>-4&&dd<bd){bd=dd;e=v}}
+        if(e){u.mgcd=.5;const ok=Math.random()<hitChance(.3,bd,44,e,.35,u),len=bd||1;S.bullets.push({src:u,x:u.x+6,y:u.y-6,tx:e.x,ty:e.y-6,vx:(e.x-u.x)/len*340,vy:(e.y-u.y)/len*340,sp:340,left:len,ok,t:e,dmg:10})}}}}
     if(medic&&s===1&&u.inTrench)u.hp=Math.min(u.max,u.hp+2*dt);
   }
   // 위생병 치료: 여러 명이 겹쳐도 한 명분만
@@ -2079,14 +2763,26 @@ function step(dt){
   if(healers.length)for(const v of S.units){if(U[v.type].armor||v.hp>=v.max)continue;
     const h=healers.find(h=>h.side===v.side&&Math.hypot(h.x-v.x,(h.y-v.y)*1.2)<S.ST[h.side].corpsman.hr);
     if(h){v.hp=Math.min(v.max,v.hp+S.ST[h.side].corpsman.heal*dt);if(Math.random()<dt*4)S.parts.push({x:v.x+R(-2,2),y:v.y-10,vx:0,vy:-8,g:0,life:.5,max:.5,c:'#b9cc6a',sz:1})}}
+  // 백병전: 맞붙은(6 안) 보병끼리 1초쯤마다 한 번씩 찌른다
+  for(const u of S.units){
+    if(u.mcd>0){u.mcd-=dt;continue}const du=U[u.type];if(du.armor||du.aux||!MELEE[u.type]||u.stun>0)continue;
+    let e=null,bd=10;for(const v of S.units){if(v.side===u.side||U[v.type].armor||v.dead)continue;const dd=Math.hypot(v.x-u.x,(v.y-u.y)*1.3);if(dd<bd){bd=dd;e=v}}
+    if(!e)continue;u.mcd=R(.8,1.1);let p=MELEE[u.type];
+    if(u.side===1){if(u.type==='rifle'||u.type==='assault')p+=.15*lv('bayonet');if(u.type==='rifle'&&doct('inf',3))p+=.2;
+      if(lv('clearing')&&u.inTrench){const T=nearTrench(u.x,9);if(T&&T.own!==1)p+=.25}}
+    if(S.rout[u.side]>0)p*=.4;if(e.inTrench)p*=.85;
+    S.parts.push({x:(u.x+e.x)/2,y:(u.y+e.y)/2-6,vx:R(-10,10),vy:R(-14,-4),g:60,life:.2,max:.2,c:'#e9dec3',sz:1});
+    if(Math.random()<p){S.meleeKills=(S.meleeKills||0)+1;hit(e,999,u);floatText(e.x,e.y-16,'+',u.side===1?'185,204,106':'200,85,61');sfx('pop',e.x,.4)}
+  }
   for(const T of S.trench){
     let a=0,b=0;for(const u of S.units)if(Math.abs(u.x-T.x)<10&&inTrenchSpan(T,u.y)){u.side===1?a++:b++}
     const prev=T.own;if(a&&!b)T.own=1;else if(b&&!a)T.own=-1;
+    if(T.own!==prev&&T.own){morale(T.own,10);if(prev)morale(prev,-12);S.capT=S.capT||{1:0,'-1':0};S.capT[T.own]=8}
     if(T.own===1&&prev!==1){floatText(T.x,FY0-16,'TAKEN','185,204,106');if(lv('capture')){S.pts[1]+=15;floatText(T.x,FY0-8,'+15 CP')}}
     if(T.own===-1&&prev!==-1&&prev!==0)floatText(T.x,FY0-16,'LOST','200,85,61');
   }
   for(let i=S.units.length-1;i>=0;i--){const u=S.units[i];if(!u||u.hp>0)continue;
-    S.units.splice(i,1);if(u.vet)vetDied(u);if(u.side===-1){S.kills++;if(lv('bounty'))S.pts[1]+=2*lv('bounty')}else{S.lost++;if(has('letter'))S.pts[1]+=2;
+    S.units.splice(i,1);if(u.vet)vetDied(u);if(u.side===1&&U[u.type].armor&&lv('salvage'))S.pts[1]+=S.ST[1][u.type].cost*.4;if(u.side===-1){S.kills++;if(lv('bounty'))S.pts[1]+=2*lv('bounty')}else{S.lost++;if(has('letter'))S.pts[1]+=2;
       if(lv('rally'))for(const v of S.units)if(v.side===1&&Math.hypot(v.x-u.x,v.y-u.y)<34)v.rally=4}
     if(u.type==='apc'){boom(u.x,u.y,true);const n=Math.ceil(u.cargo.length/2);
       for(const c of u.cargo.slice(0,n)){c.x=u.x+R(-6,6);c.y=clampY(u.y+R(-6,6));c.hp=c.max*.5;S.units.push(c)}
@@ -2100,7 +2796,7 @@ function step(dt){
     if(p.rocket&&Math.random()<.6){const k=p.t/p.dur;S.parts.push({x:p.x0+(p.x1-p.x0)*k,y:p.y0+(p.y1-p.y0)*k,vx:R(-2,2),vy:R(-4,0),g:0,life:.5,max:.5,c:'smoke',sz:2})}
     if(p.t>=p.dur){impact(p);p.done=true}}
   S.proj=S.proj.filter(p=>!p.done);
-  for(const b of S.barr){b.t+=dt;if(b.t>=0&&!b.sm&&b.side===1&&lv('smoke')){b.sm=true;S.smokes.push({x:b.x,y:b.y,r:34,life:has('canister')?15:10,max:has('canister')?15:10,side:1})}while(b.t>=b.fired*.28&&b.t>=0&&b.fired<b.n){b.fired++;
+  for(const b of S.barr){b.t+=dt;if(b.side===1&&b.t>=0&&doct('art',3)&&b.fired<b.n)b.x+=dt*14;if(b.t>=0&&!b.sm&&b.side===1&&lv('smoke')){b.sm=true;S.smokes.push({x:b.x,y:b.y,r:34,life:has('canister')?15:10,max:has('canister')?15:10,side:1})}while(b.t>=b.fired*.28&&b.t>=0&&b.fired<b.n){b.fired++;
     const k=spotted(b.side,b.x,b.y)?S.ST[b.side].observer.spot:1,x=b.x+R(-26,26)*k;S.proj.push({x0:x+R(-20,20),y0:-10,x1:x,y1:clampY(b.y+R(-20,20)*k),t:0,dur:.35,arc:0,side:b.side,dmg:22,splash:12,barrage:true,falling:true,bref:b})}}
   S.barr=S.barr.filter(b=>b.fired<b.n||S.proj.some(p=>p.bref===b));
   for(const p of S.parts){p.life-=dt;p.vy+=p.g*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;if(p.c!=='smoke'&&p.gy&&p.y>p.gy){p.y=p.gy;p.vx*=.3;p.vy=0}}
@@ -2116,12 +2812,21 @@ function step(dt){
     if(Math.random()<dt*14)S.parts.push({x:f.x+R(-f.r,f.r)*.8,y:f.y+R(-4,4),vx:R(-2,2),vy:R(-14,-6),g:0,life:R(.3,.6),max:.6,c:Math.random()<.5?'#ff9a3a':'#ffd36a',sz:1});
     if(Math.random()<dt*3)S.parts.push({x:f.x+R(-6,6),y:f.y-4,vx:R(-2,2),vy:R(-8,-4),g:-1,life:1.2,max:1.2,c:'smoke',sz:R(2,4)})}
   S.fires=S.fires.filter(f=>f.life>0);
+  for(const u of S.units)u.gas=false;
+  for(const g of S.gases){g.life-=dt;g.x+=g.vx*dt;const inside={1:0,'-1':0};
+    for(const u of S.units){if(U[u.type].armor||Math.hypot(u.x-g.x,(u.y-g.y)*1.2)>=g.r)continue;const mk=u.side===1&&lv('gasmask')?.3:1;u.gas=mk===1;hit(u,2*dt*mk,null);inside[u.side]=mk}
+    for(const s2 of [1,-1])if(inside[s2])morale(s2,-1.2*dt*inside[s2])}
+  S.gases=S.gases.filter(g=>g.life>0);
   for(const m of S.smokes)m.life-=dt;S.smokes=S.smokes.filter(m=>m.life>0);
   for(const m of S.mines){const ms=m.side||1;for(const e of S.units)if(e.side!==ms&&Math.hypot(e.x-m.x,e.y-m.y)<5){m.gone=true;impact({x1:m.x,y1:m.y,side:ms,dmg:28,armorDmg:40,splash:11,grenade:true});break}}
   for(const h of S.heals){h.life-=dt;for(const u of S.units)if(u.side===h.side&&!U[u.type].armor&&Math.hypot(u.x-h.x,u.y-h.y)<h.r)u.hp=Math.min(u.max,u.hp+(h.rate||3)*dt);
     if(Math.random()<dt*10)S.parts.push({x:h.x+R(-h.r,h.r)*.7,y:h.y+R(-h.r,h.r)*.5,vx:0,vy:-8,g:0,life:.6,max:.6,c:'#b9cc6a',sz:1})}
   S.heals=S.heals.filter(h=>h.life>0);
   for(const st of S.strikes){st.t+=dt;if(st.t<0)continue;
+    if(st.k==='gas'&&!st.done){st.done=true;S.gases.push({x:st.x,y:st.y,r:st.r,life:st.life,max:st.life,side:st.side,vx:st.side*4});sfx('pop',st.x,.5)}
+    if(st.k==='tunnel'&&!st.done){st.done=true;const T=st.T;let n=0;
+      for(const e of S.units){if(e.side===st.side)continue;const inT=Math.abs(e.x-T.x)<11&&inTrenchSpan(T,e.y),near=Math.hypot(e.x-st.x,(e.y-st.y)*.5)<SUP.tunnel.r;if(inT||near){hit(e,inT?(U[e.type].armor?90:200):40,null);n++}}
+      for(let i=0;i<6;i++)boom(T.x+R(-6,6),R(T.y0,T.y1),true);T.own=0;morale(-st.side,-30);S.shake=7;floatText(T.x,FY0-16,'MINE!',st.side===1?'185,204,106':'200,85,61');sfx('boom',T.x,1.6)}
     if(st.k==='smoke'&&!st.done){st.done=true;{const L=st.side===1&&has('canister')?15:10;S.smokes.push({x:st.x,y:st.y,r:SUP.smoke.r,life:L,max:L,side:st.side})};sfx('pop',st.x,.6)}
     if(st.k==='howitzer'&&!st.done){st.done=true;
       // 관측병이 보는 곳이면 떨어지는 순간 근처(24)에서 가장 비싼 적에게 맞춘다
@@ -2212,6 +2917,7 @@ function render(){
     drawSpr(img,u.x,u.y,u.side===-1,u.inTrench);
     if(u.hitT>0)drawSpr(whiteOf(img),u.x,u.y,u.side===-1,u.inTrench,.75);
     if(u.hp<u.max){const top=u.y-(img.lh||img.height)-3+(u.inTrench?4:0);ctx.fillStyle='#000';ctx.fillRect(Math.round(u.x-4),top,8,2);ctx.fillStyle=u.hp/u.max>.4?'#9cc04a':'#c8553d';ctx.fillRect(Math.round(u.x-4),top,Math.max(1,Math.round(8*u.hp/u.max)),1)}
+    if(u.stun>0){ctx.fillStyle='#e9dec3';ctx.fillRect(Math.round(u.x)-2,u.y-16,1,1);ctx.fillRect(Math.round(u.x)+2,u.y-17,1,1)}
     if(u.vet){ctx.fillStyle='#e8c96a';const top=u.y-(img.lh||img.height)-2+(u.inTrench?4:0);ctx.fillRect(Math.round(u.x)-1,top,3,1);ctx.fillRect(Math.round(u.x),top-1,1,1)}
     if(u.cargo&&u.cargo.length){ctx.fillStyle=u.side===1?'#b9cc6a':'#b6c9da';for(let i=0;i<u.cargo.length;i++)ctx.fillRect(Math.round(u.x-5+i*2),u.y-14,1,1)}
     if(d.setup&&u.setupT<d.setup&&u.setupT>0){ctx.fillStyle='#d98b3a';ctx.fillRect(Math.round(u.x-4),u.y+1,Math.round(8*u.setupT/d.setup),1)}}
@@ -2227,6 +2933,7 @@ function render(){
   for(const p of S.parts){const a=Math.max(0,p.life/p.max);
     if(p.c==='smoke'){ctx.fillStyle=`rgba(120,112,96,${a*.45})`;ctx.fillRect(Math.round(p.x-p.sz/2),Math.round(p.y-p.sz/2),Math.round(p.sz),Math.round(p.sz));p.sz+=.04}
     else{ctx.fillStyle=p.c;ctx.fillRect(Math.round(p.x),Math.round(p.y),p.sz,p.sz)}}
+  for(const g of S.gases){const a=Math.min(1,g.life/2,(g.max-g.life)*2);for(let i=0;i<8;i++){const ang=i/8*6.28+S.t*.3,rx=g.x+Math.cos(ang)*g.r*.55,ry=g.y+Math.sin(ang)*g.r*.35;ctx.fillStyle=`rgba(150,170,80,${.2*a})`;ctx.beginPath();ctx.arc(rx,ry,g.r*.45,0,7);ctx.fill()}}
   for(const m of S.smokes){const a=Math.min(1,m.life/2,(m.max-m.life)*2);for(let i=0;i<7;i++){const ang=i/7*6.28+S.t*.2,rx=m.x+Math.cos(ang)*m.r*.55,ry=m.y+Math.sin(ang)*m.r*.35;ctx.fillStyle=`rgba(170,165,150,${.22*a})`;ctx.beginPath();ctx.arc(rx,ry,m.r*.45,0,7);ctx.fill()}}
   for(const g of S.rings){ctx.strokeStyle=`rgba(255,220,170,${g.life/.3*.5})`;ctx.lineWidth=1;ctx.beginPath();ctx.ellipse(g.x,g.y,g.r,g.r*.45,0,0,7);ctx.stroke()}
   for(const f of S.flashes){const a=f.life/f.max;
@@ -2234,6 +2941,7 @@ function render(){
     else{const x=Math.round(f.x),y=Math.round(f.y),L=f.big?3:2;ctx.fillStyle='#ffb84a';ctx.fillRect(x,y-1,1,3);ctx.fillRect(x+f.dir*0,y,f.dir*L+ (f.dir<0?1:0),1);ctx.fillRect(x+f.dir,y,f.dir*L,1);ctx.fillStyle='#fff3c8';ctx.fillRect(x,y,1,1);if(f.big){ctx.fillStyle='rgba(255,184,74,.6)';ctx.fillRect(x+f.dir*2,y-1,f.dir*2,3)}}}
   for(const f of S.flares){const gr=ctx.createRadialGradient(f.x,f.y,0,f.x,f.y,46);gr.addColorStop(0,'rgba(255,245,215,.22)');gr.addColorStop(1,'rgba(255,245,215,0)');ctx.fillStyle=gr;ctx.fillRect(f.x-46,f.y-46,92,92);ctx.fillStyle='#fffbe8';ctx.fillRect(Math.round(f.x),Math.round(f.y),1,1);ctx.fillStyle='rgba(200,200,190,.4)';ctx.fillRect(Math.round(f.x),Math.round(f.y)-3,1,2)}
   ctx.font='6px Silkscreen, monospace';ctx.textAlign='center';
+  if(S.chain.n>=3&&S.chain.t>0){const a=Math.min(1,S.chain.t);ctx.save();ctx.font='10px Silkscreen, monospace';const x=S.cam+VW/2,y=FY0-28;ctx.fillStyle=`rgba(10,8,4,${.8*a})`;ctx.fillText(`×${S.chain.n} CHAIN`,x+1,y+1);ctx.fillStyle=`rgba(232,201,138,${a})`;ctx.fillText(`×${S.chain.n} CHAIN`,x,y);ctx.restore()}
   for(const f of S.texts){ctx.fillStyle='rgba(10,8,4,'+Math.min(1,f.life)*.8+')';ctx.fillText(f.txt,Math.round(f.x)+1,Math.round(f.y)+1);ctx.fillStyle=`rgba(${f.col},${Math.min(1,f.life)})`;ctx.fillText(f.txt,Math.round(f.x),Math.round(f.y))}
   const ring=(x,y,r,col,dash)=>{ctx.strokeStyle=col;if(dash)ctx.setLineDash([2,2]);ctx.beginPath();ctx.ellipse(x,y,r,r*.77,0,0,7);ctx.stroke();ctx.setLineDash([])};
   const band=(x,r,col,a)=>{ctx.fillStyle=col.replace('A',a);ctx.fillRect(Math.round(x-r),FY0-6,r*2,FY1-FY0+12)};
@@ -2267,14 +2975,23 @@ function buildCards(){
     b.onclick=()=>{if(!S||S.over||S.paused)return;
       if(sup){if(S.aim===k){S.aim=false;aimX=null;return}if(supReady(1,k)){S.aim=k}return}
       if(k==='apc'){apcCard();return}
-      if(S.pts[1]>=d.cost&&!(S.cd[1][k]>0)&&popCount(1)<54)spawn(1,k)};
+      if(S.pts[1]>=d.cost&&!(S.cd[1][k]>0)&&popCount(1)<capN())spawn(1,k)};
     (sup?sl:el).append(b);cards[k]=b;if(key)keyMap.push([key,k])};
   for(const k of ORDER.filter(t=>RUN.units.includes(t)))mk(k,false);
   for(const k of supLoadout())mk(k,true);
 }
-function setStance(st){if(st==='advance'&&S.noAdv>0)return;S.stance[1]=st;document.querySelectorAll('.seg button[data-st]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.st===st))}
+function setStance(st){if(st==='advance'&&S.noAdv>0)return;
+  if(st==='advance'&&S.stance[1]!=='advance'&&S.started){const T=S.timers;
+    if(lv('bugle')&&!(T.bugleCd>0)){T.bugle=4;T.bugleCd=30;morale(1,10);floatText(HQ[1]+40,FY0-14,'BUGLE','232,201,138')}
+    if(lv('overtop')&&!(T.otCd>0)){S.otT=4;T.otCd=40;floatText(HQ[1]+40,FY0-20,'OVER THE TOP','232,201,138');S.shake=2}}
+  S.stance[1]=st;document.querySelectorAll('.seg button[data-st]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.st===st))}
 document.querySelectorAll('.seg button[data-st]').forEach(b=>b.onclick=()=>S&&setStance(b.dataset.st));
 $('#bFront').onclick=()=>{if(S)S.follow=true};
+// 총공세: 전투마다 한 번(전설 특성은 없음). 전진 명령 + 사기 +25 + 8초 기세
+function bigPush(force){if(!S||S.over||!S.started||(S.paused&&!force)||(S.pushes||0)>=pushMax())return;S.pushes=(S.pushes||0)+1;setStance('advance');morale(1,25);S.surgeT[1]=Math.max(S.surgeT[1],8);S.shake=3;sfx('boom',S.cam+VW/2,.6);
+  floatText(S.cam+VW/2,FY0-20,'BIG PUSH','232,201,138');evBanner(_t('총공세! 모든 병력이 참호를 넘어 돌격합니다.'));ui()}
+const pushMax=()=>1+lv('secondwave');
+$('#bPush').onclick=bigPush;
 $('#bSpeed').onclick=e=>{if(!S)return;S.speed=S.speed>=4?1:S.speed+1;e.target.textContent='×'+S.speed};
 function soundLabel(){$('#bSound').textContent=AU.on?_t('소리 켬'):_t('소리 끔');$('#bSound').setAttribute('aria-pressed',AU.on)}
 $('#bSound').onclick=()=>{AU.on=!AU.on;store.set('trenchline.sound',AU.on);if(AU.on)audioInit();soundLabel()};
@@ -2284,6 +3001,8 @@ function ui(){
   {const n={};for(const u of S.units){if(u.side!==1)continue;n[u.type]=(n[u.type]||0)+1;if(u.cargo)for(const c of u.cargo)n[c.type]=(n[c.type]||0)+1}
    for(const k in cards){const el=cards[k].querySelector('.cnt');if(el)el.textContent=n[k]||''}}
   $('#cp').textContent=Math.floor(S.pts[1]);$('#cp').classList.toggle('pay',S.payFlash>0);$('#payAmt').textContent=_t("+{0} / {1}초",payAmount(1),payInterval(1).toFixed(1));$('#payBar').style.width=Math.min(100,S.payT[1]/payInterval(1)*100)+'%';
+  {const b=$('#bPush');b.disabled=(S.pushes||0)>=pushMax()||!S.started;b.textContent=_t('총공세')+(pushMax()>1?` ${pushMax()-(S.pushes||0)}`:'')}
+  $('#morP').style.width=S.mor[1]+'%';$('#morE').style.width=S.mor[-1]+'%';$('#morTag').textContent=S.rout[1]>0?_t('아군 붕괴'):S.rout[-1]>0?_t('적 붕괴'):S.surgeT[1]>0?_t('아군 기세'):S.surgeT[-1]>0?_t('적 기세'):'';
   $('#hpP').style.width=Math.max(0,S.hq[1]/S.hqMax[1]*100)+'%';$('#hpE').style.width=Math.max(0,S.hq[-1]/S.hqMax[-1]*100)+'%';
   for(const k in cards){const sup=!!SUP[k]&&!U[k],d=sup?{cost:supCost(1,k),cd:supCd(1,k)}:S.ST[1][k],cd=S.cd[1][k]||0;
     let poor=S.pts[1]<d.cost;
@@ -2326,16 +3045,25 @@ function loadoutPicker(){
 function bindLoadout(){ov.querySelectorAll('[data-lo]').forEach(b=>b.onclick=()=>{const k=b.dataset.lo,lo=supLoadout();
   if(lo.includes(k)){if(lo.length>1)lo.splice(lo.indexOf(k),1)}else{if(lo.length>=supSlots())lo.shift();lo.push(k)}
   ov.querySelectorAll('[data-lo]').forEach(x=>x.setAttribute('aria-pressed',lo.includes(x.dataset.lo)));const p=ov.querySelector('.lo').previousElementSibling;if(p)p.textContent=_t("출전 지원 카드 {0}/{1}",lo.length,supSlots());buildCards();ui();saveRun()})}
+// 전투 명령: 일반·정예 전투마다 하나. 달성하면 보급
+const OBJ={
+  fast:{name:_t('속전속결'),desc:_t('150초 안에 승리'),r:30,ok:()=>S.t<=150},
+  lean:{name:_t('병력 보존'),desc:_t('아군 손실 8 이하로 승리'),r:35,ok:()=>S.lost<=8},
+  chain:{name:_t('섬멸'),desc:_t('연쇄 사살 ×10 달성'),r:30,ok:()=>S.chain.best>=10},
+  hold3:{name:_t('전선 장악'),desc:_t('참호 3개를 동시에 점령'),r:30,ok:()=>(S.maxOwned||0)>=3},
+  nocard:{name:_t('자력 돌파'),desc:_t('지원 카드 없이 승리'),r:35,ok:()=>!S.usedSup},
+};
 function startBattle(n){
   const f=n.f,boss=n.type==='boss',elite=n.type==='elite',nc=nodeCfg(n);if(RUN.daily==='night'&&!n.mod)n.mod='fog';
-  CFG={node:n,f:nc.ef,floor:f,act:nc.act,actBoss:nc.actBoss,boss,elite,mod:n.mod,diff:nc.diff,ehq:nc.ehq,cmd:cmdOf(n)};
+  CFG={node:n,f:nc.ef,floor:f,act:nc.act,actBoss:nc.actBoss,boss,elite,mod:n.mod,diff:nc.diff,ehq:nc.ehq,cmd:cmdOf(n),obj:boss?null:Object.keys(OBJ)[((n.seed||0)>>>3)%5]};
   newGame(CFG);show('vBattle');S.cam=0;
   $('#bName').textContent=(CFG.actBoss?_t("{0}번째 전선 · {1}막 결전",f+1,CFG.act+1):boss?_t('적 사령부 공략'):_t("{0}번째 전선 · {1}",f+1,elite?_t('정예 부대'):_t('일반 전투')))+' · '+BIOMES[CFG.terrain.biome].name;
+  {const o=$('#bObj');o.hidden=!CFG.obj;if(CFG.obj){o.textContent='★ '+OBJ[CFG.obj].name;o.title=OBJ[CFG.obj].desc;o.classList.remove('done')}}
   const m=$('#bMod');m.hidden=!n.mod;if(n.mod){m.textContent=MODS[n.mod].name;m.title=MODS[n.mod].desc}
   $('#bPause').textContent=_t('일시정지');$('#bSpeed').textContent='×1';
   render();ui();
   setTimeout(bindLoadout,0);
-  overlay(_t("<h2>{0}</h2><p>{1}{2}지형: {3}. {4}적 사령부 내구도 {5}, 아군 사령부 {6}/{7}.</p>{8}",$('#bName').textContent,boss?_t('적 사령부는 내구도가 높고 전차와 기관총이 미리 배치돼 있습니다. '):elite?_t('적이 진지를 미리 갖추고 있습니다. '):'',n.mod?MODS[n.mod].name+': '+MODS[n.mod].desc+'. ':'',[...new Set(CFG.terrain.feats.map(o=>FEAT[o.type].name))].join(', ')||_t('개활지'),(rk()>1?_t("등급 {0} {1}. ",rk(),RANKS[rk()].name):'')+(CFG.cmd?_t("적 지휘관: {0}({1}). {2} ",CMDRS[CFG.cmd].name,CMDRS[CFG.cmd].style,CMDRS[CFG.cmd].desc):''),CFG.ehq,RUN.hq,RUN.hqMax,loadoutPicker()),_t('작전 개시'),()=>{ov.hidden=true;S.paused=false;S.started=true;audioInit();soundLabel()});
+  overlay(_t("<h2>{0}</h2><p>{1}{2}지형: {3}. {4}적 사령부 내구도 {5}, 아군 사령부 {6}/{7}.</p>{8}",$('#bName').textContent,boss?_t('적 사령부는 내구도가 높고 전차와 기관총이 미리 배치돼 있습니다. '):elite?_t('적이 진지를 미리 갖추고 있습니다. '):'',n.mod?MODS[n.mod].name+': '+MODS[n.mod].desc+'. ':'',[...new Set(CFG.terrain.feats.map(o=>FEAT[o.type].name))].join(', ')||_t('개활지'),(rk()>1?_t("등급 {0} {1}. ",rk(),RANKS[rk()].name):'')+(CFG.cmd?iconTag(CFG.cmd,'ico')+_t("적 지휘관: {0}({1}). {2} ",CMDRS[CFG.cmd].name,CMDRS[CFG.cmd].style,CMDRS[CFG.cmd].desc):'')+(CFG.obj?_t("전투 명령 '{0}': {1} → 보급 +{2}. ",OBJ[CFG.obj].name,OBJ[CFG.obj].desc,OBJ[CFG.obj].r):''),CFG.ehq,RUN.hq,RUN.hqMax,loadoutPicker()),_t('작전 개시'),()=>{ov.hidden=true;S.paused=false;S.started=true;audioInit();soundLabel()});
 }
 function vetDied(u){const v=(RUN.vets||[]).find(x=>x.id===u.vet);if(!v)return;
   RUN.vets=RUN.vets.filter(x=>x!==v);floatText(u.x,u.y-18,VET_NAMES[v.n%VET_NAMES.length],'200,85,61');
@@ -2356,14 +3084,15 @@ function endBattle(win){
   if(win){if(S.ls){RUN.bonus=(RUN.bonus||0)+20;floatText(HQ[1],FY0-20,'+20 MERIT','232,201,138')}vetsAfter();checkAch('battle')}
   const n=CFG.node;
   if(win){
-    RUN.hq=Math.min(RUN.hqMax,Math.max(1,Math.ceil(S.hq[1]))+(has('canteen')?15:0)+(has('kitchen')?10:0));if(has('kitchen'))RUN.supply+=10;if(has('interest'))RUN.supply+=Math.min(5,Math.floor(RUN.supply/10));if(CFG.elite)RUN.elites=(RUN.elites||0)+1;
+    RUN.hq=Math.min(RUN.hqMax,Math.max(1,Math.ceil(S.hq[1]))+(has('canteen')?15:0)+(has('kitchen')?10:0));if(has('kitchen'))RUN.supply+=10;RUN.supply+=15*lv('bonds')+(lv('leftover')?Math.floor(S.pts[1]/10):0);if(has('interest'))RUN.supply+=Math.min(5,Math.floor(RUN.supply/10));if(CFG.elite)RUN.elites=(RUN.elites||0)+1;
     if(CFG.actBoss){RUN.acts=(RUN.acts||0)+1;const gain=Math.round((40+CFG.f*5)*(has('coin')?1.5:1));RUN.supply+=gain;
       overlay(_t("<h2>{0}막 돌파</h2><p>적 사살 {1} · 아군 손실 {2} · 보급 +{3}. 적 지휘관을 물리치고 전리품을 얻었습니다.</p>",CFG.act+1,S.kills,S.lost,gain),_t('전리품 고르기'),()=>keystoneChoice(n));return}
     if(CFG.boss){overlay(_t("<h2>적 사령부 함락</h2><p>적 사살 {0} · 아군 손실 {1}</p>",S.kills,S.lost),_t('결과 보기'),()=>{RUN.path.push(n.id);gameOver(true)});return}
-    const gain=Math.round((25+CFG.f*5+(CFG.elite?35:0))*(has('coin')?1.5:1)*(RUN.daily==='poor'?2:1));RUN.supply+=gain;
-    overlay(_t("<h2>전선 돌파</h2><p>적 사살 {0} · 아군 손실 {1} · 사령부 {2}/{3}</p>",S.kills,S.lost,RUN.hq,RUN.hqMax),_t('보상 고르기'),()=>showReward(n,gain));
+    let gain=Math.round((25+CFG.f*5+(CFG.elite?35:0))*(has('coin')?1.5:1)*(RUN.daily==='poor'?2:1));
+    const objOk=CFG.obj&&OBJ[CFG.obj].ok();if(objOk)gain+=OBJ[CFG.obj].r;RUN.supply+=gain;
+    overlay(`<img class="vig sm" src="${vig('win')}" alt="">`+_t("<h2>전선 돌파</h2><p>적 사살 {0} · 아군 손실 {1} · 사령부 {2}/{3}</p>",S.kills,S.lost,RUN.hq,RUN.hqMax)+(CFG.obj?`<p>${objOk?_t("전투 명령 '{0}' 달성: 보급 +{1}",OBJ[CFG.obj].name,OBJ[CFG.obj].r):_t("전투 명령 '{0}' 실패",OBJ[CFG.obj].name)}</p>`:'')+(S.chain.best>=5?`<p>${_t("최대 연쇄 사살 ×{0}",S.chain.best)}</p>`:''),_t('보상 고르기'),()=>showReward(n,gain));
   }else{
-    overlay(_t("<h2>아군 사령부 함락</h2><p>적 사살 {0} · 아군 손실 {1}</p>",S.kills,S.lost),_t('결과 보기'),()=>gameOver(false));
+    overlay(`<img class="vig sm" src="${vig('lose')}" alt="">`+_t("<h2>아군 사령부 함락</h2><p>적 사살 {0} · 아군 손실 {1}</p>",S.kills,S.lost),_t('결과 보기'),()=>gameOver(false));
   }
 }
 
@@ -2388,6 +3117,7 @@ window.addEventListener('keydown',e=>{if($('#vBattle').hidden||!S||S.over)return
   {const m=keyMap.find(p=>p[0]===k);if(m){cards[m[1]].click();return}}
   if(k==='q')setStance('advance');if(k==='w')setStance('hold');if(k==='e')setStance('fall');
   if(k==='f')S.follow=true;
+  if(k==='r')bigPush();
   if(k===' '){e.preventDefault();$('#bPause').click()}
   if(e.key==='Tab'){e.preventDefault();$('#bSpeed').click()}
   if(e.key==='Escape'){S.aim=false;aimX=null}
@@ -2412,7 +3142,7 @@ function frame(now){
 }
 /* ---------- test hook (tests/ 시뮬레이션 전용, 게임 로직은 쓰지 않음) ---------- */
 window.__TL={get S(){return S},get RUN(){return RUN},set RUN(v){RUN=v},get CFG(){return CFG},U,PERKS,RELICS,
-  genMap,hashSeed,startBattle,step,spawn,setStance,callBarrage,callSupport,supReady,SUP,gameOver,newRun,getMeta,showMap,enterNode,nodeById,finishNode,endBattle,fieldEvent,grabCrate,checkAch,ACH,mkRun:(over)=>({seed:'SIM',map:genMap(1),path:[],hq:250,hqMax:250,supply:20,units:['rifle','assault','mg','at','sniper','mortar','tank','flame','corpsman','observer','apc'],perks:{},relics:[],support:['bar'],loadout:['bar'],kills:0,battles:0,recruits:0,elites:0,...(over||{})})};
+  genMap,hashSeed,startBattle,step,spawn,setStance,callBarrage,callSupport,supReady,SUP,gameOver,newRun,getMeta,showMap,enterNode,nodeById,finishNode,endBattle,fieldEvent,grabCrate,checkAch,ACH,EVENTS,DOCT,OBJ,bigPush,vig,VIGS,pixIcon,ICONS,pickEvent,mkRun:(over)=>({seed:'SIM',map:genMap(1),path:[],hq:250,hqMax:250,supply:20,units:['rifle','assault','mg','at','sniper','mortar','tank','flame','corpsman','observer','officer','apc'],perks:{},relics:[],support:['bar'],loadout:['bar'],kills:0,battles:0,recruits:0,elites:0,...(over||{})})};
 if(/^dev\.|-dev\.|localhost|127\.0\.0\.1/.test(location.hostname))$('#devTag').hidden=false;
 $('#bLang').textContent=LANG==='en'?'한국어':'English';$('#bLang').lang=LANG==='en'?'ko':'en';
 if($('#ver').textContent.startsWith('__'))$('#ver').textContent='local';
