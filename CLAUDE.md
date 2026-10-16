@@ -55,6 +55,8 @@ sed -n '/<script>/,/<\/script>/p' public/index.html | sed '1d;$d' > /tmp/g.js &&
 | 사기·연쇄 사살 | `morale(side,d)`(`S.mor`, 붕괴 `S.rout`, 기세 `S.surgeT`), `onKill()`(사기·연쇄 `S.chain`·교리 보상), 총공세 `bigPush()`/`pushMax()`, 적 총반격 `S.eCounter` |
 | 교리·백병전 | `PERKS[k].t`(inf·art·arm·def·mob·log), `DOCT`, `doctLv()`/`doct(t,n)`, `MELEE`(병과별 백병전 승률), 전설 특성 `PERKS[k].gold` |
 | 가스·갱도·전투 명령 | `SUP.gas`/`SUP.tunnel`(`callSupport`, `S.gases`), `OBJ`(전투 명령), 역사 사건은 `EVENTS` 뒤쪽 + `giveSup()`/`givePerk()` |
+| 삽화·아이콘 | `vignettes & icons` 섹션: `VP`(소품 격자), `VIGS`(장면), `vig(k)`, `ICONS`/`pixIcon(k)`/`iconTag(k,cls)`. `panel(...,art)` 다섯째 인자로 삽화 |
+| 사건 고르기 | `pickEvent(n)`(`RUN.seen`, `era`, `req`+`RUN.flags`) |
 | 적 AI | `aiStep()` |
 | 사건 | `EVENTS` |
 | 지형·바이옴 | `BIOMES`, `FEAT`, `genTerrain()`, `buildGround()` |
@@ -67,6 +69,7 @@ sed -n '/<script>/,/<\/script>/p' public/index.html | sed '1d;$d' > /tmp/g.js &&
 - 전장은 2배 해상도(`SC=2`)로 그린다. 전장 스프라이트(`SPR`)는 굽고 나서 `epx()`(Scale2x)로 윤곽을 다듬어 2배가 되며, `lw`/`lh`가 월드 단위 크기다. 그림 좌표는 계속 월드 단위로 쓴다.
 - 출신 그림: `ORIGIN_ART`에 24×14, 팔레트 `RELIC_PAL`. 사람 얼굴 대신 병과 무기를 그린다.
 - 유닛: 높이 12px 안팎, 팔레트 `PAL[1]`(아군)·`PAL[-1]`(적)의 같은 글자를 써서 두 진영 색이 자동으로 갈리게 한다.
+- 사건·장면 삽화: `VIGS`에 소품 배치로 만든다(64×28). 새 소품은 `VP`에 RELIC_PAL 격자로. 사람 얼굴은 그리지 않는다(병사 스프라이트는 얼굴이 안 보이는 크기라 허용).
 - 유물 아이콘: `RELIC_ICON`에 12×12, 팔레트 `RELIC_PAL`만 사용. 외곽선은 `k`(진한 갈색), 하이라이트 1~2픽셀. 새 유물을 추가하면 아이콘도 같이 넣는다. 없으면 ◆로 대체된다.
 - 색을 새로 넣지 말고 기존 팔레트 글자를 쓴다. 꼭 필요하면 NOTES에 적고 팀장 확인.
 
