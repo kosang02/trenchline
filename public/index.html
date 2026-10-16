@@ -867,7 +867,7 @@ const I18N_EN={
   "8초간 독가스 구름. 안의 병사는 참호와 상관없이 초당 2 피해, 명중 -40%, 사기 하락. 바람에 실려 적 쪽으로 흐르고 아군도 다칩니다. 이프르, 1915.":"Poison gas cloud for 8 s. Troops inside take 2 damage per second even in trenches, -40% accuracy, falling morale. Drifts on the wind toward the enemy and can hurt your own troops. Ypres, 1915.",
   "갱도 폭파":"Tunnel Mine",
   "12초 동안 땅굴을 판 뒤 지정한 곳에서 가까운 적 참호를 통째로 폭파합니다. 참호 안 적은 거의 전멸, 적 사기 -30. 메신 능선, 1917.":"Digs for 12 s, then blows up the enemy trench nearest the target. Troops inside are nearly wiped out; enemy morale -30. Messines Ridge, 1917.",
-  "권총만 찹니다. 반경 40 안 아군 명중 +12%, 살아 있으면 사기가 더 높게 유지됩니다. 쓰러지면 그 편 사기 -15, 4초 동안 주변 명중 -30%. 저격수가 먼저 노립니다.":"Carries only a sidearm. Allies within 40 get +12% accuracy, and morale holds higher while he lives. If he falls, that side loses 15 morale and nearby accuracy drops 30% for 4 s. Snipers target him first.",
+  "권총만 찹니다. 최전방 바로 뒤를 따라가며 반경 40 안 아군 명중 +12%, 살아 있으면 사기가 더 높게 유지됩니다. 쓰러지면 아군 사기 -8(적 장교는 -15), 4초 동안 주변 명중 -30%. 저격수가 먼저 노립니다.":"Pistol only. Follows just behind the front line. Allies within 40 get +12% accuracy, and morale stays higher while alive. If killed: your morale -8 (enemy officer -15), nearby accuracy -30% for 4 s. Snipers target officers first.",
   "총검술":"Bayonet Drill",
   "소총수·돌격조가 백병전에서 이길 확률 +15%":"Riflemen and Assault Teams win melee +15% more often",
   "잠망경 소총":"Periscope Rifle",
@@ -895,7 +895,7 @@ const I18N_EN={
   "철조망 가설":"Wire Entanglements",
   "전투 시작 때 아군 두 번째 참호 앞에 철조망":"At battle start, barbed wire is laid in front of your second trench",
   "방독면":"Gas Mask",
-  "아군이 가스 피해와 사기 하락을 받지 않음":"Allies take no gas damage and lose no morale to gas",
+  "아군이 받는 가스 피해·사기 하락 -70%, 가스 속에서도 명중 감소 없음":"Allies take 70% less gas damage and morale loss, and keep full accuracy in gas",
   "콘크리트 벙커":"Concrete Bunker",
   "참호 안 아군이 받는 폭발 피해 추가 -40%":"Allies in trenches take an extra -40% explosion damage",
   "갱도 청음병":"Tunnel Listeners",
@@ -919,22 +919,22 @@ const I18N_EN={
   "선전 전단":"Propaganda Leaflets",
   "적이 사기 35로 전투를 시작":"Enemy starts the battle at 35 morale",
   "참호를 넘어라":"Over the Top",
-  "전진 명령 때 아군 모두 2.5초간 무적·이동 +60% (재사용 40초). 대가: 사수 중 아군 명중 -10%":"On an advance order, all allies are invulnerable and +60% speed for 2.5 s (40 s cooldown). Cost: allied accuracy -10% while holding",
+  "전진 명령 때 아군 모두 4초간 무적·이동 +60% (재사용 40초). 대가: 사수 중 아군 명중 -10%":"On Advance, all allies are invulnerable and move +60% for 4 s (40 s cooldown). Cost: -10% accuracy while holding",
   "국민 총동원":"General Mobilization",
   "병력 상한 54 → 90, 소총수 비용 5. 대가: 소총수 체력 -20%":"Troop cap 54 → 90, Rifleman cost 5. Cost: Rifleman HP -20%",
   "포탄 충격":"Shell Shock",
-  "아군 폭발에 맞은 적은 1.2초 동안 아무것도 못 함":"Enemies hit by allied explosions are stunned for 1.2 s",
+  "아군 폭발에 맞은 적은 2초 동안 아무것도 못 함":"Enemies hit by your explosions are stunned for 2 s",
   "소모전":"War of Attrition",
-  "아군이 쓰러질 때마다 CP +3, 적 사기 -2. 대가: 아군 사기 상승 절반":"Each fallen ally gives CP +3 and enemy morale -2. Cost: allied morale gains halved",
-  "전격전":"Blitzkrieg",
-  "전투 첫 30초 동안 아군 이동·연사 +50%. 대가: 그 뒤 연사 -10%":"First 30 s of battle: allied speed and fire rate +50%. Cost: fire rate -10% afterwards",
+  "아군이 쓰러질 때마다 CP +5, 적 사기 -2. 대가: 아군 사기 상승 절반":"Each ally lost gives +5 CP and enemy morale -2. Cost: your morale gains halved",
+  "기습 개전":"Surprise Opening",
+  "전투 첫 45초 동안 아군 이동·연사 +50%. 대가: 그 뒤 연사 -10%":"For the first 45 s of each battle, allies move and fire 50% faster. Cost: -10% fire rate afterwards",
   "최후의 1인":"Last Man Standing",
   "아군이 3명 이하일 때 아군이 주는 피해 ×3, 무너지지 않음":"With 3 or fewer allies left, they deal ×3 damage and never rout",
   "보병 교리":"Infantry Doctrine",
   "총검 돌격: 소총수가 백병전에서 이길 확률 +20%":"Bayonet Charge: Riflemen win melee +20% more often",
   "매드 미닛: 45초마다 8초 동안 소총수 연사 2배":"Mad Minute: every 45 s, Rifleman fire rate doubles for 8 s",
   "포병 교리":"Artillery Doctrine",
-  "이동 탄막: 아군 포격이 표시한 곳에서 시작해 적 쪽으로 40 전진하며 떨어짐":"Creeping Barrage: allied barrages start at the marker and walk 40 toward the enemy",
+  "이동 탄막: 아군 포격이 표시한 곳 20 뒤에서 시작해 적 쪽으로 40 전진하며 떨어짐":"Creeping Barrage: your Barrage starts 20 behind the marked spot and walks 40 toward the enemy",
   "일제 사격: 15초마다 모든 박격포가 함께 쏘고 그 탄은 폭발 범위 +50%":"Time on Target: every 15 s all Mortars fire together, with +50% blast radius",
   "기갑 교리":"Armor Doctrine",
   "전차 정비: 아군 전차가 초당 체력 1 회복, 전차가 적을 쓰러뜨리면 사기 +3":"Tank Maintenance: allied Tanks regain 1 HP per second; when a Tank kills an enemy, morale +3",
@@ -1096,7 +1096,7 @@ const SUP={
 };
 const SUP_ORDER=['bar','smoke','mines','aid','howitzer','strafe','gas','tunnel'];
 const ORDER=['rifle','assault','mg','at','flame','sniper','mortar','tank','corpsman','observer','officer','apc'];
-const UNIT_DESC={officer:_t('권총만 찹니다. 반경 40 안 아군 명중 +12%, 살아 있으면 사기가 더 높게 유지됩니다. 쓰러지면 그 편 사기 -15, 4초 동안 주변 명중 -30%. 저격수가 먼저 노립니다.'),flame:_t('짧은 사거리에서 불을 뿜습니다. 불은 참호와 엄폐를 무시하고 4초 동안 탑니다. 참호를 비울 때 씁니다.'),corpsman:_t('무기가 없습니다. 최전방 바로 뒤를 따라가며 반경 안 아군 보병을 초당 3씩 치료합니다.'),observer:_t('무기가 없습니다. 살아 있는 동안 포격·야포·기총소사 재사용 대기 -25%. 반경 70 안에서는 박격포·포격 탄착이 절반으로 모이고, 야포는 근처 적을 따라가며, 박격포 사거리 +25%. 여러 명이어도 겹치지 않습니다. 몸을 드러내고 있어 참호·엄폐 보호를 못 받고 잘 맞습니다.'),apc:_t('보병 5명(소총수·돌격조·대전차병·위생병)을 태워 최전방 참호까지 실어 나릅니다. 카드를 누르면 차가 나오고, 그다음 산 병력이 탑승합니다. 다시 누르면 바로 출발합니다. 파괴되면 탑승병 절반이 살아남습니다.'),sniper:_t('사거리가 아주 길고 한 발이면 쓰러뜨립니다. 기관총·박격포·대전차병·저격수를 먼저 노립니다. 연사가 느립니다.'),mortar:_t('곡사로 범위 피해를 줍니다. 멀리 쏠수록 탄착이 크게 흩어지고, 가까운 적은 못 쏩니다. 저격수에게 약합니다.'),tank:_t('튼튼하고 범위 포격을 합니다. 대전차병과 수류탄에 약합니다.')};
+const UNIT_DESC={officer:_t('권총만 찹니다. 최전방 바로 뒤를 따라가며 반경 40 안 아군 명중 +12%, 살아 있으면 사기가 더 높게 유지됩니다. 쓰러지면 아군 사기 -8(적 장교는 -15), 4초 동안 주변 명중 -30%. 저격수가 먼저 노립니다.'),flame:_t('짧은 사거리에서 불을 뿜습니다. 불은 참호와 엄폐를 무시하고 4초 동안 탑니다. 참호를 비울 때 씁니다.'),corpsman:_t('무기가 없습니다. 최전방 바로 뒤를 따라가며 반경 안 아군 보병을 초당 3씩 치료합니다.'),observer:_t('무기가 없습니다. 살아 있는 동안 포격·야포·기총소사 재사용 대기 -25%. 반경 70 안에서는 박격포·포격 탄착이 절반으로 모이고, 야포는 근처 적을 따라가며, 박격포 사거리 +25%. 여러 명이어도 겹치지 않습니다. 몸을 드러내고 있어 참호·엄폐 보호를 못 받고 잘 맞습니다.'),apc:_t('보병 5명(소총수·돌격조·대전차병·위생병)을 태워 최전방 참호까지 실어 나릅니다. 카드를 누르면 차가 나오고, 그다음 산 병력이 탑승합니다. 다시 누르면 바로 출발합니다. 파괴되면 탑승병 절반이 살아남습니다.'),sniper:_t('사거리가 아주 길고 한 발이면 쓰러뜨립니다. 기관총·박격포·대전차병·저격수를 먼저 노립니다. 연사가 느립니다.'),mortar:_t('곡사로 범위 피해를 줍니다. 멀리 쏠수록 탄착이 크게 흩어지고, 가까운 적은 못 쏩니다. 저격수에게 약합니다.'),tank:_t('튼튼하고 범위 포격을 합니다. 대전차병과 수류탄에 약합니다.')};
 const PERKS={
   rifleDmg:{name:_t('정밀 사격'),desc:_t('소총수 명중률 +30%'),max:2},
   mgSetup:{name:_t('신속 거치'),desc:_t('기관총 사격 준비 시간 절반'),max:1},
@@ -1140,7 +1140,7 @@ const PERKS={
   tankterror:{name:_t('전차 공포'),desc:_t('아군 전차 곁(30)의 적 명중 -25%. 전차를 처음 투입하면 적 사기 -10. 플레르, 1916.'),max:1,t:'arm',req:'tank'},
   salvage:{name:_t('구난반'),desc:_t('아군 전차·수송차가 파괴되면 비용의 40%를 CP로 돌려받음'),max:1,t:'arm',req:['tank','apc']},
   wire:{name:_t('철조망 가설'),desc:_t('전투 시작 때 아군 두 번째 참호 앞에 철조망'),max:2,t:'def'},
-  gasmask:{name:_t('방독면'),desc:_t('아군이 가스 피해와 사기 하락을 받지 않음'),max:1,t:'def'},
+  gasmask:{name:_t('방독면'),desc:_t('아군이 받는 가스 피해·사기 하락 -70%, 가스 속에서도 명중 감소 없음'),max:1,t:'def'},
   bunker:{name:_t('콘크리트 벙커'),desc:_t('참호 안 아군이 받는 폭발 피해 추가 -40%'),max:1,t:'def'},
   listen:{name:_t('갱도 청음병'),desc:_t('적 갱도 폭파가 8초 늦게 터짐'),max:1,t:'def'},
   discipline:{name:_t('군기'),desc:_t('아군은 사기가 0이 돼도 무너지지 않음'),max:1,t:'def'},
@@ -1153,17 +1153,17 @@ const PERKS={
   secondwave:{name:_t('제2파'),desc:_t('전투마다 총공세를 한 번 더 쓸 수 있음'),max:2,t:'mob'},
   leaflets:{name:_t('선전 전단'),desc:_t('적이 사기 35로 전투를 시작'),max:1,t:'log'},
   // 전설 특성: 보상에 가끔(12%, 정예·보스 25%) 한 칸 나온다. 규칙을 바꾸고 대가가 있다.
-  overtop:{name:_t('참호를 넘어라'),desc:_t('전진 명령 때 아군 모두 2.5초간 무적·이동 +60% (재사용 40초). 대가: 사수 중 아군 명중 -10%'),max:1,gold:true},
+  overtop:{name:_t('참호를 넘어라'),desc:_t('전진 명령 때 아군 모두 4초간 무적·이동 +60% (재사용 40초). 대가: 사수 중 아군 명중 -10%'),max:1,gold:true},
   levee:{name:_t('국민 총동원'),desc:_t('병력 상한 54 → 90, 소총수 비용 5. 대가: 소총수 체력 -20%'),max:1,gold:true},
-  shellshock:{name:_t('포탄 충격'),desc:_t('아군 폭발에 맞은 적은 1.2초 동안 아무것도 못 함'),max:1,gold:true},
-  attrition:{name:_t('소모전'),desc:_t('아군이 쓰러질 때마다 CP +3, 적 사기 -2. 대가: 아군 사기 상승 절반'),max:1,gold:true},
-  blitz:{name:_t('전격전'),desc:_t('전투 첫 30초 동안 아군 이동·연사 +50%. 대가: 그 뒤 연사 -10%'),max:1,gold:true},
+  shellshock:{name:_t('포탄 충격'),desc:_t('아군 폭발에 맞은 적은 2초 동안 아무것도 못 함'),max:1,gold:true},
+  attrition:{name:_t('소모전'),desc:_t('아군이 쓰러질 때마다 CP +5, 적 사기 -2. 대가: 아군 사기 상승 절반'),max:1,gold:true},
+  blitz:{name:_t('기습 개전'),desc:_t('전투 첫 45초 동안 아군 이동·연사 +50%. 대가: 그 뒤 연사 -10%'),max:1,gold:true},
   lastman:{name:_t('최후의 1인'),desc:_t('아군이 3명 이하일 때 아군이 주는 피해 ×3, 무너지지 않음'),max:1,gold:true},
 };
 for(const [k,t] of Object.entries({rifleDmg:'inf',veteran:'inf',vanguard:'inf',scope:'inf',doubleTap:'inf',ghillie:'inf',mortarSplash:'art',barrage:'art',incendiary:'art',smoke:'art',atDmg:'arm',tankHp:'arm',motor:'arm',apAmmo:'arm',mgSetup:'def',trench:'def',medic:'def',hqArmor:'def',mines:'def',grenade:'mob',capture:'mob',rally:'mob',income:'log',logistics:'log',startCP:'log',cheap:'log',drill:'log',bounty:'log'}))PERKS[k].t=t;
 const DOCT={
   inf:{name:_t('보병 교리'),b3:_t('총검 돌격: 소총수가 백병전에서 이길 확률 +20%'),b6:_t('매드 미닛: 45초마다 8초 동안 소총수 연사 2배')},
-  art:{name:_t('포병 교리'),b3:_t('이동 탄막: 아군 포격이 표시한 곳에서 시작해 적 쪽으로 40 전진하며 떨어짐'),b6:_t('일제 사격: 15초마다 모든 박격포가 함께 쏘고 그 탄은 폭발 범위 +50%')},
+  art:{name:_t('포병 교리'),b3:_t('이동 탄막: 아군 포격이 표시한 곳 20 뒤에서 시작해 적 쪽으로 40 전진하며 떨어짐'),b6:_t('일제 사격: 15초마다 모든 박격포가 함께 쏘고 그 탄은 폭발 범위 +50%')},
   arm:{name:_t('기갑 교리'),b3:_t('전차 정비: 아군 전차가 초당 체력 1 회복, 전차가 적을 쓰러뜨리면 사기 +3'),b6:_t('돌파구: 아군 전차가 적 참호에 들어서면 그 참호의 적 모두 피해 20, 적 사기 -15')},
   def:{name:_t('참호 교리'),b3:_t('종심 방어: 보급마다 점령한 참호 1개당 CP +2'),b6:_t('철벽: 사령부가 처음 50% 아래로 내려가면 참호 안 아군 완치, 10초간 명중 +30%')},
   mob:{name:_t('돌격 교리'),b3:_t('돌격대: 돌격조가 지형 감속을 무시하고 이동 +20%'),b6:_t('침투 전술: 돌격조가 아군 최전방 참호에서 나타남')},
@@ -2242,7 +2242,7 @@ function impact(p){
     const dd=Math.hypot(e.x-p.x1,e.y-p.y1);if(dd>p.splash)continue;nh++;if(p.bref){(p.bref.hit||(p.bref.hit=new Set)).add(e)}
     let dmg=(isArmor(e)?(p.armorDmg??p.dmg):p.dmg)*(1-dd/p.splash*.5);
     if(!p.grenade&&!U[e.type].exposed){if(e.inTrench)dmg*=.55*S.trenchMul[e.side]*(p.side===1&&lv('delayfuse')?1.6:1)*(e.side===1&&lv('bunker')?.6:1);else if(e.scov)dmg*=e.scov}
-    if(p.side===1&&lv('shellshock')&&!p.rocket)e.stun=1.2;hit(e,dmg,p.src)}
+    if(p.side===1&&lv('shellshock')&&!p.rocket)e.stun=2;hit(e,dmg,p.src)}
   if(Math.abs(HQ[-p.side]-p.x1)<16)hit({hq:-p.side},p.dmg*.8);
   if(p.fire)S.fires.push({x:p.x1,y:p.y1,r:11,life:4,side:p.side});
   if(nh>=3)morale(-p.side,-Math.min(8,nh*1.2));
@@ -2304,7 +2304,7 @@ function aiStep(dt){
   }
   if(F>=5&&supReady(-1,'gas')){
     let bx=null,by=0,bn=0;for(const u of pu){if(!u.inTrench)continue;const n=pu.filter(v=>Math.hypot(v.x-u.x,v.y-u.y)<26).length;if(n>bn){bn=n;bx=u.x;by=u.y}}
-    if(bn>=4)return use('gas',bx+12,by);
+    if(bn>=6)return use('gas',bx+12,by);
   }
   if((F>=8||(CFG.boss&&CFG.act>=1))&&supReady(-1,'tunnel')&&!S.strikes.some(st=>st.k==='tunnel'&&st.side===-1)){
     let T=null,bn=0;for(const t of S.trench){if(t.own!==1)continue;const n=pu.filter(u=>Math.abs(u.x-t.x)<11&&inTrenchSpan(t,u.y)).length;if(n>bn){bn=n;T=t}}
@@ -2321,7 +2321,7 @@ function callSupport(side,k,x,y){
   const d=SUP[k],mine=side===1;if(mine){const us=RUN.used||(RUN.used={u:{},sup:0,arty:0});us.sup=1;if(k==='bar'||k==='howitzer')us.arty=1}S.pts[side]-=supCost(side,k);S.cd[side][k]=supCd(side,k);y=clampY(y);
   if(mine)S.usedSup=true;
   if(!mine&&(k==='bar'||k==='howitzer')&&lv('counter')){S.freeBar=15;floatText(HQ[1]+40,FY0-20,'COUNTER-BATTERY','232,201,138')}
-  if(k==='bar'){const hu=mine&&lv('hurricane');S.barr.push({side,x,y,t:-d.delay-(hu?1:0),n:Math.round(S.barN[side]*(hu?1.5:1)),fired:0});return}
+  if(k==='bar'){const hu=mine&&lv('hurricane');S.barr.push({side,x:x-(mine&&doct('art',3)?20:0),y,t:-d.delay-(hu?1:0),n:Math.round(S.barN[side]*(hu?1.5:1)),fired:0});return}
   if(k==='gas'){const big=mine&&lv('gasmaster');S.strikes.push({k,side,x,y,t:-d.delay,pass:0,r:d.r*(big?1.25:1),life:8+(big?4:0)});return}
   if(k==='tunnel'){let T=null,bd=1e9;for(const t of S.trench){const dd=Math.abs(t.x-x)+(t.own===-side?0:60);if(dd<bd){bd=dd;T=t}}
     S.strikes.push({k,side,x:T.x,y:(T.y0+T.y1)/2,T,t:-d.delay-(side===-1&&lv('listen')?8:0),pass:0});
@@ -2347,15 +2347,15 @@ function morale(side,d){
     evBanner(side===1?_t('아군 전선 붕괴! 6초 동안 병사들이 물러납니다.'):_t('적 전선 붕괴! 6초 동안 적이 달아납니다. 지금 밀어붙이세요.'))}
 }
 function onKill(u,src){
-  if(u.type==='officer'){morale(u.side,-15);S.leaderless=S.leaderless||{1:0,'-1':0};S.leaderless[u.side]=4;floatText(u.x,u.y-20,'OFFICER DOWN',u.side===-1?'185,204,106':'200,85,61')}
+  if(u.type==='officer'){morale(u.side,u.side===1?-8:-15);S.leaderless=S.leaderless||{1:0,'-1':0};S.leaderless[u.side]=4;floatText(u.x,u.y-20,'OFFICER DOWN',u.side===-1?'185,204,106':'200,85,61')}
   const c=U[u.type].cost,dv=.8+c/30+(u.type==='tank'?6:0);
-  morale(u.side,-dv);morale(-u.side,dv*.8);
+  morale(u.side,-dv);morale(-u.side,dv*.8*(S.capT&&S.capT[-u.side]>0?2:1));
   if(u.side===-1){
     const ch=S.chain;ch.n++;ch.t=2.6;ch.best=Math.max(ch.best,ch.n);
-    if(ch.n%5===0){const b=ch.n>=20?60:ch.n>=15?40:ch.n>=10?25:10;S.pts[1]+=b;morale(1,4);floatText(u.x,u.y-22,`×${ch.n} CHAIN +${b}`,'232,201,138');S.shake=Math.max(S.shake,1.5)}
+    if(ch.n%5===0){const b=ch.n>=20?120:ch.n>=15?80:ch.n>=10?50:20;S.pts[1]+=b;morale(1,6);floatText(u.x,u.y-22,`×${ch.n} CHAIN +${b}`,'232,201,138');S.shake=Math.max(S.shake,1.5)}
     if(doct('log',6))S.pts[1]+=c*.1;
     if(src&&src.type==='tank'&&src.side===1&&doct('arm',3))morale(1,3);
-  }else if(lv('attrition')){S.pts[1]+=3;morale(-1,-2)}
+  }else if(lv('attrition')){S.pts[1]+=5;morale(-1,-2)}
 }
 const capN=()=>lv('levee')?90:54;
 /* ---------- step ---------- */
@@ -2371,12 +2371,12 @@ function step(dt){
   const medic=lv('medic');
   {const T=S.timers;for(const k in T)if(T[k]>0)T[k]-=dt;if(S.otT>0)S.otT-=dt;if(S.bulwark>0)S.bulwark-=dt;if(S.freeBar>0)S.freeBar-=dt;if(S.mad>0)S.mad-=dt;
    S.offs=S.units.filter(u=>u.type==='officer');S.leaderless=S.leaderless||{1:0,'-1':0};
-   for(const s of [1,-1]){if(S.rout[s]>0)S.rout[s]-=dt;if(S.surgeT[s]>0)S.surgeT[s]-=dt;if(S.leaderless[s]>0)S.leaderless[s]-=dt;S.mor[s]+=((S.offs.some(o=>o.side===s)?62:52)-S.mor[s])*.012*dt}
+   for(const s of [1,-1]){if(S.rout[s]>0)S.rout[s]-=dt;if(S.surgeT[s]>0)S.surgeT[s]-=dt;if(S.leaderless[s]>0)S.leaderless[s]-=dt;if(S.capT&&S.capT[s]>0)S.capT[s]-=dt;S.mor[s]+=((S.offs.some(o=>o.side===s)?62:52)-S.mor[s])*.012*dt}
    if(!S.eCounter&&S.started&&S.hq[-1]<S.hqMax[-1]*.4&&S.hq[-1]>0){S.eCounter=true;S.stance[-1]='advance';morale(-1,25);S.surgeT[-1]=8;floatText(HQ[-1]-40,FY0-14,'COUNTERATTACK','200,85,61');evBanner(_t('적 총반격! 적이 사령부를 지키려고 전부 뛰쳐나옵니다.'))}
    const ch=S.chain;if(ch.t>0){ch.t-=dt;if(ch.t<=0)ch.n=0}
    S.few=S.units.filter(u=>u.side===1&&u.type!=='apc').length<=3&&S.t>20;
    if(doct('inf',6)&&!(T.madCd>0)&&S.t>10){T.madCd=45;S.mad=8;floatText(HQ[1]+40,FY0-14,'MAD MINUTE','232,201,138')}
-   if(doct('art',6)&&!(T.totCd>0)&&S.t>8){const ms=S.units.filter(u=>u.side===1&&u.type==='mortar');if(ms.length){T.totCd=15;for(const m of ms){m.cd=0;m.tot=true}floatText(HQ[1]+40,FY0-20,'TIME ON TARGET','232,201,138')}}
+   if(doct('art',6)&&!(T.totCd>0)&&S.t>8){const ms=S.units.filter(u=>u.side===1&&u.type==='mortar');if(ms.length){T.totCd=15;for(const m of ms){m.cd=0;m.tot=true}floatText(HQ[1]+40,FY0-20,'VOLLEY','232,201,138')}}
    if(doct('def',6)&&!S.bulwarkUsed&&S.hq[1]<S.hqMax[1]*.5){S.bulwarkUsed=true;S.bulwark=10;for(const u of S.units)if(u.side===1&&u.inTrench)u.hp=u.max;floatText(HQ[1]+30,FY0-14,'BULWARK','232,201,138')}}
   S.dt=dt;S.horde=has('horde')&&S.units.reduce((n,u)=>n+(u.side===1),0)>=15;if(S.holdT>0)S.holdT-=dt;
   for(const u of S.units){
@@ -2386,10 +2386,11 @@ function step(dt){
     const t=d.aux||d.kind==='apc'||routing?null:findTarget(u);let want=null;
     if(d.kind==='apc'){if(u.state==='drop')apcUnload(u,dt);else want=apcStep(u,d,L)}
     else if(d.aux)want=auxWant(u,d,L);
+    else if(u.type==='officer'){if(t&&u.cd<=0){fire(u,t);u.cd=d.rof*R(.85,1.15)}want=auxWant(u,d,L)}
     else if(t){
       if(d.setup)u.setupT=Math.min(d.setup,u.setupT+dt);
       if((!d.setup||u.setupT>=d.setup)&&u.cd<=0){fire(u,t);
-        if(d.doubleTap&&!u.dt&&d.kind==='small'&&Math.random()<.3){u.dt=true;u.cd=.16}else{u.dt=false;u.cd=d.rof*R(.85,1.15)*(u.rally>0?.67:1)*(S.surgeT[s]>0?.7:1)*(s===1?(S.mad>0&&u.type==='rifle'?.5:1)*(lv('blitz')?(S.t<30?.67:1.1):1):1)}}
+        if(d.doubleTap&&!u.dt&&d.kind==='small'&&Math.random()<.3){u.dt=true;u.cd=.16}else{u.dt=false;u.cd=d.rof*R(.85,1.15)*(u.rally>0?.67:1)*(S.surgeT[s]>0?.7:1)*(s===1?(S.mad>0&&u.type==='rifle'?.5:1)*(lv('blitz')?(S.t<45?.67:1.1):1):1)}}
       if(!d.armor){const T=nearTrench(u.x,9);if(T)want=T.x+u.slot*.6}
       // 돌격: 전진 명령 중인 보병(소총·돌격·화염·대전차)은 쏘면서 반 속도로 다가가 백병전을 건다. 무너진 적은 제 속도로 쫓는다.
       u.chg=0;if(!d.armor&&!t.hq&&(MELEE[u.type]||0)>=.15&&S.stance[s]==='advance'){want=t.x-s*2;u.chg=S.rout[-s]>0?1:.5;u.y=clampY(u.y+Math.sign(t.y-u.y)*d.spd*.5*dt)}
@@ -2404,7 +2405,7 @@ function step(dt){
         want+=d.armor?-s*14:u.slot}
     }
     u.moving=false;
-    if(want!=null){const dx=want-u.x;if(Math.abs(dx)>1){const sp=d.spd*(u.slow||1)*(dx*s<0?.8:1)*(s===1&&S.stance[1]==='advance'?(has('whistle')?1.25:1)*(has('seal')?.75:1)*(S.timers.bugle>0?1.4:1)*(S.otT>0?1.6:1):1)*(routing?1.3:1)*(u.chg&&t?u.chg:1)*(S.surgeT[s]>0?1.15:1)*(s===1&&lv('blitz')&&S.t<30?1.5:1);u.x+=Math.sign(dx)*Math.min(Math.abs(dx),sp*dt);u.moving=true}}
+    if(want!=null){const dx=want-u.x;if(Math.abs(dx)>1){const sp=d.spd*(u.slow||1)*(dx*s<0?.8:1)*(s===1&&S.stance[1]==='advance'?(has('whistle')?1.25:1)*(has('seal')?.75:1)*(S.timers.bugle>0?1.4:1)*(S.otT>0?1.6:1):1)*(routing?1.3:1)*(u.chg&&t?u.chg:1)*(S.surgeT[s]>0?1.15:1)*(s===1&&lv('blitz')&&S.t<45?1.5:1);u.x+=Math.sign(dx)*Math.min(Math.abs(dx),sp*dt);u.moving=true}}
     if(u.moving&&d.setup)u.setupT=Math.max(0,u.setupT-dt*3);
     u.inTrench=!d.armor&&S.trench.some(T=>Math.abs(T.x-u.x)<=8&&inTrenchSpan(T,u.y));
     {const o=featAt(u.x,u.y),F=o&&FEAT[o.type];u.feat=o?o.type:null;
@@ -2427,7 +2428,7 @@ function step(dt){
   // 백병전: 맞붙은(6 안) 보병끼리 1초쯤마다 한 번씩 찌른다
   for(const u of S.units){
     if(u.mcd>0){u.mcd-=dt;continue}const du=U[u.type];if(du.armor||du.aux||!MELEE[u.type]||u.stun>0)continue;
-    let e=null,bd=6;for(const v of S.units){if(v.side===u.side||U[v.type].armor||v.dead)continue;const dd=Math.hypot(v.x-u.x,(v.y-u.y)*1.3);if(dd<bd){bd=dd;e=v}}
+    let e=null,bd=10;for(const v of S.units){if(v.side===u.side||U[v.type].armor||v.dead)continue;const dd=Math.hypot(v.x-u.x,(v.y-u.y)*1.3);if(dd<bd){bd=dd;e=v}}
     if(!e)continue;u.mcd=R(.8,1.1);let p=MELEE[u.type];
     if(u.side===1){if(u.type==='rifle'||u.type==='assault')p+=.15*lv('bayonet');if(u.type==='rifle'&&doct('inf',3))p+=.2;
       if(lv('clearing')&&u.inTrench){const T=nearTrench(u.x,9);if(T&&T.own!==1)p+=.25}}
@@ -2438,7 +2439,7 @@ function step(dt){
   for(const T of S.trench){
     let a=0,b=0;for(const u of S.units)if(Math.abs(u.x-T.x)<10&&inTrenchSpan(T,u.y)){u.side===1?a++:b++}
     const prev=T.own;if(a&&!b)T.own=1;else if(b&&!a)T.own=-1;
-    if(T.own!==prev&&T.own){morale(T.own,10);if(prev)morale(prev,-12)}
+    if(T.own!==prev&&T.own){morale(T.own,10);if(prev)morale(prev,-12);S.capT=S.capT||{1:0,'-1':0};S.capT[T.own]=8}
     if(T.own===1&&prev!==1){floatText(T.x,FY0-16,'TAKEN','185,204,106');if(lv('capture')){S.pts[1]+=15;floatText(T.x,FY0-8,'+15 CP')}}
     if(T.own===-1&&prev!==-1&&prev!==0)floatText(T.x,FY0-16,'LOST','200,85,61');
   }
@@ -2475,8 +2476,8 @@ function step(dt){
   S.fires=S.fires.filter(f=>f.life>0);
   for(const u of S.units)u.gas=false;
   for(const g of S.gases){g.life-=dt;g.x+=g.vx*dt;const inside={1:0,'-1':0};
-    for(const u of S.units){if(U[u.type].armor||Math.hypot(u.x-g.x,(u.y-g.y)*1.2)>=g.r)continue;if(u.side===1&&lv('gasmask'))continue;u.gas=true;hit(u,2*dt,null);inside[u.side]=1}
-    for(const s2 of [1,-1])if(inside[s2])morale(s2,-1.2*dt)}
+    for(const u of S.units){if(U[u.type].armor||Math.hypot(u.x-g.x,(u.y-g.y)*1.2)>=g.r)continue;const mk=u.side===1&&lv('gasmask')?.3:1;u.gas=mk===1;hit(u,2*dt*mk,null);inside[u.side]=mk}
+    for(const s2 of [1,-1])if(inside[s2])morale(s2,-1.2*dt*inside[s2])}
   S.gases=S.gases.filter(g=>g.life>0);
   for(const m of S.smokes)m.life-=dt;S.smokes=S.smokes.filter(m=>m.life>0);
   for(const m of S.mines){const ms=m.side||1;for(const e of S.units)if(e.side!==ms&&Math.hypot(e.x-m.x,e.y-m.y)<5){m.gone=true;impact({x1:m.x,y1:m.y,side:ms,dmg:28,armorDmg:40,splash:11,grenade:true});break}}
@@ -2644,12 +2645,12 @@ function buildCards(){
 function setStance(st){if(st==='advance'&&S.noAdv>0)return;
   if(st==='advance'&&S.stance[1]!=='advance'&&S.started){const T=S.timers;
     if(lv('bugle')&&!(T.bugleCd>0)){T.bugle=4;T.bugleCd=30;morale(1,10);floatText(HQ[1]+40,FY0-14,'BUGLE','232,201,138')}
-    if(lv('overtop')&&!(T.otCd>0)){S.otT=2.5;T.otCd=40;floatText(HQ[1]+40,FY0-20,'OVER THE TOP','232,201,138');S.shake=2}}
+    if(lv('overtop')&&!(T.otCd>0)){S.otT=4;T.otCd=40;floatText(HQ[1]+40,FY0-20,'OVER THE TOP','232,201,138');S.shake=2}}
   S.stance[1]=st;document.querySelectorAll('.seg button[data-st]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.st===st))}
 document.querySelectorAll('.seg button[data-st]').forEach(b=>b.onclick=()=>S&&setStance(b.dataset.st));
 $('#bFront').onclick=()=>{if(S)S.follow=true};
 // 총공세: 전투마다 한 번(전설 특성은 없음). 전진 명령 + 사기 +25 + 8초 기세
-function bigPush(){if(!S||S.over||!S.started||S.paused||(S.pushes||0)>=pushMax())return;S.pushes=(S.pushes||0)+1;setStance('advance');morale(1,25);S.surgeT[1]=Math.max(S.surgeT[1],8);S.shake=3;sfx('boom',S.cam+VW/2,.6);
+function bigPush(force){if(!S||S.over||!S.started||(S.paused&&!force)||(S.pushes||0)>=pushMax())return;S.pushes=(S.pushes||0)+1;setStance('advance');morale(1,25);S.surgeT[1]=Math.max(S.surgeT[1],8);S.shake=3;sfx('boom',S.cam+VW/2,.6);
   floatText(S.cam+VW/2,FY0-20,'BIG PUSH','232,201,138');evBanner(_t('총공세! 모든 병력이 참호를 넘어 돌격합니다.'));ui()}
 const pushMax=()=>1+lv('secondwave');
 $('#bPush').onclick=bigPush;
@@ -2803,7 +2804,7 @@ function frame(now){
 }
 /* ---------- test hook (tests/ 시뮬레이션 전용, 게임 로직은 쓰지 않음) ---------- */
 window.__TL={get S(){return S},get RUN(){return RUN},set RUN(v){RUN=v},get CFG(){return CFG},U,PERKS,RELICS,
-  genMap,hashSeed,startBattle,step,spawn,setStance,callBarrage,callSupport,supReady,SUP,gameOver,newRun,getMeta,showMap,enterNode,nodeById,finishNode,endBattle,fieldEvent,grabCrate,checkAch,ACH,EVENTS,DOCT,OBJ,mkRun:(over)=>({seed:'SIM',map:genMap(1),path:[],hq:250,hqMax:250,supply:20,units:['rifle','assault','mg','at','sniper','mortar','tank','flame','corpsman','observer','officer','apc'],perks:{},relics:[],support:['bar'],loadout:['bar'],kills:0,battles:0,recruits:0,elites:0,...(over||{})})};
+  genMap,hashSeed,startBattle,step,spawn,setStance,callBarrage,callSupport,supReady,SUP,gameOver,newRun,getMeta,showMap,enterNode,nodeById,finishNode,endBattle,fieldEvent,grabCrate,checkAch,ACH,EVENTS,DOCT,OBJ,bigPush,mkRun:(over)=>({seed:'SIM',map:genMap(1),path:[],hq:250,hqMax:250,supply:20,units:['rifle','assault','mg','at','sniper','mortar','tank','flame','corpsman','observer','officer','apc'],perks:{},relics:[],support:['bar'],loadout:['bar'],kills:0,battles:0,recruits:0,elites:0,...(over||{})})};
 if(/^dev\.|-dev\.|localhost|127\.0\.0\.1/.test(location.hostname))$('#devTag').hidden=false;
 $('#bLang').textContent=LANG==='en'?'한국어':'English';$('#bLang').lang=LANG==='en'?'ko':'en';
 if($('#ver').textContent.startsWith('__'))$('#ver').textContent='local';
