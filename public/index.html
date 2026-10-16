@@ -290,9 +290,9 @@ const I18N_EN={
   "4초 뒤 대형 포탄 한 발. 피해 80, 전차에도 통합니다. 움직이는 적은 피합니다.":"One heavy shell lands after 4 s. 80 damage; works on tanks. Moving enemies dodge it.",
   "기총소사":"Strafing Run",
   "2.5초 뒤 전투기가 세로 한 줄을 두 번 훑습니다. 참호 한 줄 소탕용.":"After 2.5 s a fighter sweeps one vertical line, twice. Clears a trench line.",
-  "사거리가 아주 길고 한 발이면 쓰러뜨립니다. 기관총·박격포·대전차병·저격수를 먼저 노립니다. 연사가 느립니다.":"Very long range; one hit kills. Targets machine guns, mortars, anti-tank troops and snipers first. Slow rate of fire.",
+  "사거리가 아주 길고 한 발이면 쓰러뜨립니다. 기관총·박격포·대전차병·저격수를 먼저 노립니다. 연사가 느리고 걸음도 느리며, 다시 뽑기까지 오래 걸립니다. 포격·박격포·수류탄 같은 폭발에 맞으면 한 방에 쓰러집니다.":"Very long range and kills in one shot. Targets Machine Guns, Mortars, Anti-Tank and Snipers first. Slow to fire, slow to move and slow to redeploy. Any explosion (Barrage, mortar, grenade) kills it outright.",
   "곡사로 범위 피해를 줍니다. 멀리 쏠수록 탄착이 크게 흩어지고, 가까운 적은 못 쏩니다. 저격수에게 약합니다.":"Lobbed shells deal area damage. The farther the shot, the wider the spread; can't hit close targets. Weak to snipers.",
-  "튼튼하고 범위 포격을 합니다. 대전차병과 수류탄에 약합니다.":"Sturdy, with area bombardment. Weak to anti-tank troops and grenades.",
+  "아주 튼튼하고 범위 포격을 합니다. 대전차병·전차·포격·야포·지뢰로만 피해를 입고, 소총·기관총·저격수는 철갑탄 특성이 있어야 통합니다. 돌격조 수류탄은 수류탄 묶음 특성이 있어야 통합니다.":"Very tough, fires area shells. Only Anti-Tank, tanks, Barrage, Howitzer and mines can damage it; rifles, machine guns and snipers need the Armor-Piercing perk, and Assault Team grenades need the Grenade Bundle perk.",
   "정밀 사격":"Precision Fire",
   "소총수 명중률 +30%":"Rifleman accuracy +30%",
   "신속 거치":"Quick Mount",
@@ -332,7 +332,7 @@ const I18N_EN={
   "조준경":"Scope",
   "소총수 사거리 +35%, 거리에 따른 명중률 감소 절반":"Rifleman range +35%, accuracy loss over distance halved",
   "철갑탄":"Armor-Piercing",
-  "소총수·기관총·저격수의 전차 피해 3배":"Rifleman, Machine Gun and Sniper damage to tanks ×3",
+  "소총수·기관총·저격수가 전차·수송차를 공격할 수 있음(이 특성이 없으면 장갑에 피해 0)":"Riflemen, Machine Guns and Snipers can damage tanks and transports (without it, they deal 0 to armor)",
   "속사":"Rapid Fire",
   "소총수가 30% 확률로 곧바로 한 발 더 쏨":"30% chance a Rifleman fires again at once",
   "소이탄":"Incendiary Shells",
@@ -368,7 +368,7 @@ const I18N_EN={
   "낡은 수통":"Worn Canteen",
   "전투가 끝날 때마다 사령부 +15":"HQ +15 after every battle",
   "묵주":"Rosary",
-  "아군 보병이 처음 치명상을 입으면 체력 1로 버팀":"First time allied infantry take a fatal hit, they hang on at 1 HP",
+  "아군 소총수·돌격조·기관총·대전차병이 처음 치명상을 입으면 체력 1로 버팀":"The first time an allied Rifleman, Assault Team, Machine Gun or Anti-Tank takes a fatal hit, they hold on at 1 HP",
   "탄약 상자":"Ammo Crate",
   "기관총 사격 준비 즉시, 연사 +20%":"Machine gun setup instant, fire rate +20%",
   "축음기":"Gramophone",
@@ -911,7 +911,7 @@ const I18N_EN={
   "참호 소탕":"Trench Clearing",
   "아군 것이 아닌 참호 안에서 백병전 승률 +25%":"+25% melee win chance inside trenches you do not hold",
   "수류탄 묶음":"Grenade Bundle",
-  "돌격조 수류탄의 장갑 피해 2배":"Assault Team grenades deal double damage to armor",
+  "돌격조 수류탄이 전차·수송차에도 피해(없으면 장갑에 피해 0)":"Assault Team grenades can damage tanks and transports (without it, 0 to armor)",
   "전쟁 채권":"War Bonds",
   "전투 승리 때 보급 +15":"Winning a battle gives Supply +15",
   "군수 정산":"Quartermaster's Audit",
@@ -1210,9 +1210,9 @@ const U={
   assault:{name:_t('돌격조'),  cost:20, hp:18, dmg:8, range:24,rof:.6, spd:15,cd:4,  kind:'small',acc:.62,grenade:true,gEvery:4,gDmg:14,gArmor:30},
   mg:     {name:_t('기관총'),  cost:35, hp:30, dmg:10,range:62,rof:.15,spd:7, cd:8,  kind:'small',acc:.26,setup:1.2},
   at:     {name:_t('대전차병'),cost:25, hp:10, dmg:10,armorDmg:66,range:52,rof:3,spd:10,cd:6,kind:'at',acc:.5,armorAcc:.82},
-  sniper: {name:_t('저격수'),  cost:40, hp:20, dmg:30,range:96,rof:3,spd:9,cd:12,kind:'small',acc:.7,decay:.12,prio:true,snipe:true},
+  sniper: {name:_t('저격수'),  cost:40, hp:20, dmg:30,range:96,rof:3,spd:6,cd:25,kind:'small',acc:.7,decay:.12,prio:true,snipe:true},
   mortar: {name:_t('박격포'),  cost:50, hp:20, dmg:12,range:72,min:28,rof:4.4,spd:7,cd:12,kind:'shell',splash:10,flight:1.1,arc:42,scatter:6,spread:.32},
-  tank:   {name:_t('전차'),    cost:110,hp:130,dmg:16,range:52,rof:3.2,spd:6, cd:35, kind:'shell',splash:6,flight:.22,arc:0,scatter:3,armor:true},
+  tank:   {name:_t('전차'),    cost:150,hp:180,dmg:20,range:52,rof:3,  spd:6, cd:40, kind:'shell',splash:8,flight:.22,arc:0,scatter:3,armor:true},
   // 화염방사병: 맞힌 자리에 불을 붙인다(초당 dmg, burn초, 반경 fr). 불은 참호·엄폐를 무시. 장갑에는 armorMul.
   flame:  {name:_t('화염방사병'),cost:30,hp:30,dmg:14,range:30,rof:1,  spd:13,cd:8, kind:'flame',burn:4,fr:12,armorMul:.3},
   // 위생병·관측병: 무기 없음(aux). 아군 최전방 바로 뒤를 따라간다.
@@ -1238,7 +1238,7 @@ const SUP={
 };
 const SUP_ORDER=['bar','smoke','mines','aid','howitzer','strafe','gas','tunnel'];
 const ORDER=['rifle','assault','mg','at','flame','sniper','mortar','tank','corpsman','observer','officer','apc'];
-const UNIT_DESC={officer:_t('권총만 찹니다. 최전방 바로 뒤를 따라가며 반경 40 안 아군 명중 +12%, 살아 있으면 사기가 더 높게 유지됩니다. 쓰러지면 아군 사기 -8(적 장교는 -15), 4초 동안 주변 명중 -30%. 저격수가 먼저 노립니다.'),flame:_t('짧은 사거리에서 불을 뿜습니다. 불은 참호와 엄폐를 무시하고 4초 동안 탑니다. 참호를 비울 때 씁니다.'),corpsman:_t('무기가 없습니다. 최전방 바로 뒤를 따라가며 반경 안 아군 보병을 초당 3씩 치료합니다.'),observer:_t('무기가 없습니다. 살아 있는 동안 포격·야포·기총소사 재사용 대기 -25%. 반경 70 안에서는 박격포·포격 탄착이 절반으로 모이고, 야포는 근처 적을 따라가며, 박격포 사거리 +25%. 여러 명이어도 겹치지 않습니다. 몸을 드러내고 있어 참호·엄폐 보호를 못 받고 잘 맞습니다.'),apc:_t('보병 5명(소총수·돌격조·대전차병·위생병)을 태워 최전방 참호까지 실어 나릅니다. 카드를 누르면 차가 나오고, 그다음 산 병력이 탑승합니다. 다시 누르면 바로 출발합니다. 파괴되면 탑승병 절반이 살아남습니다.'),sniper:_t('사거리가 아주 길고 한 발이면 쓰러뜨립니다. 기관총·박격포·대전차병·저격수를 먼저 노립니다. 연사가 느립니다.'),mortar:_t('곡사로 범위 피해를 줍니다. 멀리 쏠수록 탄착이 크게 흩어지고, 가까운 적은 못 쏩니다. 저격수에게 약합니다.'),tank:_t('튼튼하고 범위 포격을 합니다. 대전차병과 수류탄에 약합니다.')};
+const UNIT_DESC={officer:_t('권총만 찹니다. 최전방 바로 뒤를 따라가며 반경 40 안 아군 명중 +12%, 살아 있으면 사기가 더 높게 유지됩니다. 쓰러지면 아군 사기 -8(적 장교는 -15), 4초 동안 주변 명중 -30%. 저격수가 먼저 노립니다.'),flame:_t('짧은 사거리에서 불을 뿜습니다. 불은 참호와 엄폐를 무시하고 4초 동안 탑니다. 참호를 비울 때 씁니다.'),corpsman:_t('무기가 없습니다. 최전방 바로 뒤를 따라가며 반경 안 아군 보병을 초당 3씩 치료합니다.'),observer:_t('무기가 없습니다. 살아 있는 동안 포격·야포·기총소사 재사용 대기 -25%. 반경 70 안에서는 박격포·포격 탄착이 절반으로 모이고, 야포는 근처 적을 따라가며, 박격포 사거리 +25%. 여러 명이어도 겹치지 않습니다. 몸을 드러내고 있어 참호·엄폐 보호를 못 받고 잘 맞습니다.'),apc:_t('보병 5명(소총수·돌격조·대전차병·위생병)을 태워 최전방 참호까지 실어 나릅니다. 카드를 누르면 차가 나오고, 그다음 산 병력이 탑승합니다. 다시 누르면 바로 출발합니다. 파괴되면 탑승병 절반이 살아남습니다.'),sniper:_t('사거리가 아주 길고 한 발이면 쓰러뜨립니다. 기관총·박격포·대전차병·저격수를 먼저 노립니다. 연사가 느리고 걸음도 느리며, 다시 뽑기까지 오래 걸립니다. 포격·박격포·수류탄 같은 폭발에 맞으면 한 방에 쓰러집니다.'),mortar:_t('곡사로 범위 피해를 줍니다. 멀리 쏠수록 탄착이 크게 흩어지고, 가까운 적은 못 쏩니다. 저격수에게 약합니다.'),tank:_t('아주 튼튼하고 범위 포격을 합니다. 대전차병·전차·포격·야포·지뢰로만 피해를 입고, 소총·기관총·저격수는 철갑탄 특성이 있어야 통합니다. 돌격조 수류탄은 수류탄 묶음 특성이 있어야 통합니다.')};
 const PERKS={
   rifleDmg:{name:_t('정밀 사격'),desc:_t('소총수 명중률 +30%'),max:2},
   mgSetup:{name:_t('신속 거치'),desc:_t('기관총 사격 준비 시간 절반'),max:1},
@@ -1260,7 +1260,7 @@ const PERKS={
   veteran:{name:_t('고참병'),desc:_t('모든 보병 명중률 +15%'),max:2},
   vanguard:{name:_t('선발대'),desc:_t('전투 시작 시 소총수 2명 무료 배치'),max:2},
   scope:{name:_t('조준경'),desc:_t('소총수 사거리 +35%, 거리에 따른 명중률 감소 절반'),max:1},
-  apAmmo:{name:_t('철갑탄'),desc:_t('소총수·기관총·저격수의 전차 피해 3배'),max:1},
+  apAmmo:{name:_t('철갑탄'),desc:_t('소총수·기관총·저격수가 전차·수송차를 공격할 수 있음(이 특성이 없으면 장갑에 피해 0)'),max:1},
   doubleTap:{name:_t('속사'),desc:_t('소총수가 30% 확률로 곧바로 한 발 더 쏨'),max:1},
   incendiary:{name:_t('소이탄'),desc:_t('박격포탄 자리에 4초간 불이 붙어 들어선 적에게 피해'),max:1,req:'mortar'},
   smoke:{name:_t('연막 포격'),desc:_t('포격 지점에 10초간 연막. 연막 안의 적은 명중률 절반'),max:1},
@@ -1289,7 +1289,7 @@ const PERKS={
   infiltrate:{name:_t('침투조'),desc:_t('돌격조 이동 속도 +25%, 철조망 무시'),max:1,t:'mob'},
   bugle:{name:_t('돌격 나팔'),desc:_t('전진 명령을 내리면 4초간 아군 이동 +40%, 사기 +10 (재사용 30초)'),max:1,t:'mob'},
   clearing:{name:_t('참호 소탕'),desc:_t('아군 것이 아닌 참호 안에서 백병전 승률 +25%'),max:1,t:'mob'},
-  bundle:{name:_t('수류탄 묶음'),desc:_t('돌격조 수류탄의 장갑 피해 2배'),max:1,t:'mob'},
+  bundle:{name:_t('수류탄 묶음'),desc:_t('돌격조 수류탄이 전차·수송차에도 피해(없으면 장갑에 피해 0)'),max:1,t:'mob'},
   bonds:{name:_t('전쟁 채권'),desc:_t('전투 승리 때 보급 +15'),max:2,t:'log'},
   leftover:{name:_t('군수 정산'),desc:_t('전투가 끝날 때 남은 CP 10당 보급 +1'),max:1,t:'log'},
   secondwave:{name:_t('제2파'),desc:_t('전투마다 총공세를 한 번 더 쓸 수 있음'),max:2,t:'mob'},
@@ -1321,7 +1321,7 @@ const RELICS={
   binocs:{name:_t('야전 쌍안경'),desc:_t('모든 아군 사거리 +10%')},
   coin:{name:_t('행운의 동전'),desc:_t('전투 승리 보급 +50%')},
   canteen:{name:_t('낡은 수통'),desc:_t('전투가 끝날 때마다 사령부 +15')},
-  rosary:{name:_t('묵주'),desc:_t('아군 보병이 처음 치명상을 입으면 체력 1로 버팀')},
+  rosary:{name:_t('묵주'),desc:_t('아군 소총수·돌격조·기관총·대전차병이 처음 치명상을 입으면 체력 1로 버팀')},
   ammobox:{name:_t('탄약 상자'),desc:_t('기관총 사격 준비 즉시, 연사 +20%')},
   gramophone:{name:_t('축음기'),desc:_t('전투 시작 30초간 보급량 2배')},
   netting:{name:_t('위장망'),desc:_t('참호 안 아군이 맞을 확률 추가 -15%')},
@@ -2497,9 +2497,12 @@ function lines(side){
 }
 function nearTrench(x,r){for(const t of S.trench)if(Math.abs(t.x-x)<r)return t;return null}
 const PRIO={mg:1,mortar:1,at:1,sniper:1,flame:1,corpsman:1,observer:1,officer:1};
+// 장갑(전차·수송차)을 공격할 수 있는 병과: 대전차병, 전차, 철갑탄 특성을 받은 소총수·기관총·저격수
+const ROSARY={rifle:1,assault:1,mg:1,at:1};
+const antiArmor=(u,d)=>d.kind==='at'||u.type==='tank'||!!d.apMul;
 function findTarget(u){
-  const d=S.ST[u.side][u.type],mn=d.min||-4;let best=null,bd=1e9,armor=false;
-  for(const e of S.units){if(e.side===u.side)continue;const fx=(e.x-u.x)*u.side;if(fx<mn)continue;const dist=Math.hypot(fx,e.y-u.y);if(dist>d.range*(u.rangeMul||1))continue;
+  const d=S.ST[u.side][u.type],mn=d.min||-4,aa=antiArmor(u,d);let best=null,bd=1e9,armor=false;
+  for(const e of S.units){if(e.side===u.side||(!aa&&isArmor(e)))continue;const fx=(e.x-u.x)*u.side;if(fx<mn)continue;const dist=Math.hypot(fx,e.y-u.y);if(dist>d.range*(u.rangeMul||1))continue;
     const a=d.kind==='at'&&isArmor(e),sc=dist-(d.prio&&PRIO[e.type]?70:0);
     if((a&&!armor)||(a===armor&&sc<bd)){bd=sc;best=e;armor=a}}
   if(!best){const hd=(HQ[-u.side]-u.x)*u.side;if(hd<=d.range*(u.rangeMul||1)+8&&hd>=mn)best={hq:-u.side,x:HQ[-u.side],y:u.y}}
@@ -2519,7 +2522,7 @@ const surge=()=>1+.2*Math.floor(S.t/60);
 function payAmount(s){if(s!==1)return PAY_BASE*S.inc[-1]*surge();return Math.round((PAY_BASE+3*mlv('payroll'))*S.inc[1]*(has('gramophone')&&S.t<30?2:1)*(S.dice||1)*(RUN.daily==='lonely'?1.25:1)*surge())}
 function hit(t,amt,src){if(t.hq){S.hq[t.hq]-=amt*.6;return}
   if(t.side===1&&S.otT>0)return;
-  if(t.side===1&&!U[t.type].armor){if(S.holdT>0)amt*=.7;if(has('ironreg')&&S.units.some(v=>v.type==='tank'&&v.side===1&&Math.hypot(v.x-t.x,v.y-t.y)<20))amt*=.75}if(t.side===1&&!t.saved&&t.hp-amt<=0&&t.hp>0&&has('rosary')&&!U[t.type].armor){t.saved=true;t.hp=1;t.hitT=.3;floatText(t.x,t.y-14,'SAVED','232,201,138');return}t.hp-=amt;t.hitT=.12;if(t.hp<=0&&!t.dead){t.dead=true;if(src&&src.side!==t.side)src.kills=(src.kills||0)+1;onKill(t,src)}}
+  if(t.side===1&&!U[t.type].armor){if(S.holdT>0)amt*=.7;if(has('ironreg')&&S.units.some(v=>v.type==='tank'&&v.side===1&&Math.hypot(v.x-t.x,v.y-t.y)<20))amt*=.75}if(t.side===1&&!t.saved&&t.hp-amt<=0&&t.hp>0&&has('rosary')&&ROSARY[t.type]){t.saved=true;t.hp=1;t.hitT=.3;floatText(t.x,t.y-14,'SAVED','232,201,138');return}t.hp-=amt;t.hitT=.12;if(t.hp<=0&&!t.dead){t.dead=true;if(src&&src.side!==t.side)src.kills=(src.kills||0)+1;onKill(t,src)}}
 function fire(u,t){
   const d=S.ST[u.side][u.type],s=u.side,w=sprOf(u).lw||sprOf(u).width;
   const tip={x:u.x+s*(w/2),y:u.y-(u.type==='tank'?8:u.type==='mortar'?11:u.type==='at'?10:7)};
@@ -2532,7 +2535,7 @@ function fire(u,t){
     const ty=t.y-(t.type==='tank'?5:6)+R(-1,1);
     const tx=t.x+(ok?0:R(-6,6)),tyy=ok?ty:t.y+R(-2,3),len=Math.hypot(tx-tip.x,tyy-tip.y)||1;
     const bs=d.snipe?620:340;
-    S.bullets.push({src:u,x:tip.x,y:tip.y,tx,ty:tyy,vx:(tx-tip.x)/len*bs,vy:(tyy-tip.y)/len*bs,sp:bs,left:len,ok,t,dmg:(isArmor(t)?d.dmg*.2*(d.apMul||1):d.dmg)*(s===1&&S.few&&lv('lastman')?3:1),armor:isArmor(t),snipe:d.snipe});
+    S.bullets.push({src:u,x:tip.x,y:tip.y,tx,ty:tyy,vx:(tx-tip.x)/len*bs,vy:(tyy-tip.y)/len*bs,sp:bs,left:len,ok,t,dmg:(isArmor(t)?(d.apMul?d.dmg*.2*d.apMul:0):d.dmg)*(s===1&&S.few&&lv('lastman')?3:1),armor:isArmor(t),snipe:d.snipe});
     sfx(d.snipe?'snipe':u.type==='mg'?'mg':'rifle',u.x);
   }else if(d.kind==='at'){
     const a=isArmor(t);
@@ -2578,7 +2581,8 @@ function impact(p){
   boom(p.x1,p.y1,p.big||p.barrage);let nh=0;
   for(const e of S.units){if(e.side===p.side)continue;
     const dd=Math.hypot(e.x-p.x1,e.y-p.y1);if(dd>p.splash)continue;nh++;if(p.bref){(p.bref.hit||(p.bref.hit=new Set)).add(e)}
-    let dmg=(isArmor(e)?(p.armorDmg??p.dmg):p.dmg)*(1-dd/p.splash*.5);
+    let dmg=(isArmor(e)?(p.src&&p.src.type!=='tank'&&!(p.grenade&&p.side===1&&lv('bundle'))?0:(p.armorDmg??p.dmg)):p.dmg)*(1-dd/p.splash*.5);
+    if(e.type==='sniper'&&!p.rocket&&!isArmor(e))dmg=999;
     if(!p.grenade&&!U[e.type].exposed){if(e.inTrench)dmg*=.55*S.trenchMul[e.side]*(p.side===1&&lv('delayfuse')?1.6:1)*(e.side===1&&lv('bunker')?.6:1);else if(e.scov)dmg*=e.scov}
     if(p.side===1&&lv('shellshock')&&!p.rocket)e.stun=2;hit(e,dmg,p.src)}
   if(Math.abs(HQ[-p.side]-p.x1)<16)hit({hq:-p.side},p.dmg*.8);
@@ -2808,7 +2812,7 @@ function step(dt){
   S.bullets=S.bullets.filter(b=>!b.done);
   for(const f of S.flashes)f.life-=dt;S.flashes=S.flashes.filter(f=>f.life>0);
   for(const f of S.texts){f.life-=dt;f.y-=dt*6}S.texts=S.texts.filter(f=>f.life>0);
-  for(const f of S.fires){f.life-=dt;for(const e of S.units)if(e.side!==f.side&&Math.hypot(e.x-f.x,e.y-f.y)<f.r)hit(e,(isArmor(e)?(f.arm!=null?f.dps*f.arm:1):(f.dps||5))*dt);
+  for(const f of S.fires){f.life-=dt;for(const e of S.units)if(e.side!==f.side&&Math.hypot(e.x-f.x,e.y-f.y)<f.r){if(!isArmor(e))hit(e,(f.dps||5)*dt)}
     if(Math.random()<dt*14)S.parts.push({x:f.x+R(-f.r,f.r)*.8,y:f.y+R(-4,4),vx:R(-2,2),vy:R(-14,-6),g:0,life:R(.3,.6),max:.6,c:Math.random()<.5?'#ff9a3a':'#ffd36a',sz:1});
     if(Math.random()<dt*3)S.parts.push({x:f.x+R(-6,6),y:f.y-4,vx:R(-2,2),vy:R(-8,-4),g:-1,life:1.2,max:1.2,c:'smoke',sz:R(2,4)})}
   S.fires=S.fires.filter(f=>f.life>0);
