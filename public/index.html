@@ -65,6 +65,7 @@ h1 small{font-family:var(--pix);font-size:10px;color:var(--muted);margin-left:6p
 .tip p.lore{color:var(--muted);font-size:12px}
 .chip.u{border-color:var(--friend-dim)}
 .chip.r{border-color:#8a6f3a;color:#e8c98a}
+.metasec{grid-column:1/-1;border:2px solid var(--line);background:var(--panel);padding:0 12px}.metasec summary{cursor:pointer;padding:10px 0;font-weight:600;list-style:none}.metasec summary::before{content:'▸ ';color:var(--alert)}.metasec[open] summary::before{content:'▾ '}.metasec .relic-list{margin:0 0 10px}
 .clears{display:flex;flex-direction:column;gap:6px;margin-top:6px;font-size:13px}
 .clears table{border-collapse:collapse;font-variant-numeric:tabular-nums}
 .clears th,.clears td{border:1px solid var(--line);padding:3px 8px;text-align:center;font-weight:400;color:var(--muted)}
@@ -578,9 +579,7 @@ const I18N_EN={
   "공적으로 모든 작전에 남는 강화를 삽니다. 보유 공적 {0}. 도감 유물 {1}/{2}개 · 영구 보너스 CP 수입 +{3}%, 사령부 +{4}.{5}":"Spend Merit on upgrades that carry across all operations. Merit held: {0}. Codex relics {1}/{2} · permanent bonus: CP income +{3}%, HQ +{4}.{5}",
   " 다음 작전 계승 유물: {0}.":" Carried over to next operation: {0}.",
   "새 작전 시작":"Start New Operation",
-  "<li style=\"margin-top:6px\"><b style=\"color:var(--fg)\">유물 도감</b></li>":"<li style=\"margin-top:6px\"><b style=\"color:var(--fg)\">Relic Codex</b></li>",
   "<li class=\"no\"><b>◇ ???</b> · 아직 발견하지 못함</li>":"<li class=\"no\"><b>◇ ???</b> · Not yet found</li>",
-  "<b>지휘관 명부</b><table><tr><th></th>":"<b>Commander Roster</b><table><tr><th></th>",
   "</table><p>★ 클리어 · ○ 도전 가능 · · 잠김(등급 미개방)</p>":"</table><p>★ Cleared · ○ Available · · Locked (rank not open)</p>",
   "최고 기록 {0}번째 전선 · 작전 완수 {1}회 · 열린 등급 {2} · 명부 {3}/{4} · 보유 공적 <span class=\"merit\">{5}</span> · 유물 도감 {6}/{7}":"Best: Front {0} · Operations won {1} · Ranks open {2} · Roster {3}/{4} · Merit <span class=\"merit\">{5}</span> · Relic Codex {6}/{7}",
   "진흙 평원":"Mud Plain",
@@ -812,9 +811,7 @@ const I18N_EN={
   "이름 있는 부대":"Named Unit",
   "생환병 5명을 동시에 거느림":"Command 5 Survivors at once",
   "업적: {0}":"Achievement: {0}",
-  "<li style=\"margin-top:6px\"><b style=\"color:var(--fg)\">업적 {0}/{1}</b></li>":"<li style=\"margin-top:6px\"><b style=\"color:var(--fg)\">Achievements {0}/{1}</b></li>",
   " · 공적 +{0}":" · Merit +{0}",
-  "<li style=\"margin-top:6px\"><b style=\"color:var(--fg)\">전사자 명부</b></li>":"<li style=\"margin-top:6px\"><b style=\"color:var(--fg)\">Roll of the Fallen</b></li>",
   "사살 {0} · {1}번째 전선":"Kills {0} · Front {1}",
   "철갑의 날":"Day of Steel",
   "적 전차가 1번째 전선부터. 대전차병 비용 -30%.":"Enemy tanks from Front 1. Anti-Tank cost -30%.",
@@ -1044,7 +1041,12 @@ const I18N_EN={
   "전투 명령 '{0}' 달성: 보급 +{1}":"Battle Order '{0}' met: Supply +{1}",
   "전투 명령 '{0}' 실패":"Battle Order '{0}' failed",
   "최대 연쇄 사살 ×{0}":"Longest kill chain ×{0}",
-  "사기":"Morale"
+  "사기":"Morale",
+  "유물 도감 {0}/{1}":"Relic Codex {0}/{1}",
+  "업적 {0}/{1}":"Achievements {0}/{1}",
+  "전사자 명부 {0}":"Roll of Honour {0}",
+  "지휘관 명부 {0}/{1}":"Commander Roster {0}/{1}",
+  " 강화를 하나 살 때마다 모든 가격이 10%씩 오릅니다(지금 +{0}%).":" Every upgrade you buy raises all prices by 10% (now +{0}%)."
 };
 const LANG=(()=>{try{const v=localStorage.getItem('trenchline.lang');if(v==='ko'||v==='en')return v}catch(e){}return /^ko\b/i.test(navigator.language||'')?'ko':'en'})();
 function _t(k,...a){const s=LANG==='en'&&I18N_EN[k]?I18N_EN[k]:k;return a.length?s.replace(/\{(\d+)\}/g,(m,i)=>a[+i]):s}
@@ -1227,16 +1229,16 @@ const RELICS={
 };
 const reqOk=r=>!r.req||r.req.some(q=>RUN.units.includes(q)||supOwned().includes(q)||lv(q)>0);
 const META_UP={
-  hq:{name:_t('사령부 증축'),desc:_t('시작 사령부 내구도 +20'),max:5,cost:[20,35,55,80,110]},
-  supply:{name:_t('비상 금고'),desc:_t('시작 보급 +25'),max:3,cost:[20,40,70]},
-  cp:{name:_t('예비 탄약고'),desc:_t('전투 시작 CP +15'),max:3,cost:[25,45,75]},
-  payroll:{name:_t('군수 예산'),desc:_t('보급 1회당 CP +3'),max:4,cost:[25,45,70,100]},
-  reroll:{name:_t('참모 회의'),desc:_t('보상 화면마다 다시 뽑기 1회'),max:2,cost:[40,90]},
-  academy:{name:_t('사관학교'),desc:_t('보상 선택지 3개 → 4개'),max:1,cost:[70]},
-  mortarDoc:{name:_t('박격포 교범'),desc:_t('작전 시작부터 박격포 편성'),max:1,cost:[50]},
-  sniperDoc:{name:_t('저격 교범'),desc:_t('작전 시작부터 저격수 편성'),max:1,cost:[50]},
-  chest:{name:_t('전리품 상자'),desc:_t('작전 시작 시 무작위 유물 1개'),max:1,cost:[90]},
-  slots:{name:_t('지원 참모부'),desc:_t('지원 카드 출전 슬롯 +1 (2칸 → 3칸)'),max:1,cost:[80]},
+  hq:{name:_t('사령부 증축'),desc:_t('시작 사령부 내구도 +20'),max:5,cost:[30,70,140,260,450]},
+  supply:{name:_t('비상 금고'),desc:_t('시작 보급 +25'),max:3,cost:[30,80,180]},
+  cp:{name:_t('예비 탄약고'),desc:_t('전투 시작 CP +15'),max:3,cost:[40,100,220]},
+  payroll:{name:_t('군수 예산'),desc:_t('보급 1회당 CP +3'),max:4,cost:[40,100,220,450]},
+  reroll:{name:_t('참모 회의'),desc:_t('보상 화면마다 다시 뽑기 1회'),max:2,cost:[60,200]},
+  academy:{name:_t('사관학교'),desc:_t('보상 선택지 3개 → 4개'),max:1,cost:[150]},
+  mortarDoc:{name:_t('박격포 교범'),desc:_t('작전 시작부터 박격포 편성'),max:1,cost:[80]},
+  sniperDoc:{name:_t('저격 교범'),desc:_t('작전 시작부터 저격수 편성'),max:1,cost:[80]},
+  chest:{name:_t('전리품 상자'),desc:_t('작전 시작 시 무작위 유물 1개'),max:1,cost:[180]},
+  slots:{name:_t('지원 참모부'),desc:_t('지원 카드 출전 슬롯 +1 (2칸 → 3칸)'),max:1,cost:[200]},
 };
 
 /* ---------- storage ---------- */
@@ -1880,24 +1882,24 @@ function checkAch(ev,extra){
 }
 function toast(t){let el=$('#toast');if(!el){el=document.createElement('div');el.id='toast';el.className='toast';el.setAttribute('role','status');document.body.append(el)}el.textContent=t;el.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>{el.hidden=true},4000)}
 function afterRun(){showMeta()}
+// 사령부 보급창 가격: 단계마다 크게 오르고, 무엇이든 하나 살 때마다 모든 가격 +10%(누적)
+const metaBought=M=>Object.values(M.up).reduce((a,b)=>a+(b||0),0);
+const metaPrice=(M,k,l)=>Math.round(META_UP[k].cost[l]*(1+.1*metaBought(M))/5)*5;
 function showMeta(){
   const M=getMeta(),L=legacy();
-  const ch=Object.entries(META_UP).map(([k,u])=>{const l=M.up[k]||0,max=l>=u.max,c=u.cost[l];
-    return {tag:`LV ${l}/${u.max}`,name:u.name,desc:u.desc,price:max?null:c,unit:_t('공적'),disabled:max||M.merit<c,go:()=>{const m=getMeta();if(m.merit<c)return;m.merit-=c;m.up[k]=l+1;setMeta(m);showMeta()}}});
-  panel(_t('사령부 보급창'),_t("공적으로 모든 작전에 남는 강화를 삽니다. 보유 공적 {0}. 도감 유물 {1}/{2}개 · 영구 보너스 CP 수입 +{3}%, 사령부 +{4}.{5}",M.merit,L.n,Object.keys(RELICS).length,Math.round(L.inc*100),L.hq,M.heir?_t(" 다음 작전 계승 유물: {0}.",RELICS[M.heir].name):''),ch.map(c=>({...c,price:c.price})),{label:_t('새 작전 시작'),go:startSetup});
+  const ch=Object.entries(META_UP).map(([k,u])=>{const l=M.up[k]||0,max=l>=u.max,c=max?0:metaPrice(M,k,l);
+    return {tag:`LV ${l}/${u.max}`,name:u.name,desc:u.desc,price:max?null:c,unit:_t('공적'),disabled:max||M.merit<c,go:()=>{const m=getMeta(),cc=metaPrice(m,k,m.up[k]||0);if(m.merit<cc)return;m.merit-=cc;m.up[k]=(m.up[k]||0)+1;setMeta(m);showMeta()}}});
+  panel(_t('사령부 보급창'),_t("공적으로 모든 작전에 남는 강화를 삽니다. 보유 공적 {0}. 도감 유물 {1}/{2}개 · 영구 보너스 CP 수입 +{3}%, 사령부 +{4}.{5}",M.merit,L.n,Object.keys(RELICS).length,Math.round(L.inc*100),L.hq,M.heir?_t(" 다음 작전 계승 유물: {0}.",RELICS[M.heir].name):'')+_t(" 강화를 하나 살 때마다 모든 가격이 10%씩 오릅니다(지금 +{0}%).",metaBought(M)*10),ch.map(c=>({...c,price:c.price})),{label:_t('새 작전 시작'),go:startSetup});
   const box=$('#pChoices');
-  const ul=document.createElement('ul');ul.className='relic-list';ul.style.gridColumn='1/-1';
-  ul.innerHTML=_t('<li style="margin-top:6px"><b style="color:var(--fg)">유물 도감</b></li>')+Object.entries(RELICS).map(([k,r])=>M.found.includes(k)?`<li>${iconImg(k,'ico sm')}<b>${r.name}</b> · ${r.desc}</li>`:_t('<li class="no"><b>◇ ???</b> · 아직 발견하지 못함</li>')).join('');
-  box.append(ul);
-  const ua=document.createElement('ul');ua.className='relic-list';ua.style.gridColumn='1/-1';
-  ua.innerHTML=_t("<li style=\"margin-top:6px\"><b style=\"color:var(--fg)\">업적 {0}/{1}</b></li>",ACH.filter(a=>M.ach[a.id]).length,ACH.length)+ACH.map(a=>`<li class="${M.ach[a.id]?'':'no'}"><b>${M.ach[a.id]?'★':'☆'} ${a.name}</b> · ${a.desc}${a.r?_t(" · 공적 +{0}",a.r):''}</li>`).join('');
-  box.append(ua);
-  if(M.fallen.length){const uf=document.createElement('ul');uf.className='relic-list';uf.style.gridColumn='1/-1';
-    uf.innerHTML=_t('<li style="margin-top:6px"><b style="color:var(--fg)">전사자 명부</b></li>')+M.fallen.map(f=>`<li>✝ <b>${VET_NAMES[f.n%VET_NAMES.length]}</b> · ${U[f.t]?U[f.t].name:''} · ${_t("사살 {0} · {1}번째 전선",f.k,f.f)}</li>`).join('');box.append(uf)}
-  const g=document.createElement('div');g.className='clears';g.style.gridColumn='1/-1';
-  let h=_t('<b>지휘관 명부</b><table><tr><th></th>')+[1,2,3,4,5,6].map(i=>`<th>${i}</th>`).join('')+'</tr>';
+  // 긴 목록은 접어 둔다. 펼친 상태는 기기마다 기억한다.
+  const sec=(id,title,html)=>{const d=document.createElement('details');d.className='metasec';let open=false;try{open=localStorage.getItem('trenchline.sec.'+id)==='1'}catch(e){}d.open=open;
+    d.innerHTML=`<summary>${title}</summary>${html}`;d.ontoggle=()=>{try{localStorage.setItem('trenchline.sec.'+id,d.open?'1':'0')}catch(e){}};box.append(d)};
+  sec('codex',_t("유물 도감 {0}/{1}",M.found.length,Object.keys(RELICS).length),'<ul class="relic-list">'+Object.entries(RELICS).map(([k,r])=>M.found.includes(k)?`<li>${iconImg(k,'ico sm')}<b>${r.name}</b> · ${r.desc}</li>`:_t('<li class="no"><b>◇ ???</b> · 아직 발견하지 못함</li>')).join('')+'</ul>');
+  sec('ach',_t("업적 {0}/{1}",ACH.filter(a=>M.ach[a.id]).length,ACH.length),'<ul class="relic-list">'+ACH.map(a=>`<li class="${M.ach[a.id]?'':'no'}"><b>${M.ach[a.id]?'★':'☆'} ${a.name}</b> · ${a.desc}${a.r?_t(" · 공적 +{0}",a.r):''}</li>`).join('')+'</ul>');
+  if(M.fallen.length)sec('fallen',_t("전사자 명부 {0}",M.fallen.length),'<ul class="relic-list">'+M.fallen.map(f=>`<li>✝ <b>${VET_NAMES[f.n%VET_NAMES.length]}</b> · ${U[f.t]?U[f.t].name:''} · ${_t("사살 {0} · {1}번째 전선",f.k,f.f)}</li>`).join('')+'</ul>');
+  let h='<div class="clears"><table><tr><th></th>'+[1,2,3,4,5,6].map(i=>`<th>${i}</th>`).join('')+'</tr>';
   for(const k of ORIGIN_ORDER){h+=`<tr><th>${ORIGINS[k].short}</th>`+[1,2,3,4,5,6].map(i=>`<td class="${M.clears[k+':'+i]?'on':i>M.rank?'lock':''}">${M.clears[k+':'+i]?'★':i>M.rank?'·':'○'}</td>`).join('')+'</tr>'}
-  g.innerHTML=h+_t('</table><p>★ 클리어 · ○ 도전 가능 · · 잠김(등급 미개방)</p>');box.append(g);
+  sec('roster',_t("지휘관 명부 {0}/{1}",Object.keys(M.clears).length,ORIGIN_ORDER.length*6),h+_t('</table><p>★ 클리어 · ○ 도전 가능 · · 잠김(등급 미개방)</p>')+'</div>');
 }
 function showTitle(){
   show('vTitle');renderAccount();const sv=store.get('trenchline.run');$('#bCont').hidden=!sv;
