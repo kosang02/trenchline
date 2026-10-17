@@ -69,6 +69,7 @@ h1 small{font-family:var(--pix);font-size:10px;color:var(--muted);margin-left:6p
 .vig{display:block;width:min(100%,384px);height:auto;image-rendering:pixelated;border:2px solid var(--line);margin:2px 0 10px}
 .node image{image-rendering:pixelated;pointer-events:none}
 .acthd img{width:96px;height:42px;image-rendering:pixelated;border:1px solid var(--line)}
+.pchips{margin:0 0 10px}.pchips .chips{padding-bottom:10px}
 .metasec{grid-column:1/-1;border:2px solid var(--line);background:var(--panel);padding:0 12px}.metasec summary{cursor:pointer;padding:10px 0;font-weight:600;list-style:none}.metasec summary::before{content:'▸ ';color:var(--alert)}.metasec[open] summary::before{content:'▾ '}.metasec .relic-list{margin:0 0 10px}
 .clears{display:flex;flex-direction:column;gap:6px;margin-top:6px;font-size:13px}
 .clears table{border-collapse:collapse;font-variant-numeric:tabular-nums}
@@ -214,6 +215,7 @@ body.pc .keys{display:block}
 
   <section class="view" id="vPanel" hidden>
     <div class="status" id="panelStatus"></div>
+    <details class="metasec pchips" id="panelChips" hidden><summary></summary><div class="chips"></div></details>
     <div class="panel">
       <h2 id="pTitle"></h2>
       <img id="pArt" class="vig" alt="" hidden>
@@ -1187,7 +1189,8 @@ const I18N_EN={
   "말들이 포차를 끌게 됐습니다. 보급 +40.":"The horses will pull the guns now. Supply +40.",
   "획득":"GAINED",
   "장부의 덤":"The Ledger's Due",
-  "장부에 적힌 빚을 받아냈습니다: {0}":"You collected a debt from the ledger: {0}"
+  "장부에 적힌 빚을 받아냈습니다: {0}":"You collected a debt from the ledger: {0}",
+  "내 부대 · 유물 {0} · 특성 {1}":"My Force · Relics {0} · Perks {1}"
 };
 const LANG=(()=>{try{const v=localStorage.getItem('trenchline.lang');if(v==='ko'||v==='en')return v}catch(e){}return /^ko\b/i.test(navigator.language||'')?'ko':'en'})();
 function _t(k,...a){const s=LANG==='en'&&I18N_EN[k]?I18N_EN[k]:k;return a.length?s.replace(/\{(\d+)\}/g,(m,i)=>a[+i]):s}
@@ -1993,7 +1996,11 @@ function hideTip(){const tp=$('#tip');if(tp){tp.hidden=true;tp.dataset.k=''}docu
 document.addEventListener('click',e=>{const c=e.target.closest('.chip[data-k]');if(c){showTip(c);return}if(!e.target.closest('#tip'))hideTip()});
 addEventListener('scroll',hideTip,{passive:true});addEventListener('resize',hideTip);
 function panel(title,text,choices,skip,art){
-  show('vPanel');{const pa=$('#pArt');pa.hidden=!art;if(art)pa.src=vig(art)}$('#panelStatus').innerHTML=statusHTML();$('#pTitle').textContent=title;$('#pText').textContent=text;
+  show('vPanel');
+  // 보상·사건·보급소 화면에서도 지금 가진 병과·카드·유물·특성·교리를 본다(칩을 누르면 설명)
+  {const pc=$('#panelChips');pc.hidden=!RUN;if(RUN){const n=(RUN.relics||[]).length,m=Object.keys(RUN.perks).length;pc.querySelector('summary').textContent=_t("내 부대 · 유물 {0} · 특성 {1}",n,m);pc.querySelector('.chips').innerHTML=chipsHTML();
+    let op=true;try{op=localStorage.getItem('trenchline.sec.pchips')!=='0'}catch(e){}pc.open=op;pc.ontoggle=()=>{try{localStorage.setItem('trenchline.sec.pchips',pc.open?'1':'0')}catch(e){}}}}
+  {const pa=$('#pArt');pa.hidden=!art;if(art)pa.src=vig(art)}$('#panelStatus').innerHTML=statusHTML();$('#pTitle').textContent=title;$('#pText').textContent=text;
   const box=$('#pChoices');box.innerHTML='';
   for(const c of choices){const b=document.createElement('button');b.className='choice'+(c.gold?' gold':'');b.disabled=!!c.disabled;
     b.innerHTML=`${c.icon?c.icon:''}${c.tag?`<em class="tag">${c.tag}</em>`:''}<b>${c.name}</b><span>${c.desc}</span>${c.price!=null?`<em class="price">${c.price} ${c.unit||_t('보급')}</em>`:''}`;
