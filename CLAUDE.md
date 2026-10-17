@@ -54,6 +54,7 @@ sed -n '/<script>/,/<\/script>/p' public/index.html | sed '1d;$d' > /tmp/g.js &&
 | 업적·오늘의 작전 | `ACH`/`checkAch()`(`META.ach`), `DAILY`/`showDaily()`(`RUN.daily`) |
 | 사기·연쇄 사살 | `morale(side,d)`(`S.mor`, 붕괴 `S.rout`, 기세 `S.surgeT`), `onKill()`(사기·연쇄 `S.chain`·교리 보상), 총공세 `bigPush()`/`pushMax()`, 적 총반격 `S.eCounter` |
 | 교리·백병전 | `PERKS[k].t`(inf·art·arm·def·mob·log), `DOCT`, `doctLv()`/`doct(t,n)`, `MELEE`(병과별 백병전 승률), 전설 특성 `PERKS[k].gold` |
+| 확장 지원 카드 | `callSupport()` 앞부분(즉시형 reserves·runner·rum·camo)과 strike 처리(flare·wire·snipehunt·thermite·bertha·creep). 조명 `S.lit`→`u.lit`(`hitChance`), 위장 `S.camos`→`u.hid`(`findTarget`), 철조망 `drawWireFeat()`. `shape:'none'`은 카드 클릭 즉시 발동 |
 | 가스·갱도·전투 명령 | `SUP.gas`/`SUP.tunnel`(`callSupport`, `S.gases`), `OBJ`(전투 명령), 역사 사건은 `EVENTS` 뒤쪽 + `giveSup()`/`givePerk()` |
 | 삽화·아이콘 | `vignettes & icons` 섹션: `VP`(소품 격자), `VIGS`(장면), `vig(k)`, `ICONS`/`pixIcon(k)`/`iconTag(k,cls)`. `panel(...,art)` 다섯째 인자로 삽화 |
 | 사건 고르기 | `pickEvent(n)`(`RUN.seen`, `era`, `req`+`RUN.flags`) |

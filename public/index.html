@@ -1190,7 +1190,27 @@ const I18N_EN={
   "획득":"GAINED",
   "장부의 덤":"The Ledger's Due",
   "장부에 적힌 빚을 받아냈습니다: {0}":"You collected a debt from the ledger: {0}",
-  "내 부대 · 유물 {0} · 특성 {1}":"My Force · Relics {0} · Perks {1}"
+  "내 부대 · 유물 {0} · 특성 {1}":"My Force · Relics {0} · Perks {1}",
+  "조명탄":"Star Shell",
+  "15초 동안 반경 안을 밝힙니다. 그 안의 적은 참호·엄폐·연막 보호를 잃고, 아군은 그 적을 쏠 때 명중 +20%.":"Lights the area for 15 s. Enemies inside lose trench, cover and smoke protection, and your units get +20% accuracy against them.",
+  "예비대 투입":"Commit the Reserves",
+  "소총수 5명이 곧바로 아군 최전방 참호에 나타납니다. 누르면 바로 씁니다.":"5 Riflemen appear at once in your front trench. Used immediately when tapped.",
+  "철조망 가설":"Wiring Party",
+  "2초 뒤 지정한 세로줄에 철조망을 칩니다. 지나가는 보병은 크게 느려집니다(적·아군 모두). 전투가 끝날 때까지 남습니다.":"After 2 s, strings barbed wire along the chosen line. Infantry crossing it are badly slowed (both sides). Lasts the whole battle.",
+  "이동 탄막":"Creeping Barrage",
+  "지정한 세로줄에서 시작해 7초 동안 적 쪽으로 70 나아가며 포탄이 떨어집니다. 그 뒤를 따라 돌격하세요. 솜, 1916.":"Starts at the chosen line and walks 70 toward the enemy over 7 s. Advance right behind it. The Somme, 1916.",
+  "저격 사냥":"Counter-Sniping",
+  "2초 뒤 반경 안의 적 저격수·장교·관측병·기관총 중 하나를 저격합니다(저격수 먼저).":"After 2 s, shoots one enemy Sniper, Officer, Spotter or Machine Gun in the area (Snipers first).",
+  "전령":"Runner",
+  "모든 병과의 재배치 대기를 즉시 없앱니다. 누르면 바로 씁니다.":"Instantly clears all unit redeploy cooldowns. Used immediately when tapped.",
+  "럼주 배급":"Rum Ration",
+  "반경 안 아군이 체력 5 회복, 8초 동안 연사 +50%. 아군 사기 +15.":"Allies in the area heal 5 and fire 50% faster for 8 s. Your morale +15.",
+  "소이 포격":"Incendiary Barrage",
+  "지정한 세로줄을 따라 5초 동안 불이 붙습니다(초당 3 피해). 불은 참호와 엄폐를 무시합니다.":"Sets the chosen line ablaze for 5 s (3 damage per second). Fire ignores trenches and cover.",
+  "열차포":"Railway Gun",
+  "8초 뒤 초대형 포탄 한 발. 반경 30 안에 피해 200, 적 사령부 근처면 사령부에도 큰 피해. 파리 대포, 1918.":"After 8 s, one enormous shell: 200 damage within 30, and heavy damage to the enemy HQ if it lands near it. The Paris Gun, 1918.",
+  "위장망":"Camouflage Netting",
+  "8초 동안 반경 안 아군은 15보다 멀리 있는 적에게 표적이 되지 않습니다.":"For 8 s, allies in the area cannot be targeted by enemies more than 15 away."
 };
 const LANG=(()=>{try{const v=localStorage.getItem('trenchline.lang');if(v==='ko'||v==='en')return v}catch(e){}return /^ko\b/i.test(navigator.language||'')?'ko':'en'})();
 function _t(k,...a){const s=LANG==='en'&&I18N_EN[k]?I18N_EN[k]:k;return a.length?s.replace(/\{(\d+)\}/g,(m,i)=>a[+i]):s}
@@ -1238,9 +1258,20 @@ const SUP={
   howitzer:{name:_t('야포 사격'),cost:80,cd:45,delay:4,  r:16,shape:'circle',desc:_t('4초 뒤 대형 포탄 한 발. 피해 80, 전차에도 통합니다. 움직이는 적은 피합니다.')},
   strafe:  {name:_t('기총소사'), cost:90,cd:50,delay:2.5,r:9, shape:'line',  desc:_t('2.5초 뒤 전투기가 세로 한 줄을 두 번 훑습니다. 참호 한 줄 소탕용.')},
   gas:     {name:_t('가스탄'),   cost:50,cd:45,delay:1.2,r:30,shape:'circle',desc:_t('8초간 독가스 구름. 안의 병사는 참호와 상관없이 초당 2 피해, 명중 -40%, 사기 하락. 바람에 실려 적 쪽으로 흐르고 아군도 다칩니다. 이프르, 1915.')},
+  // 2026-10-17 지원 카드 확장. shape 'none'은 누르면 바로 쓴다(조준 없음)
+  flare:{name:_t("조명탄"),cost:20,cd:25,delay:0.6,r:50,shape:'circle',desc:_t("15초 동안 반경 안을 밝힙니다. 그 안의 적은 참호·엄폐·연막 보호를 잃고, 아군은 그 적을 쏠 때 명중 +20%.")},
+  reserves:{name:_t("예비대 투입"),cost:60,cd:50,delay:0,r:0,shape:'none',desc:_t("소총수 5명이 곧바로 아군 최전방 참호에 나타납니다. 누르면 바로 씁니다.")},
+  wire:{name:_t("철조망 가설"),cost:30,cd:35,delay:2,r:5,shape:'line',desc:_t("2초 뒤 지정한 세로줄에 철조망을 칩니다. 지나가는 보병은 크게 느려집니다(적·아군 모두). 전투가 끝날 때까지 남습니다.")},
+  creep:{name:_t("이동 탄막"),cost:90,cd:55,delay:1.5,r:14,shape:'line',desc:_t("지정한 세로줄에서 시작해 7초 동안 적 쪽으로 70 나아가며 포탄이 떨어집니다. 그 뒤를 따라 돌격하세요. 솜, 1916.")},
+  snipehunt:{name:_t("저격 사냥"),cost:45,cd:40,delay:2,r:40,shape:'circle',desc:_t("2초 뒤 반경 안의 적 저격수·장교·관측병·기관총 중 하나를 저격합니다(저격수 먼저).")},
+  runner:{name:_t("전령"),cost:40,cd:60,delay:0,r:0,shape:'none',desc:_t("모든 병과의 재배치 대기를 즉시 없앱니다. 누르면 바로 씁니다.")},
+  rum:{name:_t("럼주 배급"),cost:35,cd:45,delay:0,r:40,shape:'circle',desc:_t("반경 안 아군이 체력 5 회복, 8초 동안 연사 +50%. 아군 사기 +15.")},
+  thermite:{name:_t("소이 포격"),cost:70,cd:50,delay:1.8,r:6,shape:'line',desc:_t("지정한 세로줄을 따라 5초 동안 불이 붙습니다(초당 3 피해). 불은 참호와 엄폐를 무시합니다.")},
+  bertha:{name:_t("열차포"),cost:150,cd:120,delay:8,r:30,shape:'circle',desc:_t("8초 뒤 초대형 포탄 한 발. 반경 30 안에 피해 200, 적 사령부 근처면 사령부에도 큰 피해. 파리 대포, 1918.")},
+  camo:{name:_t("위장망"),cost:30,cd:40,delay:0,r:30,shape:'circle',desc:_t("8초 동안 반경 안 아군은 15보다 멀리 있는 적에게 표적이 되지 않습니다.")},
   tunnel:  {name:_t('갱도 폭파'),cost:120,cd:90,delay:12,r:22,shape:'circle',desc:_t('12초 동안 땅굴을 판 뒤 지정한 곳에서 가까운 적 참호를 통째로 폭파합니다. 참호 안 적은 거의 전멸, 적 사기 -30. 메신 능선, 1917.')},
 };
-const SUP_ORDER=['bar','smoke','mines','aid','howitzer','strafe','gas','tunnel'];
+const SUP_ORDER=['bar','smoke','mines','aid','howitzer','strafe','gas','tunnel','flare','reserves','wire','creep','snipehunt','runner','rum','thermite','bertha','camo'];
 const ORDER=['rifle','assault','mg','at','flame','sniper','mortar','tank','corpsman','observer','officer','apc'];
 const UNIT_DESC={officer:_t('권총만 찹니다. 최전방 바로 뒤를 따라가며 반경 40 안 아군 명중 +12%, 살아 있으면 사기가 더 높게 유지됩니다. 쓰러지면 아군 사기 -8(적 장교는 -15), 4초 동안 주변 명중 -30%. 저격수가 먼저 노립니다.'),flame:_t('짧은 사거리에서 불을 뿜습니다. 불은 참호와 엄폐를 무시하고 4초 동안 탑니다. 참호를 비울 때 씁니다.'),corpsman:_t('무기가 없습니다. 최전방 바로 뒤를 따라가며 반경 안 아군 보병을 초당 3씩 치료합니다.'),observer:_t('무기가 없습니다. 살아 있는 동안 포격·야포·기총소사 재사용 대기 -25%. 반경 70 안에서는 박격포·포격 탄착이 절반으로 모이고, 야포는 근처 적을 따라가며, 박격포 사거리 +25%. 여러 명이어도 겹치지 않습니다. 몸을 드러내고 있어 참호·엄폐 보호를 못 받고 잘 맞습니다.'),apc:_t('보병 5명(소총수·돌격조·대전차병·위생병)을 태워 최전방 참호까지 실어 나릅니다. 카드를 누르면 차가 나오고, 그다음 산 병력이 탑승합니다. 다시 누르면 바로 출발합니다. 파괴되면 탑승병 절반이 살아남습니다.'),sniper:_t('사거리가 아주 길고 한 발이면 쓰러뜨립니다. 기관총·박격포·대전차병·저격수를 먼저 노립니다. 연사가 느리고 걸음도 느리며, 다시 뽑기까지 오래 걸립니다. 포격·박격포·수류탄 같은 폭발에 맞으면 한 방에 쓰러집니다.'),mortar:_t('곡사로 범위 피해를 줍니다. 멀리 쏠수록 탄착이 크게 흩어지고, 가까운 적은 못 쏩니다. 저격수에게 약합니다.'),tank:_t('아주 튼튼하고 범위 포격을 합니다. 대전차병·전차·포격·야포·지뢰로만 피해를 입고, 소총·기관총·저격수는 철갑탄 특성이 있어야 통합니다. 돌격조 수류탄은 수류탄 묶음 특성이 있어야 통합니다.')};
 const PERKS={
@@ -1650,6 +1681,16 @@ const SUP_ICON={
   howitzer:["....kkkk....","...kGggGk...","...kgggGk...","..kSSSSSSk..","..kSsSSSSk..","..kSsSSSSk..","..kSsSSSSk..","..kSsSSSSk..","..kSsSSSSk..","..kGGGGGGk..","..kggggggk..","..kkkkkkkk.."],
   strafe:[".....kk.....",".....kk.....","....kSSk....","kkkkkSSkkkkk","kSSSSSSSSSSk","kkkkkSSkkkkk","....kSSk....",".....SS.....","....kSSk....","...kkSSkk...","...kSSSSk...","....kkkk...."],
   gas:["..mmm..mm...",".mcmmmmcmm..","mmmmcmmmmmm.",".mmmmmmcmm..","...mmmmm....",".....kk.....","....kSSk....","...kOOOOk...","...kOooOk...","...kOOOOk...","...kOooOk...","....kkkk...."],
+  flare:["...kkkkk....", "..kwwwwwk...", ".kwwpwwwwk..", ".k.k...k.k..", "..k.k.k.k...", "....kgk.....", "....ggg.....", "...gGwGg....", "....ggg.....", ".....g......", "............", "............"],
+  reserves:["............", "..kkk..kkk..", ".kOOOkkOOOk.", ".kkkkkkkkkk.", "..ooo..ooo..", "....kkk.....", "...kOOOk....", "...kkkkk....", "....ooo.....", "............", "............", "............"],
+  wire:["............", "k..........k", ".k.S.S.S.Sk.", "..SkSkSkSk..", ".SkS.S.SkS..", "..SkSkSkSk..", ".k.S.S.S.Sk.", "k..........k", "..b......b..", "..b......b..", ".bbb....bbb.", "............"],
+  creep:["............", "..g...g...g.", ".gGg.gGg.gGg", ".SsS.SsS.SsS", ".SsS.SsS.SsS", ".kkk.kkk.kkk", "............", "...r..r..r..", "rrrrrrrrrrr.", "...r..r..r..", "............", "............"],
+  snipehunt:["....kkkk....", "..kk.rr.kk..", ".k...rr...k.", ".k...rr...k.", "k....rr....k", "krrrrkkrrrrk", "krrrrkkrrrrk", "k....rr....k", ".k...rr...k.", ".k...rr...k.", "..kk.rr.kk..", "....kkkk...."],
+  runner:["............", "............", "..kkkkkkkkk.", "..kpppppppk.", "S.kPkpppkPk.", "..kppkpkppk.", "S.kpppkpppk.", "..kpppppppk.", "S.kkkkkkkkk.", "............", "............", "............"],
+  rum:["....kk......", "....kk......", "...kbbk.....", "..kbBBbk....", "..kbBBbk....", "..kbwwbk....", "..kbwwbk.kk.", "..kbBBbkkSk.", "..kbBBbk.Sk.", "..kkkkkk.kk.", "............", "............"],
+  thermite:["............", "..r...r...r.", ".rgr.rgr.rgr", ".rgr.rgr.rgr", "rgGgrgGgrgGg", "rgGgrgGgrgGg", "kbkbkbkbkbkb", "............", "............", "............", "............", "............"],
+  bertha:["..........kk", "........kkSk", "......kkSSk.", "....kkSSSk..", "...kSSSSk...", "..kSSSSk....", ".kbbbbbbk...", "kbkbbkbbkb..", "kkkkkkkkkkk.", "SkkSkkSkkSk.", "............", "............"],
+  camo:["............", "kmkOkmkOkmk.", ".m.O.m.O.m..", "kOkmkOkmkOk.", ".O.m.O.m.O..", "kmkOkmkOkmk.", "............", "....kkk.....", "...kOOOk....", "...kkkkk....", "............", "............"],
   tunnel:["..g.r..g....","...grgg.....",".rggGggr....","..gGrGg.....",".rggGggr....","...g.rg.....","......kk....",".....kbk....","....kbk.....","..kSSk......",".kSSSk......","..kkk......."],
 };
 const SUP_URL={};
@@ -2372,6 +2413,8 @@ function buildGround(TER){
   for(let i=0;i<10;i++)crater(R(140,500),R(FY0,FY1),R(3,5));
   TER.props.sort((p,q)=>p.y-q.y);
 }
+function drawWireFeat(o){const cx=o.x,cy=o.y-GY,snow=S.terrain.biome==='snow';for(let y=cy-o.ry;y<cy+o.ry;y+=7){gx.fillStyle='#2a241a';gx.fillRect(cx,Math.round(y),1,4)}
+  gx.fillStyle=snow?'#5a5650':'#6b6454';for(let y=cy-o.ry;y<cy+o.ry;y++){gx.fillRect(cx+Math.round(Math.sin(y*.9)*3),Math.round(y),1,1);if(Math.random()<.3)gx.fillRect(cx+Math.round(Math.cos(y*.7)*3),Math.round(y),1,1)}}
 function bags(x0,y){for(let x=x0;x<x0+23;x+=4){gx.fillStyle='#1a160f';gx.fillRect(x,y,4,3);gx.fillStyle=(x/4|0)%2?'#8b7a55':'#776844';gx.fillRect(x,y,3,2)}}
 function crater(x,y,r){y-=GY;gx.fillStyle=CUR_CRATER;gx.beginPath();gx.ellipse(x,y,r,r*.35,0,0,7);gx.fill();gx.fillStyle='#55492f';gx.fillRect(x-r,y-1,1,1);gx.fillRect(x+r-1,y,1,1);gx.fillRect(x-2,y-2,3,1)}
 
@@ -2422,7 +2465,7 @@ function newGame(cfg){
   S={t:0,over:false,paused:true,speed:1,
     pts:{1:50+30*lv('startCP')+15*mlv('cp')+(has('bell')?150:0),'-1':has('map')?0:45+cfg.f*6},hq:{1:P.hq,'-1':cfg.ehq},hqMax:{1:P.hqMax,'-1':cfg.ehq},
     ST:{1:buildStats(1,cfg),'-1':buildStats(-1,cfg)},
-    inc:{1:(1+.15*lv('income'))*(1+legacy().inc),'-1':cfg.diff},trenchMul:{1:(1-.15*lv('trench'))*(has('netting')?.85:1)*(has('seal')?.65:1),'-1':1},dice:has('dice')?(Math.random()<.5?1.4:.75):1,mor:{1:60,'-1':lv('leaflets')?35:60},rout:{1:0,'-1':0},surgeT:{1:0,'-1':0},chain:{n:0,t:0,best:0},gases:[],timers:{},
+    inc:{1:(1+.15*lv('income'))*(1+legacy().inc),'-1':cfg.diff},trenchMul:{1:(1-.15*lv('trench'))*(has('netting')?.85:1)*(has('seal')?.65:1),'-1':1},dice:has('dice')?(Math.random()<.5?1.4:.75):1,mor:{1:60,'-1':lv('leaflets')?35:60},lit:[],camos:[],rout:{1:0,'-1':0},surgeT:{1:0,'-1':0},chain:{n:0,t:0,best:0},gases:[],timers:{},
     barN:{1:BAR.n+4*lv('barrage'),'-1':BAR.n},strikes:[],heals:[],planes:[],
     stance:{1:'hold','-1':'hold'},cd:{1:{},'-1':{}},units:[],corpses:[],proj:[],tracers:[],bullets:[],rings:[],fires:[],smokes:[],mines:[],flares:[],glows:[],ash:[],nextFlare:R(6,14),nextGlow:1,warn:0,parts:[],flashes:[],barr:[],texts:[],
     trench:trs,terrain:TER,
@@ -2514,7 +2557,7 @@ const ROSARY={rifle:1,assault:1,mg:1,at:1};
 const antiArmor=(u,d)=>d.kind==='at'||u.type==='tank'||!!d.apMul;
 function findTarget(u){
   const d=S.ST[u.side][u.type],mn=d.min||-4,aa=antiArmor(u,d);let best=null,bd=1e9,armor=false;
-  for(const e of S.units){if(e.side===u.side||(!aa&&isArmor(e)))continue;const fx=(e.x-u.x)*u.side;if(fx<mn)continue;const dist=Math.hypot(fx,e.y-u.y);if(dist>d.range*(u.rangeMul||1))continue;
+  for(const e of S.units){if(e.side===u.side||(!aa&&isArmor(e)))continue;const fx=(e.x-u.x)*u.side;if(fx<mn)continue;const dist=Math.hypot(fx,e.y-u.y);if(dist>d.range*(u.rangeMul||1)||(e.hid&&dist>15))continue;
     const a=d.kind==='at'&&isArmor(e),sc=dist-(d.prio&&PRIO[e.type]?70:0);
     if((a&&!armor)||(a===armor&&sc<bd)){bd=sc;best=e;armor=a}}
   if(!best){const hd=(HQ[-u.side]-u.x)*u.side;if(hd<=d.range*(u.rangeMul||1)+8&&hd>=mn)best={hq:-u.side,x:HQ[-u.side],y:u.y}}
@@ -2571,9 +2614,10 @@ function hitChance(base,dist,range,t,decay,shooter){
   let a=base*(1-(decay??.35)*Math.min(1,Math.max(0,dist)/range));
   const ts=t.type&&S.ST[t.side][t.type];if(ts&&ts.evade)a*=1-ts.evade;
   if(shooter&&shooter.side===1&&has('banner'))a*=1+.04*owned(1);
-  if(shooter&&!(shooter.side===1&&S.flareT>0))for(const m of S.smokes)if(m.side!==shooter.side&&Math.hypot(shooter.x-m.x,(shooter.y-m.y)*1.3)<m.r)a*=.5;
+  if(shooter&&!(shooter.side===1&&S.flareT>0)&&!t.lit)for(const m of S.smokes)if(m.side!==shooter.side&&Math.hypot(shooter.x-m.x,(shooter.y-m.y)*1.3)<m.r)a*=.5;
   if(t.moving)a*=.85;
   if(ts&&ts.exposed)a*=1.4;
+  else if(t.lit)a*=1.2;
   else if(t.inTrench)a*=.6*S.trenchMul[t.side];else if(t.cover)a*=t.cover;
   if(shooter&&shooter.accMul)a*=shooter.accMul;
   if(shooter&&shooter.side===1&&shooter.type==='rifle'&&S.horde)a*=1.25;
@@ -2664,6 +2708,13 @@ function aiStep(dt){
     let T=null,bn=0;for(const t of S.trench){if(t.own!==1)continue;const n=pu.filter(u=>Math.abs(u.x-t.x)<11&&inTrenchSpan(t,u.y)).length;if(n>bn){bn=n;T=t}}
     if(T&&bn>=5)return use('tunnel',T.x,(T.y0+T.y1)/2);
   }
+  // 확장 카드(적): 저격 사냥·럼주·이동 탄막·예비대·열차포·소이 포격
+  if(F>=4&&supReady(-1,'snipehunt')){const m=pu.find(u=>u.type==='sniper'||u.type==='officer'||u.type==='observer');if(m)return use('snipehunt',m.x,m.y)}
+  if(F>=4&&S.stance[-1]==='advance'&&supReady(-1,'rum')){const es2=S.units.filter(u=>u.side===-1&&!U[u.type].armor);if(es2.length>=6){const cx=es2.reduce((a,u)=>a+u.x,0)/es2.length,cy=es2.reduce((a,u)=>a+u.y,0)/es2.length;return use('rum',cx,cy)}}
+  if(F>=6&&S.stance[-1]==='advance'&&supReady(-1,'creep')){const f=enemyFront(-1);if(f<HQ[-1]-60)return use('creep',f+40,FMID)}
+  if(F>=5&&S.hq[-1]<S.hqMax[-1]*.4&&supReady(-1,'reserves'))return use('reserves',HQ[-1],FMID);
+  if(F>=7&&supReady(-1,'thermite')){for(const t of S.trench){if(t.own!==1)continue;if(pu.filter(u=>Math.abs(u.x-t.x)<11).length>=5)return use('thermite',t.x,FMID)}}
+  if(F>=9&&supReady(-1,'bertha')){let best=null,bv=0;for(const u of pu){let v=0;for(const w of pu)if(Math.hypot(w.x-u.x,w.y-u.y)<30)v+=S.ST[1][w.type].cost;if(v>bv){bv=v;best=u}}if(best&&bv>=120)return use('bertha',best.x,best.y)}
   if(F>=3&&S.stance[-1]==='advance'&&supReady(-1,'smoke')){
     const m=pu.find(u=>u.type==='mg'||u.type==='sniper');if(m)return use('smoke',m.x,m.y);
   }
@@ -2677,6 +2728,10 @@ function callSupport(side,k,x,y){
   if(!mine&&(k==='bar'||k==='howitzer')&&lv('counter')){S.freeBar=15;floatText(HQ[1]+40,FY0-20,'COUNTER-BATTERY','232,201,138')}
   if(k==='bar'){const hu=mine&&lv('hurricane');S.barr.push({side,x:x-(mine&&doct('art',3)?20:0),y,t:-d.delay-(hu?1:0),n:Math.round(S.barN[side]*(hu?1.5:1)),fired:0});return}
   if(k==='gas'){const big=mine&&lv('gasmaster');S.strikes.push({k,side,x,y,t:-d.delay,pass:0,r:d.r*(big?1.25:1),life:8+(big?4:0)});return}
+  if(k==='reserves'){const L1=lines(side),T=S.trench.find(t=>Math.abs(t.x-L1.hold)<2);for(let i=0;i<5;i++){spawn(side,'rifle',true);const u=S.units[S.units.length-1];u.x=(T?T.x:L1.hold)+R(-4,4);u.y=T?R(T.y0+2,T.y1-2)|0:clampY(R(FY0,FY1))}floatText(L1.hold,FY0-14,'RESERVES',side===1?'185,204,106':'200,85,61');return}
+  if(k==='runner'){for(const u in S.cd[side])if(U[u])S.cd[side][u]=0;floatText(HQ[side]+side*30,FY0-14,'RUNNER',side===1?'185,204,106':'200,85,61');return}
+  if(k==='rum'){for(const u of S.units)if(u.side===side&&!U[u.type].armor&&Math.hypot(u.x-x,(u.y-y)*1.3)<d.r){u.hp=Math.min(u.max,u.hp+5);u.rally=8}morale(side,15);sfx('pay',x);return}
+  if(k==='camo'){S.camos.push({x,y,r:d.r,life:8,side});return}
   if(k==='tunnel'){let T=null,bd=1e9;for(const t of S.trench){const dd=Math.abs(t.x-x)+(t.own===-side?0:60);if(dd<bd){bd=dd;T=t}}
     S.strikes.push({k,side,x:T.x,y:(T.y0+T.y1)/2,T,t:-d.delay-(side===-1&&lv('listen')?8:0),pass:0});
     if(side===-1){floatText(T.x,FY0-14,'TUNNELING','200,85,61');evBanner(_t('땅굴 파는 소리! 곧 아군 참호 하나가 폭파됩니다. 표시된 참호에서 병력을 빼세요.'))}
@@ -2684,7 +2739,7 @@ function callSupport(side,k,x,y){
   if(k==='mines'){for(let i=0;i<(mine&&has('minecrate')?9:6);i++){const a=R(0,6.283),rr=Math.sqrt(Math.random())*d.r;S.mines.push({x:x+Math.cos(a)*rr,y:clampY(y+Math.sin(a)*rr*.8),side})}sfx('pop',x,.5);return}
   if(k==='aid'){S.heals.push({x,y,r:d.r,life:4,side,rate:mine&&has('kit')?5:3});return}
   S.strikes.push({k,side,x,y,t:-d.delay,pass:0});
-  if(side===-1&&(k==='howitzer'||k==='strafe'))floatText(x,FY0-14,k==='strafe'?'AIR RAID':'INCOMING','200,85,61');
+  if(side===-1&&(k==='howitzer'||k==='strafe'||k==='bertha'||k==='creep'||k==='thermite'))floatText(x,FY0-14,k==='strafe'?'AIR RAID':k==='bertha'?'RAILWAY GUN':'INCOMING','200,85,61');
 }
 function callBarrage(side,x,y){callSupport(side,'bar',x,y)}
 
@@ -2828,7 +2883,8 @@ function step(dt){
     if(Math.random()<dt*14)S.parts.push({x:f.x+R(-f.r,f.r)*.8,y:f.y+R(-4,4),vx:R(-2,2),vy:R(-14,-6),g:0,life:R(.3,.6),max:.6,c:Math.random()<.5?'#ff9a3a':'#ffd36a',sz:1});
     if(Math.random()<dt*3)S.parts.push({x:f.x+R(-6,6),y:f.y-4,vx:R(-2,2),vy:R(-8,-4),g:-1,life:1.2,max:1.2,c:'smoke',sz:R(2,4)})}
   S.fires=S.fires.filter(f=>f.life>0);
-  for(const u of S.units)u.gas=false;
+  for(const L of S.lit)L.life-=dt;S.lit=S.lit.filter(L=>L.life>0);for(const c of S.camos)c.life-=dt;S.camos=S.camos.filter(c=>c.life>0);
+  for(const u of S.units){u.gas=false;u.hid=S.camos.some(c=>c.side===u.side&&Math.hypot(u.x-c.x,(u.y-c.y)*1.3)<c.r);u.lit=S.lit.some(L=>L.side!==u.side&&Math.hypot(u.x-L.x,(u.y-L.y)*1.3)<L.r)}
   for(const g of S.gases){g.life-=dt;g.x+=g.vx*dt;const inside={1:0,'-1':0};
     for(const u of S.units){if(U[u.type].armor||Math.hypot(u.x-g.x,(u.y-g.y)*1.2)>=g.r)continue;const mk=u.side===1&&lv('gasmask')?.3:1;u.gas=mk===1;hit(u,2*dt*mk,null);inside[u.side]=mk}
     for(const s2 of [1,-1])if(inside[s2])morale(s2,-1.2*dt*inside[s2])}
@@ -2839,6 +2895,15 @@ function step(dt){
     if(Math.random()<dt*10)S.parts.push({x:h.x+R(-h.r,h.r)*.7,y:h.y+R(-h.r,h.r)*.5,vx:0,vy:-8,g:0,life:.6,max:.6,c:'#b9cc6a',sz:1})}
   S.heals=S.heals.filter(h=>h.life>0);
   for(const st of S.strikes){st.t+=dt;if(st.t<0)continue;
+    if(st.k==='flare'&&!st.done){st.done=true;S.lit.push({x:st.x,y:st.y,r:SUP.flare.r,life:15,side:st.side});S.flares.push({x:st.x,y:FY0,vx:0,vy:-70,life:7})}
+    if(st.k==='wire'&&!st.done){st.done=true;const o={type:'wire',x:Math.round(st.x),y:FMID,rx:4,ry:48};S.terrain.feats.push(o);drawWireFeat(o)}
+    if(st.k==='snipehunt'&&!st.done){st.done=true;const ord={sniper:0,officer:1,observer:2,mg:3};let best=null,bo=9;
+      for(const e of S.units){if(e.side===st.side||ord[e.type]==null||Math.hypot(e.x-st.x,(e.y-st.y)*1.3)>SUP.snipehunt.r)continue;if(ord[e.type]<bo){bo=ord[e.type];best=e}}
+      if(best){hit(best,999,null);S.flashes.push({x:best.x,y:best.y-8,life:.12,max:.12,dir:-st.side,big:false});floatText(best.x,best.y-16,'SNIPED',st.side===1?'185,204,106':'200,85,61')}sfx('snipe',st.x)}
+    if(st.k==='thermite'&&!st.done){st.done=true;for(let yy=FY0+4;yy<FY1;yy+=13)S.fires.push({x:st.x+R(-2,2),y:yy,r:9,life:5,side:st.side,dps:3,flame:true});sfx('flame',st.x)}
+    if(st.k==='bertha'&&!st.done){st.done=true;impact({x1:st.x,y1:st.y,side:st.side,dmg:200,armorDmg:200,splash:SUP.bertha.r,big:true});for(let i=0;i<4;i++)boom(st.x+R(-10,10),st.y+R(-8,8),true);
+      if(Math.abs(HQ[-st.side]-st.x)<40)hit({hq:-st.side},200);S.shake=8;sfx('boom',st.x,1.8)}
+    if(st.k==='creep'){st.cd=(st.cd||0)-dt;if(st.cd<=0&&st.t<7){st.cd=.3;const cx=st.x+st.side*st.t/7*70;S.proj.push({x0:cx+R(-20,20),y0:-10,x1:cx+R(-6,6),y1:clampY(R(FY0,FY1)),t:0,dur:.35,arc:0,side:st.side,dmg:20,splash:12,barrage:true,falling:true})}if(st.t>=7)st.done=true}
     if(st.k==='gas'&&!st.done){st.done=true;S.gases.push({x:st.x,y:st.y,r:st.r,life:st.life,max:st.life,side:st.side,vx:st.side*4});sfx('pop',st.x,.5)}
     if(st.k==='tunnel'&&!st.done){st.done=true;const T=st.T;let n=0;
       for(const e of S.units){if(e.side===st.side)continue;const inT=Math.abs(e.x-T.x)<11&&inTrenchSpan(T,e.y),near=Math.hypot(e.x-st.x,(e.y-st.y)*.5)<SUP.tunnel.r;if(inT||near){hit(e,inT?(U[e.type].armor?90:200):40,null);n++}}
@@ -2949,6 +3014,8 @@ function render(){
   for(const p of S.parts){const a=Math.max(0,p.life/p.max);
     if(p.c==='smoke'){ctx.fillStyle=`rgba(120,112,96,${a*.45})`;ctx.fillRect(Math.round(p.x-p.sz/2),Math.round(p.y-p.sz/2),Math.round(p.sz),Math.round(p.sz));p.sz+=.04}
     else{ctx.fillStyle=p.c;ctx.fillRect(Math.round(p.x),Math.round(p.y),p.sz,p.sz)}}
+  for(const L of S.lit){const a=Math.min(1,L.life/2);const gr=ctx.createRadialGradient(L.x,L.y,0,L.x,L.y,L.r);gr.addColorStop(0,`rgba(255,245,215,${.14*a})`);gr.addColorStop(1,'rgba(255,245,215,0)');ctx.fillStyle=gr;ctx.fillRect(L.x-L.r,L.y-L.r,L.r*2,L.r*2)}
+  for(const c of S.camos){ctx.strokeStyle=`rgba(107,122,58,${.5*Math.min(1,c.life)})`;ctx.setLineDash([1,2]);ctx.beginPath();ctx.ellipse(c.x,c.y,c.r,c.r*.77,0,0,7);ctx.stroke();ctx.setLineDash([])}
   for(const g of S.gases){const a=Math.min(1,g.life/2,(g.max-g.life)*2);for(let i=0;i<8;i++){const ang=i/8*6.28+S.t*.3,rx=g.x+Math.cos(ang)*g.r*.55,ry=g.y+Math.sin(ang)*g.r*.35;ctx.fillStyle=`rgba(150,170,80,${.2*a})`;ctx.beginPath();ctx.arc(rx,ry,g.r*.45,0,7);ctx.fill()}}
   for(const m of S.smokes){const a=Math.min(1,m.life/2,(m.max-m.life)*2);for(let i=0;i<7;i++){const ang=i/7*6.28+S.t*.2,rx=m.x+Math.cos(ang)*m.r*.55,ry=m.y+Math.sin(ang)*m.r*.35;ctx.fillStyle=`rgba(170,165,150,${.22*a})`;ctx.beginPath();ctx.arc(rx,ry,m.r*.45,0,7);ctx.fill()}}
   for(const g of S.rings){ctx.strokeStyle=`rgba(255,220,170,${g.life/.3*.5})`;ctx.lineWidth=1;ctx.beginPath();ctx.ellipse(g.x,g.y,g.r,g.r*.45,0,0,7);ctx.stroke()}
@@ -2989,7 +3056,7 @@ function buildCards(){
     const key=sup?KEYS_SUP[sl.children.length]:KEYS_UNIT[el.children.length];
     b.append(c);b.insertAdjacentHTML('beforeend',`<kbd>${(key||'').toUpperCase()}</kbd>${sup?'':'<i class="cnt"></i>'}<b>${d.name}</b><em>${sup?supCost(1,k):d.cost}</em>`);
     b.onclick=()=>{if(!S||S.over||S.paused)return;
-      if(sup){if(S.aim===k){S.aim=false;aimX=null;return}if(supReady(1,k)){S.aim=k}return}
+      if(sup){if(SUP[k].shape==='none'){if(supReady(1,k))callSupport(1,k,HQ[1],FMID);return}if(S.aim===k){S.aim=false;aimX=null;return}if(supReady(1,k)){S.aim=k}return}
       if(k==='apc'){apcCard();return}
       if(S.pts[1]>=d.cost&&!(S.cd[1][k]>0)&&popCount(1)<capN())spawn(1,k)};
     (sup?sl:el).append(b);cards[k]=b;if(key)keyMap.push([key,k])};
