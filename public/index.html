@@ -713,7 +713,7 @@ const I18N_EN={
   "참호 안 아군이 맞을 확률 -35%. 대가: 전진 명령 때 이동 속도 -25%":"Allies in trenches are hit 35% less often. Cost: movement speed -25% under Advance orders",
   "한 번 판 참호는 내주지 않는다":"A trench dug once is never given up",
   "도박꾼의 장부":"Gambler's Ledger",
-  "보상 선택지 2개 더(최대 6). 단 내용이 가려져 있고 고른 뒤에 공개됩니다. 대가: 보상 건너뛰기 보급 없음":"+2 reward choices (up to 6), but they are hidden until you pick one. Cost: no Supply for skipping rewards",
+  "보상을 고를 때마다 무작위 보상 하나를 더 받음(무엇일지 모름, 전설 특성 확률 36%). 대가: 사령부 최대 내구도 -30, 보상 건너뛰기 보급 없음":"Every time you pick a reward, gain one extra random reward (you never know what; 36% chance of a Legendary perk). Cost: max HQ -30, no Supply for skipping rewards",
   "어느 쪽에 걸었는지는 적혀 있지 않다":"It doesn't say which side was bet on",
   "영웅 연대":"Heroes' Regiment",
   "생환병 최대 +2명, 계급 효과 ×1.5. 대가: 생환병이 쓰러지면 사령부 -10":"Up to +2 Survivors, rank effects ×1.5. Cost: when a Survivor falls, HQ -10",
@@ -769,8 +769,6 @@ const I18N_EN={
   "{0}/3막":"Act {0}/3",
   "생환병":"Survivor",
   "{0} · 누적 사살 {1} · 체력 +{2}% · 명중 +{3}%. 전투가 시작되면 맨 먼저 배치됩니다. 쓰러지면 전사자 명부에 오릅니다.":"{0} · Kills {1} · HP +{2}% · Accuracy +{3}%. Deployed first when the battle starts. If it falls, it goes on the Roll of the Fallen.",
-  "가려진 보상":"Hidden Reward",
-  "무엇이 나올지 모릅니다.":"You don't know what you'll get.",
   "건너뛰기":"Skip",
   "지휘관의 전리품":"Commander's Spoils",
   "적 지휘관의 막사에서 유물을 하나 고르세요.":"Pick a Relic from the enemy commander's tent.",
@@ -1187,8 +1185,9 @@ const I18N_EN={
   "말을 징발한다":"Requisition the horses",
   "보급 +40":"Supply +40",
   "말들이 포차를 끌게 됐습니다. 보급 +40.":"The horses will pull the guns now. Supply +40.",
-  "열어 보니: {0}":"You open it: {0}",
-  "획득":"GAINED"
+  "획득":"GAINED",
+  "장부의 덤":"The Ledger's Due",
+  "장부에 적힌 빚을 받아냈습니다: {0}":"You collected a debt from the ledger: {0}"
 };
 const LANG=(()=>{try{const v=localStorage.getItem('trenchline.lang');if(v==='ko'||v==='en')return v}catch(e){}return /^ko\b/i.test(navigator.language||'')?'ko':'en'})();
 function _t(k,...a){const s=LANG==='en'&&I18N_EN[k]?I18N_EN[k]:k;return a.length?s.replace(/\{(\d+)\}/g,(m,i)=>a[+i]):s}
@@ -1364,7 +1363,7 @@ const RELICS={
   baton:{name:_t('탄막 지휘봉'),desc:_t('포격·야포가 적 3명 이상을 맞히면 그 카드 대기 -5초(최소 10초). 대가: 지원 카드 비용 +30%'),lore:_t('지휘봉 끝이 포연에 검게 그을렸다'),rar:'key'},
   ironreg:{name:_t('철의 연대기'),desc:_t('전차 체력 ×1.8, 전차 곁(20) 아군 보병이 받는 피해 -25%. 대가: 전차 비용 +40%'),lore:_t('시험대대의 첫 깃발'),rar:'key'},
   seal:{name:_t('참호 사령관의 인장'),desc:_t('참호 안 아군이 맞을 확률 -35%. 대가: 전진 명령 때 이동 속도 -25%'),lore:_t('한 번 판 참호는 내주지 않는다'),rar:'key'},
-  ledger:{name:_t('도박꾼의 장부'),desc:_t('보상 선택지 2개 더(최대 6). 단 내용이 가려져 있고 고른 뒤에 공개됩니다. 대가: 보상 건너뛰기 보급 없음'),lore:_t('어느 쪽에 걸었는지는 적혀 있지 않다'),rar:'key'},
+  ledger:{name:_t('도박꾼의 장부'),desc:_t('보상을 고를 때마다 무작위 보상 하나를 더 받음(무엇일지 모름, 전설 특성 확률 36%). 대가: 사령부 최대 내구도 -30, 보상 건너뛰기 보급 없음'),lore:_t('어느 쪽에 걸었는지는 적혀 있지 않다'),rar:'key'},
   heroes:{name:_t('영웅 연대'),desc:_t('생환병 최대 +2명, 계급 효과 ×1.5. 대가: 생환병이 쓰러지면 사령부 -10'),lore:_t('이름이 불리는 부대는 물러서지 않는다'),rar:'key'},
   undying:{name:_t('불사 연대'),desc:_t('사령부가 처음 무너지면 내구도 50으로 버티고 모든 아군 연사 +50% 10초. 한 번 쓰면 사라짐'),lore:_t('명부에서 지워지지 않는 연대'),rar:'key'},
   interest:{name:_t('보급 이자 장부'),desc:_t('전투에서 이길 때마다 보유 보급 10당 +1(최대 +5). 대가: 보급소 가격 +20%'),lore:_t('보급관이 매일 밤 숫자를 맞춘다'),rar:'key'},
@@ -1821,7 +1820,7 @@ function getMeta(){const m=store.get('trenchline.meta')||{};const old=store.get(
 function setMeta(M){store.set('trenchline.meta',M)}
 const mlv=k=>getMeta().up[k]||0;
 function legacy(){const n=getMeta().found.length;return {n,inc:n*.01,hq:n*2}}
-function gainRelic(k){if(!RUN.relics.includes(k)){RUN.relics.push(k);if(k==='requisition'){RUN.hqMax=Math.max(100,RUN.hqMax-40);RUN.hq=Math.min(RUN.hq,RUN.hqMax)}}const M=getMeta();if(!M.found.includes(k)){M.found.push(k);setMeta(M);return true}return false}
+function gainRelic(k){if(!RUN.relics.includes(k)){RUN.relics.push(k);if(k==='requisition'){RUN.hqMax=Math.max(100,RUN.hqMax-40);RUN.hq=Math.min(RUN.hq,RUN.hqMax)}if(k==='ledger'){RUN.hqMax=Math.max(100,RUN.hqMax-30);RUN.hq=Math.min(RUN.hq,RUN.hqMax)}}const M=getMeta();if(!M.found.includes(k)){M.found.push(k);setMeta(M);return true}return false}
 // 유물 풀: 조건(req)이 맞고 아직 없는 것. 희귀는 정예에서 잘 나오고 그 밖에서는 드물다. 키스톤은 막 보스 전용.
 function relicPool(src){
   const wt=k=>RELICS[k].rar==='rare'?(src==='elite'?1.2:.35):1;
@@ -2020,12 +2019,14 @@ function supLoadout(){if(!RUN.loadout)RUN.loadout=supOwned().slice(0,supSlots())
 function grantRandom(){const o=optionPool().find(o=>o.kind==='perk');if(!o)return _t('얻을 특성이 없습니다.');applyOpt(o);return _t("{0} 획득.",PERKS[o.k].name)}
 function showReward(n,gain,keep){
   if(!keep){RUN.rr=mlv('reroll')}
-  const cnt=Math.min(has('ledger')?6:5,3+mlv('academy')+(has('staffbook')?1:0)+(has('mapcase')&&n.type==='elite'?1:0)+(has('ledger')?2:0)),opts=optionPool().slice(0,cnt);
+  const cnt=Math.min(5,3+mlv('academy')+(has('staffbook')?1:0)+(has('mapcase')&&n.type==='elite'?1:0)),opts=optionPool().slice(0,cnt);
   {const g=Object.keys(PERKS).filter(k=>PERKS[k].gold&&!lv(k));if(g.length&&opts.length&&Math.random()<(n.type==='elite'||n.type==='boss'?.25:.12))opts[opts.length-1]={kind:'perk',k:pick(g)}}
-  const hide=has('ledger');
-  const ch=opts.map(o=>({...(hide?{tag:'???',name:_t('가려진 보상'),desc:_t('무엇이 나올지 모릅니다.')}:optView(o)),go:()=>{applyOpt(o);const next=()=>{if(n.type==='elite')relicChoice(n,_t('정예 전리품'),_t('정예 부대의 물자에서 유물을 하나 고르세요.'));else finishNode(n)};
-    // 도박꾼의 장부: 고른 뒤에 무엇이었는지 보여 준다
-    if(hide){const v=optView(o);panel(_t('가려진 보상'),_t("열어 보니: {0}",v.name),[{...v,tag:_t('획득'),go:next}],{label:_t('계속'),go:next})}else next()}}));
+  const ch=opts.map(o=>({...optView(o),go:()=>{applyOpt(o);const next=()=>{if(n.type==='elite')relicChoice(n,_t('정예 전리품'),_t('정예 부대의 물자에서 유물을 하나 고르세요.'));else finishNode(n)};
+    // 도박꾼의 장부: 고른 것과 별개로 무작위 보상 하나를 더 받는다(전설 특성 확률 36%)
+    if(has('ledger')){const g=Object.keys(PERKS).filter(k=>PERKS[k].gold&&!lv(k)),pool=optionPool();
+      const b=g.length&&Math.random()<.36?{kind:'perk',k:pick(g)}:pool[0];
+      if(b){applyOpt(b);const v=optView(b);panel(_t('장부의 덤'),_t("장부에 적힌 빚을 받아냈습니다: {0}",v.name),[{...v,tag:_t('획득'),go:next}],{label:_t('계속'),go:next});return}}
+    next()}}));
   if(RUN.rr>0)ch.push({tag:'REROLL',name:_t("다시 뽑기 ({0}회)",RUN.rr),desc:_t('선택지를 새로 받습니다.'),go:()=>{RUN.rr--;showReward(n,gain,true)}});
   panel(n.type==='elite'?_t('정예 부대 격파'):_t('전선 돌파'),_t("보급 {0}을 확보했습니다. 보상을 하나 고르세요.",gain),ch,
     {label:has('ledger')?_t('건너뛰기'):_t('건너뛰기 (보급 +20)'),go:()=>{if(!has('ledger'))RUN.supply+=20;if(n.type==='elite')relicChoice(n,_t('정예 전리품'),_t('정예 부대의 물자에서 유물을 하나 고르세요.'));else finishNode(n)}});
